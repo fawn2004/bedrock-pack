@@ -1,1 +1,1 @@
-structure load mbb:maple_tree_small ~-6 ~0 ~-4
+structure load mbb:maple_tree_small ~-3 ~0 ~-5

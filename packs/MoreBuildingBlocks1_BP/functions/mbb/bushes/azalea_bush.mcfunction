@@ -1,1 +1,1 @@
-structure load mbb:azalea_bush ~-2 ~0 ~-2
+structure load mbb:azalea_bush ~-4 ~0 ~-3

@@ -1,6 +1,6 @@
 # More Building Blocks 1 (Minecraft Bedrock add-on)
 
-**12 new woods** and **12 new stones**: 180 blocks in total, plus **66 ready-made trees, bushes and rocks**.
+**12 new woods** and **12 new stones**: 180 blocks in total, plus **68 ready-made trees, bushes and rocks**.
 Each wood has a log, stripped log, wood (bark) block, bark stairs and slab, two leaf colours, planks, slab, stairs and door.
 Each stone has a block, slab, stairs and door.
 Shapes and collision work like the vanilla blocks.
@@ -61,7 +61,8 @@ Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
   Stone slabs and stairs can also be made in the stonecutter.
 
 ## Trees, bushes and rocks (structures)
-The pack includes 36 trees (every wood in small, medium and large), 12 bushes and 18 rocks.
+The pack includes 36 trees (every wood in small, medium and large), 14 bushes and 18 rocks.
+Trees use your custom logs and bark with **vanilla leaves**. Each one has buttress roots, a bumpy trunk, stair-smoothed branches, fence twigs and a canopy of separate leaf clumps in light, mid and dark tones.
 - **Easiest:** stand where you want it and run, for example, `/function mbb/trees/maple_tree_large`.
   Trees appear with their trunk at your feet. Rocks sink 1 block into the ground so they look natural.
 - **Structure block or command:** use the name `mbb:<name>`, e.g. `/structure load mbb:redwood_tree_large ~ ~ ~`.
@@ -71,7 +72,7 @@ The pack includes 36 trees (every wood in small, medium and large), 12 bushes an
 - Empty space in a structure doesn't erase anything, so you can drop trees right next to your builds.
 
 Trees: `<wood>_tree_small|medium|large` for maple, redwood, ebony, willow, ash, azure, walnut, rosewood, palm, ironwood, ghostwood, plumwood.
-Bushes: maple_bush, willow_bush, rosewood_bush, azure_bush, plumwood_bush, ghostwood_bush, walnut_bush_large, redwood_shrub, azalea_bush, ash_hedge, palm_shrub, ironwood_bush.
+Bushes: oak_bush, oak_bush_large, azalea_bush, flowering_bush, cherry_bush, birch_bush, spruce_shrub, jungle_bush, acacia_bush, mangrove_bush, pale_bush, stemmed_bush, stemmed_bush_large, tall_bush.
 Rocks: `grey|mossy|marble|travertine|dark` + `_boulder`, `_boulder_large`, `_rock_pile`; plus grey_spire, dark_outcrop, mossy_ledge.
 
 ## Rebuilding

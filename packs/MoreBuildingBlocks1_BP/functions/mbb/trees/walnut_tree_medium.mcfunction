@@ -1,1 +1,1 @@
-structure load mbb:walnut_tree_medium ~-9 ~0 ~-6
+structure load mbb:walnut_tree_medium ~-8 ~0 ~-8

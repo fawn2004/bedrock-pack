@@ -197,391 +197,539 @@ def write_structure(grid, path):
 
 
 # ======================================================================== trees
+# Detailed builder-style trees: buttress roots, bumpy trunks, stair-smoothed
+# diagonal branches, fence twigs, and canopies made of many separate leaf
+# puffs in three tones (light tops, mid body, dark undersides). Vanilla
+# leaves only.
+
+DIAGS = [("north", "east"), ("north", "west"), ("south", "east"), ("south", "west")]
+
+
+class Palette:
+    def __init__(self, main, shade, light, extra=None):
+        self.main = [leaf_v(n) for n in main]
+        self.shade = [leaf_v(n) for n in shade]
+        self.light = [leaf_v(n) for n in light]
+        self.extra = [leaf_v(n) for n in (extra or [])]
+
 
 class Tree:
-    def __init__(self, rng, wood, spec):
+    def __init__(self, rng, wood, pal, fence):
         self.g = Grid()
         self.rng = rng
         self.wood = wood
-        self.spec = spec
-        self.trunk_cells = []
+        self.pal = pal
+        self.fence_block = blk("minecraft:" + fence)
         self.path = {}
+        self.width = 1
 
+    # ------------------------------------------------------------ helpers
     def at(self, y):
-        """Trunk position at height y (trunks can lean)."""
+        """Trunk position (north-west column) at height y."""
         y = max(0, min(int(y), max(self.path)))
         x, z = self.path[y]
         return (x, y, z)
 
-    # ---- leaves with shading: dark underneath and inside, accents sprinkled
-    def leaf(self, p, shade_t, inner=False):
-        r, s = self.rng, self.spec
-        if s.get("accent") and r.random() < s.get("accent_chance", 0.08):
-            block = s["accent"][r.randrange(len(s["accent"]))]
-        elif inner or shade_t < -0.25 or (shade_t < 0.2 and r.random() < 0.35):
-            block = blk(f"{NS}:{self.wood}_leaves_dark")
+    def choice(self, items):
+        return items[self.rng.randrange(len(items))]
+
+    def leaf(self, p, t, inner=False):
+        """t: -1 (bottom of a puff) .. 1 (top). Light on top, dark below."""
+        r, pal = self.rng, self.pal
+        if pal.extra and r.random() < 0.06:
+            b = self.choice(pal.extra)
+        elif inner or t < -0.35 or (t < 0.05 and r.random() < 0.35):
+            b = self.choice(pal.shade)
+        elif t > 0.4 and r.random() < 0.65:
+            b = self.choice(pal.light)
         else:
-            block = blk(f"{NS}:{self.wood}_leaves")
-        self.g.set(p, block, P_LEAF)
+            b = self.choice(pal.main)
+        self.g.set(p, b, P_LEAF)
 
-    def blob(self, c, rx, ry, rz, density=1.0, hang=0, hang_chance=0.25, flat_bottom=False):
-        r = self.rng
-        cx, cy, cz = c
-        cells = []
-        for x in range(int(cx - rx - 1), int(cx + rx + 2)):
-            for y in range(int(cy - ry - 1), int(cy + ry + 2)):
-                for z in range(int(cz - rz - 1), int(cz + rz + 2)):
-                    dx, dy, dz = (x - cx) / rx, (y - cy) / ry, (z - cz) / rz
-                    if flat_bottom and dy < -0.35:
-                        continue
-                    d = dx * dx + dy * dy + dz * dz
-                    if d <= 1 + r.uniform(-0.35, 0.12) and r.random() < density:
-                        self.leaf((x, y, z), dy, inner=d < 0.35)
-                        cells.append((x, y, z))
-        if hang:
-            for (x, y, z) in cells:
-                if self.g.has((x, y - 1, z)) or r.random() > hang_chance:
-                    continue
-                for k in range(1, r.randint(1, hang) + 1):
-                    p = (x, y - k, z)
-                    if self.g.has(p):
-                        break
-                    self.g.set(p, blk(f"{NS}:{self.wood}_leaves_dark") if k > 1 or r.random() < 0.6
-                               else blk(f"{NS}:{self.wood}_leaves"))
-        return cells
-
-    # ---- wood
-    def log_at(self, p, axis="y"):
+    def wood_at(self, p, axis="y"):
         self.g.set(p, log(self.wood, axis), P_WOOD)
 
-    def bark_stairs(self, p, facing, top=False):
+    def bark_block(self, p):
+        self.g.set(p, log(self.wood, bark=True), P_WOOD)
+
+    def stairs(self, p, facing, top=False):
         if not self.g.is_wood(p):
             self.g.set(p, mbb_stairs(f"{NS}:{self.wood}_bark_stairs", facing, top), P_DETAIL)
 
+    def slab(self, p, top=False):
+        if not self.g.has(p):
+            self.g.set(p, mbb_slab(f"{NS}:{self.wood}_bark_slab", top), P_DETAIL)
+
     def fence(self, p):
         if not self.g.is_wood(p):
-            self.g.set(p, blk("minecraft:" + self.spec["fence"]), P_DETAIL)
+            self.g.set(p, self.fence_block, P_DETAIL)
 
-    def trunk(self, h, width=1, lean=None, lean_every=99):
+    # ------------------------------------------------------------ canopy
+    def puff(self, c, rx, ry, rz=None, ragged=0.18, hang=0, hang_chance=0.2, density=1.0):
+        """One leaf puff: a flattened, bumpy ellipsoid with stray blocks
+        sticking out of its rim for a ragged, natural edge."""
+        r = self.rng
+        rz = rz or rx
+        cx, cy, cz = c
+        cells = []
+        for x in range(int(math.floor(cx - rx - 1)), int(math.ceil(cx + rx + 2))):
+            for y in range(int(math.floor(cy - ry - 1)), int(math.ceil(cy + ry + 2))):
+                for z in range(int(math.floor(cz - rz - 1)), int(math.ceil(cz + rz + 2))):
+                    dx, dy, dz = (x - cx) / rx, (y - cy) / ry, (z - cz) / rz
+                    d = dx * dx + dy * dy * 1.15 + dz * dz
+                    if d <= 1 + r.uniform(-0.3, 0.15) and r.random() < density:
+                        self.leaf((x, y, z), dy, inner=d < 0.3)
+                        cells.append((x, y, z))
+        cellset = set(cells)
+        for (x, y, z) in cells:
+            # ragged rim: single blocks poking out sideways (and sometimes down)
+            if r.random() < ragged:
+                dx, dz = self.choice(list(DIR_VEC.values()))
+                q = (x + dx, y - (1 if r.random() < 0.3 else 0), z + dz)
+                if q not in cellset and not self.g.has(q):
+                    self.leaf(q, -0.2)
+            if hang and (x, y - 1, z) not in cellset and r.random() < hang_chance:
+                for k in range(1, r.randint(1, hang) + 1):
+                    q = (x, y - k, z)
+                    if self.g.has(q):
+                        break
+                    self.leaf(q, -1)
+        return cells
+
+    def cluster(self, c, size, hang=0, density=1.0, flat=0.6, n=(2, 4)):
+        """A few overlapping puffs of different sizes around a point."""
+        r = self.rng
+        n = r.randint(*n)
+        for i in range(n):
+            ox = r.uniform(-1, 1) * size * 0.7
+            oz = r.uniform(-1, 1) * size * 0.7
+            oy = r.uniform(-0.4, 0.8) * size * 0.5
+            rad = size * r.uniform(0.6, 1.0)
+            self.puff((c[0] + ox, c[1] + oy, c[2] + oz), rad, max(1.1, rad * flat), hang=hang,
+                      density=density)
+
+    # ------------------------------------------------------------ trunk
+    def trunk(self, h, base_w=1, narrow_at=None, lean=None, lean_every=99, top_w=1):
+        """Logs up to h. Optional 2x2 base that narrows to 1 at narrow_at,
+        and an optional lean (shifts one block every lean_every)."""
         x = z = 0
-        top = None
+        self.width = base_w
         for y in range(h):
+            w = base_w if (narrow_at is None or y < narrow_at) else top_w
             if lean and y > 0 and y % lean_every == 0:
-                x += DIR_VEC[lean][0]
-                z += DIR_VEC[lean][1]
-                # bracket under the step so the bend looks solid
-                self.bark_stairs((x, y - 1, z), OPP[lean], top=True)
-            for ox in range(width):
-                for oz in range(width):
-                    p = (x + ox, y, z + oz)
-                    self.log_at(p)
-                    if y == 0:
-                        self.trunk_cells.append(p)
+                dx, dz = DIR_VEC[lean]
+                x, z = x + dx, z + dz
+                self.stairs((x - dx, y, z - dz), lean, top=False)   # smooth the kink
+                self.stairs((x, y - 1, z), OPP[lean], top=True)
+            for ox in range(w):
+                for oz in range(w):
+                    self.wood_at((x + ox, y, z + oz))
+            if narrow_at is not None and y == narrow_at and base_w > top_w:
+                # stairs on the ledge where the trunk narrows
+                for ox in range(base_w):
+                    for oz in range(base_w):
+                        p = (x + ox, y, z + oz)
+                        if not self.g.is_wood(p):
+                            fx = "east" if ox == 0 else "west"
+                            self.stairs(p, fx)
             self.path[y] = (x, z)
-            top = (x, y, z)
-        # wood block cap so the top isn't a log end showing through leaves
-        for ox in range(width):
-            for oz in range(width):
-                self.g.set((top[0] + ox, top[1], top[2] + oz), log(self.wood, bark=True), P_WOOD)
+        top = (x, h - 1, z)
+        self.bark_block(top)
         return top
 
-    def roots(self, size=1):
-        """Bark-stair flare round the base, plus a few creeping root logs."""
+    def trunk_bumps(self, lo, hi, n):
+        """Bark stairs / slabs stuck to the trunk so it isn't a plain pole."""
         r = self.rng
-        cells = set(self.trunk_cells)
-        for (x, y, z) in self.trunk_cells:
-            for d, (dx, dz) in DIR_VEC.items():
-                p = (x + dx, 0, z + dz)
-                if (p[0], 0, p[2]) in cells:
-                    continue
-                if r.random() < 0.85:
-                    self.bark_stairs(p, OPP[d])
-                if size > 1 and r.random() < 0.5:   # second ring higher up
-                    self.bark_stairs((p[0], 1, p[2]), OPP[d])
-                if r.random() < 0.25 * size:       # creeping root
-                    q = p
-                    for _ in range(r.randint(1, 1 + size)):
-                        self.g.set(q, log(self.wood, "x" if dx else "z"), P_WOOD)
-                        q = (q[0] + dx, 0, q[2] + dz)
-                    self.bark_stairs(q, OPP[d])
+        for _ in range(n):
+            x, y, z = self.at(r.randint(lo, hi))
+            d = self.choice(list(DIR_VEC))
+            dx, dz = DIR_VEC[d]
+            ox = self.width if dx > 0 else (-1 if dx < 0 else r.randrange(self.width))
+            oz = self.width if dz > 0 else (-1 if dz < 0 else r.randrange(self.width))
+            p = (x + ox, y, z + oz)
+            if self.g.has(p):
+                continue
+            kind = r.random()
+            if kind < 0.45:
+                self.stairs(p, OPP[d], top=r.random() < 0.5)
+            elif kind < 0.7:
+                self.bark_block(p)
+                self.stairs((p[0], y - 1, p[2]), OPP[d], top=True)
+            elif kind < 0.85:
+                self.slab(p, top=r.random() < 0.5)
+            else:
+                self.fence(p)
+                self.fence((p[0] + dx, y, p[2] + dz))
 
-    def branch(self, start, d, length, rise_every=2, diag=None):
-        """Grows a branch outwards from the trunk. Returns its end point."""
+    def buttress(self, reach=2, tall=2):
+        """Wide spreading roots: wood blocks hugging the trunk, then stairs,
+        then slabs reaching out across the ground."""
+        r = self.rng
+        w = self.width
+        x0, _, z0 = self.at(0)
+        spots = []
+        for d, (dx, dz) in DIR_VEC.items():
+            for k in range(w):
+                if dx:
+                    spots.append((d, x0 + (w if dx > 0 else -1), z0 + k))
+                else:
+                    spots.append((d, x0 + k, z0 + (w if dz > 0 else -1)))
+        for d, x, z in spots:
+            if r.random() < 0.15:
+                continue
+            dx, dz = DIR_VEC[d]
+            length = r.randint(1, reach)
+            height = r.randint(1, tall)
+            for i in range(length + 2):
+                p = (x + dx * i, 0, z + dz * i)
+                h = height - i
+                if i < length and h >= 1:
+                    for y in range(h):
+                        self.bark_block((p[0], y, p[2]))
+                    self.stairs((p[0], h, p[2]), OPP[d])
+                elif i < length + 1:
+                    self.stairs(p, OPP[d])
+                elif r.random() < 0.6:
+                    self.slab(p)
+            # sometimes a root curls sideways
+            if r.random() < 0.3:
+                side = CW_DIR[d] if r.random() < 0.5 else CCW_DIR[d]
+                sx, sz = DIR_VEC[side]
+                p = (x + dx * length + sx, 0, z + dz * length + sz)
+                self.stairs(p, OPP[side])
+
+    # ------------------------------------------------------------ branches
+    def branch(self, start, d, out, up, side=None):
+        """A branch leaving the trunk at `start`, going `out` blocks in
+        direction d while climbing `up` blocks, with stairs smoothing every
+        step so it reads as one diagonal limb. `side` drifts it sideways."""
+        r = self.rng
         x, y, z = start
         dx, dz = DIR_VEC[d]
-        ex, ez = DIR_VEC[diag] if diag else (0, 0)
-        first = True
-        for i in range(length):
-            if diag and i % 2 == 1:
-                x, z = x + ex, z + ez
-                axis = "x" if ex else "z"
-            else:
-                x, z = x + dx, z + dz
-                axis = "x" if dx else "z"
-            self.g.set((x, y, z), log(self.wood, axis), P_WOOD)
-            if first:   # upside-down stair bracket under the joint
-                self.bark_stairs((x, y - 1, z), OPP[d], top=True)
-                first = False
-            if rise_every and i % rise_every == rise_every - 1:
+        sx, sz = DIR_VEC[side] if side else (0, 0)
+        steps = out + up
+        ups = set(r.sample(range(1, steps), min(up, steps - 1))) if steps > 1 else set()
+        prev = (x, y, z)
+        for i in range(steps):
+            if i in ups:
                 y += 1
-                self.log_at((x, y, z))
-        return (x, y, z)
+                self.wood_at((x, y, z))
+                # smooth the step: stair under the outer corner, stair on the inner
+                self.stairs((x + dx, y - 1, z + dz), OPP[d], top=True)
+                self.stairs((x - dx, y, z - dz), d) if not self.g.has((x - dx, y, z - dz)) else None
+            else:
+                if side and r.random() < 0.3:
+                    x, z = x + sx, z + sz
+                    axis = "x" if sx else "z"
+                else:
+                    x, z = x + dx, z + dz
+                    axis = "x" if dx else "z"
+                self.wood_at((x, y, z), axis)
+            prev = (x, y, z)
+        return prev
 
-    def twigs(self, p, d=None, n=2):
-        """Fence-post twigs poking out of a branch end."""
+    def twigs(self, p, d, n=2, length=(1, 2)):
         r = self.rng
-        x, y, z = p
-        options = [(0, 1, 0)]
-        if d:
-            options.append((DIR_VEC[d][0], 0, DIR_VEC[d][1]))
-        for dd in DIR_VEC.values():
-            options.append((dd[0], 0, dd[1]))
+        dirs = [d, CW_DIR[d], CCW_DIR[d]]
         for _ in range(n):
-            ox, oy, oz = options[r.randrange(len(options))]
             q = p
-            for _ in range(r.randint(1, 2)):
-                q = (q[0] + ox, q[1] + oy, q[2] + oz)
+            dd = self.choice(dirs)
+            up = r.random() < 0.4
+            for _ in range(r.randint(*length)):
+                if up and r.random() < 0.5:
+                    q = (q[0], q[1] + 1, q[2])
+                else:
+                    q = (q[0] + DIR_VEC[dd][0], q[1], q[2] + DIR_VEC[dd][1])
                 if self.g.is_wood(q):
                     break
                 self.fence(q)
 
-    def branch_detail(self, end, d):
-        r = self.rng
-        self.twigs(end, d, n=r.randint(1, 3))
-        if r.random() < 0.35:   # bark slab knot on top of the branch
-            above = (end[0], end[1] + 1, end[2])
-            if not self.g.has(above):
-                self.g.set(above, mbb_slab(f"{NS}:{self.wood}_bark_slab"), P_DETAIL)
+
+CW_DIR = {"north": "east", "east": "south", "south": "west", "west": "north"}
+CCW_DIR = {v: k for k, v in CW_DIR.items()}
 
 
-def horizontal_dirs(rng, n):
-    dirs = list(DIR_VEC)
-    rng.shuffle(dirs)
+def limb_dirs(rng, n):
+    """n branch directions spread round the tree, each with a sideways drift."""
+    base = list(DIR_VEC)
+    rng.shuffle(base)
     out = []
     for i in range(n):
-        d = dirs[i % 4]
-        side = [k for k in DIR_VEC if k not in (d, OPP[d])]
-        out.append((d, rng.choice(side + [None])))
+        d = base[i % 4]
+        out.append((d, rng.choice([CW_DIR[d], CCW_DIR[d], None])))
     return out
 
 
 # ---- tree shapes --------------------------------------------------------
 
-def broadleaf(t, scale, h=(9, 12), crown=(3.6, 2.6), branches=(4, 6), blen=(3, 5),
-              hang=1, density=1.0, width=1, top_extra=1.0):
-    """Big rounded deciduous tree: several branch clusters + a crown."""
+def oak(t, s, h=(13, 16), puff=3.2, limbs=(4, 6), hang=0, lower_puffs=True):
+    """Big broad oak: buttressed trunk, stepped limbs, a crown of separate
+    puffs with gaps, and a couple of small low puffs on stubby branches."""
     r = t.rng
-    H = int(r.randint(*h) * scale)
-    w = 2 if (width == 2 and scale >= 1.2) else 1
-    top = t.trunk(H, w)
-    t.roots(2 if scale >= 1 else 1)
-    n = max(3, int(r.randint(*branches) * scale))
-    for i, (d, diag) in enumerate(horizontal_dirs(r, n)):
-        y = int(H * r.uniform(0.45, 0.85))
-        L = max(2, int(r.randint(*blen) * scale))
-        end = t.branch(t.at(y), d, L, rise_every=r.choice((1, 2, 2)), diag=diag)
-        t.branch_detail(end, d)
-        rx = crown[0] * r.uniform(0.6, 0.85) * scale
-        t.blob((end[0], end[1] + 1, end[2]), rx, crown[1] * 0.75 * scale, rx,
-               density=density, hang=hang)
-    cx = top[0] + (w - 1) / 2
-    cz = top[2] + (w - 1) / 2
-    t.blob((cx, top[1] + 1, cz), crown[0] * scale * top_extra, crown[1] * scale,
-           crown[0] * scale * top_extra, density=density, hang=hang)
-    # a few twigs breaking through the top of the crown
-    for _ in range(int(3 * scale)):
-        p = (int(cx + r.uniform(-2, 2) * scale), int(top[1] + crown[1] * scale), int(cz + r.uniform(-2, 2) * scale))
-        if not t.g.is_wood(p):
-            t.fence(p)
+    H = int(r.randint(*h) * s)
+    big = s >= 1.3
+    top = t.trunk(H, base_w=2 if big else 1, narrow_at=int(H * 0.35) if big else None)
+    t.buttress(reach=3 if big else 2, tall=3 if big else 2)
+    t.trunk_bumps(1, H - 2, int(6 * s))
+    n = int(r.randint(*limbs) * s)
+    for i, (d, side) in enumerate(limb_dirs(r, n)):
+        y0 = int(H * (0.45 + 0.4 * i / max(1, n - 1)) + r.uniform(-1, 1))
+        end = t.branch(t.at(y0), d, int(r.uniform(3, 5) * s), int(r.uniform(2, 4) * s), side)
+        t.twigs(end, d, n=r.randint(1, 3))
+        t.cluster((end[0], end[1] + 1, end[2]), puff * r.uniform(0.6, 0.8) * s, hang=hang, n=(1, 2))
+    t.cluster((top[0], top[1] + 2, top[2]), puff * 0.85 * s, hang=hang, n=(2, 3))
+    if lower_puffs:
+        for d, side in limb_dirs(r, 2):
+            end = t.branch(t.at(int(H * r.uniform(0.3, 0.45))), d, 2, 1)
+            t.puff((end[0] + DIR_VEC[d][0], end[1] + 1, end[2] + DIR_VEC[d][1]), 1.8 * s, 1.3, hang=hang)
 
 
-def conifer(t, scale, h=(16, 22), base_r=4.5, width=1):
-    """Tall redwood: thick trunk, stacked cone of leaf tiers with branches."""
+def birch(t, s):
+    """Tall straight trunk with chunky root blocks, stepped limbs near the
+    top and a loose crown of puffs pierced by fence twigs."""
     r = t.rng
-    H = int(r.randint(*h) * scale)
-    w = width if scale >= 1 else 1
-    top = t.trunk(H, w)
-    t.roots(3 if w > 1 else 2)
-    start = int(H * 0.3)
+    H = int(r.randint(15, 18) * s)
+    top = t.trunk(H)
+    t.buttress(reach=1, tall=3)
+    t.trunk_bumps(2, H - 3, int(4 * s))
+    for d, side in limb_dirs(r, int(5 * s)):
+        y0 = int(H * r.uniform(0.6, 0.9))
+        end = t.branch(t.at(y0), d, int(r.uniform(1, 3) * s), int(r.uniform(2, 3) * s), side)
+        t.twigs(end, d, n=3, length=(1, 3))
+        t.cluster((end[0], end[1] + 1, end[2]), 2.6 * s)
+    t.cluster((top[0], top[1] + 2, top[2]), 3.0 * s)
+    for _ in range(int(4 * s)):   # twigs poking out of the crown
+        x = top[0] + r.randint(-3, 3)
+        z = top[2] + r.randint(-3, 3)
+        y = top[1] + r.randint(1, 4)
+        d = r.choice(list(DIR_VEC))
+        t.fence((x, y, z))
+        t.fence((x + DIR_VEC[d][0], y, z + DIR_VEC[d][1]))
+
+
+def spruce(t, s):
+    """Tiered spruce: wide buttress roots, then flat star-shaped tiers of
+    leaves that stick out in points, each tier turned from the last."""
+    r = t.rng
+    H = int(r.randint(18, 22) * s)
+    big = s >= 1.3
+    top = t.trunk(H, base_w=2 if big else 1, narrow_at=int(H * 0.25) if big else None)
+    t.buttress(reach=3, tall=3 if big else 2)
+    t.trunk_bumps(1, int(H * 0.3), int(4 * s))
+    start = int(H * 0.28)
     y = start
-    while y < H + 2:
-        frac = (y - start) / max(1, (H + 2 - start))
-        rad = max(1.2, base_r * scale * (1 - frac) + 0.8)
-        cx, cz = top[0] + (w - 1) / 2, top[2] + (w - 1) / 2
-        t.blob((cx, y, cz), rad, 1.3, rad, density=0.97, hang=1, hang_chance=0.15, flat_bottom=True)
-        if rad > 2.2:
-            for d in r.sample(list(DIR_VEC), 2):
-                end = t.branch(t.at(y - 1), d, int(rad - 1), rise_every=0)
-                t.twigs(end, d, 1)
+    tier = 0
+    while y <= H:
+        frac = (y - start) / max(1, H - start)
+        reach = max(1, int(round((5.2 * s) * (1 - frac) + 1)))
+        x0, _, z0 = t.at(y)
+        arms = DIAGS if tier % 2 else [(d, None) for d in DIR_VEC]
+        # tier plate: a small disc plus pointed arms
+        t.puff((x0 + 0.5 * (t.width - 1), y, z0 + 0.5 * (t.width - 1)), max(1.2, reach * 0.55), 0.8,
+               ragged=0.1)
+        for a in arms:
+            d1, d2 = a
+            vx, vz = DIR_VEC[d1]
+            if d2:
+                vx, vz = vx + DIR_VEC[d2][0], vz + DIR_VEC[d2][1]
+            L = reach if not d2 else max(1, int(reach * 0.7))
+            for i in range(1, L + 1):
+                p = (x0 + vx * i, y - (1 if i == L and L > 2 else 0), z0 + vz * i)
+                t.leaf(p, 0.2 if i < L else -0.5)
+                if i < L - 1:   # thicken the arm
+                    t.leaf((p[0] + (vz != 0), p[1], p[2] + (vx != 0)), -0.4)
+            if L > 2 and r.random() < 0.7:   # a hidden branch inside the arm
+                bx, bz = (vx > 0) - (vx < 0), (vz > 0) - (vz < 0)
+                for i in range(1, L - 1):
+                    t.wood_at((x0 + bx * i, y - 1, z0 + bz * i), "x" if bx else "z")
+        y += 2
+        tier += 1
+    for k in range(1, 4):   # spire tip
+        t.leaf((top[0], H + k - 1, top[2]), 1 if k == 3 else 0)
+
+
+def pine(t, s):
+    """Very tall, thin pine: bare lower trunk with dead twigs, then small
+    tufts on short branches towards the top."""
+    r = t.rng
+    H = int(r.randint(24, 30) * s)
+    top = t.trunk(H, lean=r.choice(list(DIR_VEC)), lean_every=r.randint(14, 18))
+    t.buttress(reach=1, tall=2)
+    t.trunk_bumps(1, int(H * 0.5), int(5 * s))
+    for _ in range(int(5 * s)):   # dead twigs on the bare trunk
+        x, y, z = t.at(r.randint(int(H * 0.25), int(H * 0.55)))
+        d = r.choice(list(DIR_VEC))
+        t.twigs((x, y, z), d, n=1, length=(1, 3))
+    y = int(H * 0.5)
+    while y <= H:
+        frac = (y - H * 0.5) / (H * 0.5)
+        dirs = list(DIR_VEC)
+        r.shuffle(dirs)
+        for d in dirs[:r.randint(2, 3)]:
+            side = r.choice([CW_DIR[d], CCW_DIR[d], None])
+            out = max(1, int((3.2 * s) * (1 - frac * 0.7)))
+            end = t.branch(t.at(y), d, out, 1 if out > 2 else 0, side)
+            t.twigs(end, d, n=1)
+            t.puff((end[0], end[1] + 1, end[2]), 1.3 + 0.6 * s * (1 - frac), 1.0, ragged=0.3)
         y += r.choice((2, 3))
-    for k in range(1, 3):   # spire
-        t.g.set((top[0], H + k, top[2]), blk(f"{NS}:{t.wood}_leaves"))
+    t.puff((top[0], H + 1, top[2]), 1.4, 2.2, ragged=0.25)
 
 
-def column(t, scale, h=(17, 21)):
-    """Ironwood: tall narrow cypress-like column."""
+def cypress(t, s):
+    """Narrow spire made of stacked, offset leaf layers with stray blocks
+    sticking out, like a tall Italian cypress."""
     r = t.rng
-    H = int(r.randint(*h) * scale)
-    top = t.trunk(H, 1)
-    t.roots(1)
-    for y in range(3, H + 3):
-        frac = (y - 3) / (H)
-        rad = 2.3 * scale * math.sin(math.pi * min(1, frac * 1.05)) ** 0.6 + 0.6
-        t.blob((top[0], y, top[2]), rad, 1.2, rad, density=0.95)
-        if y % 4 == 0 and y < H:
+    H = int(r.randint(16, 20) * s)
+    top = t.trunk(H)
+    t.buttress(reach=1, tall=1)
+    for y in range(2, H + 4):
+        frac = (y - 2) / (H + 2)
+        rad = (2.6 * s) * math.sin(math.pi * min(1.0, 0.15 + frac * 0.95)) ** 0.7 + 0.5
+        x0, _, z0 = t.at(min(y, H - 1))
+        ox, oz = r.uniform(-0.6, 0.6), r.uniform(-0.6, 0.6)
+        for x in range(int(-rad - 2), int(rad + 3)):
+            for z in range(int(-rad - 2), int(rad + 3)):
+                d = math.hypot(x - ox, z - oz)
+                if d <= rad + r.uniform(-0.4, 0.3):
+                    t.leaf((x0 + x, y, z0 + z), 0.6 if d > rad - 1 else -0.6, inner=d < rad - 1.5)
+        # stray block sticking out of this layer
+        if r.random() < 0.7:
             d = r.choice(list(DIR_VEC))
-            t.twigs(t.branch(t.at(y), d, 1, rise_every=0), d, 1)
+            k = int(rad) + 1
+            t.leaf((x0 + DIR_VEC[d][0] * k, y, z0 + DIR_VEC[d][1] * k), 0.3)
+    t.leaf((top[0], H + 4, top[2]), 1)
 
 
-def willow(t, scale):
+def willow(t, s):
     r = t.rng
-    H = int(r.randint(10, 12) * scale)
-    top = t.trunk(H, 1, lean=r.choice(list(DIR_VEC)), lean_every=4)
-    t.roots(2)
-    for d, diag in horizontal_dirs(r, max(4, int(5 * scale))):
-        end = t.branch(t.at(H * r.uniform(0.6, 0.9)), d,
-                       int(r.randint(3, 5) * scale), rise_every=2, diag=diag)
-        t.branch_detail(end, d)
-        t.blob((end[0], end[1] + 1, end[2]), 3 * scale, 1.6 * scale, 3 * scale,
-               hang=int(6 * scale), hang_chance=0.55)
-    t.blob((top[0], top[1] + 1, top[2]), 4.5 * scale, 2.2 * scale, 4.5 * scale,
-           hang=int(7 * scale), hang_chance=0.6)
+    H = int(r.randint(10, 12) * s)
+    top = t.trunk(H, lean=r.choice(list(DIR_VEC)), lean_every=5)
+    t.buttress(reach=2, tall=2)
+    t.trunk_bumps(1, H - 2, int(4 * s))
+    for d, side in limb_dirs(r, int(5 * s)):
+        end = t.branch(t.at(H * r.uniform(0.6, 0.9)), d, int(r.uniform(3, 5) * s), 2, side)
+        t.twigs(end, d, n=1)
+        t.cluster((end[0], end[1] + 1, end[2]), 2.6 * s, hang=int(6 * s), flat=0.5)
+    t.cluster((top[0], top[1] + 2, top[2]), 3.2 * s, hang=int(6 * s), flat=0.5)
 
 
-def umbrella(t, scale):
-    """Ebony: tall bare trunk splitting into wide, flat-topped canopies."""
+def acacia(t, s):
+    """Ebony: tall forked trunk with flat umbrella puffs."""
     r = t.rng
-    H = int(r.randint(11, 14) * scale)
-    top = t.trunk(H, 1)
-    t.roots(2)
-    for d, diag in horizontal_dirs(r, max(3, int(4 * scale))):
-        end = t.branch(t.at(H * 0.7), d, int(r.randint(4, 6) * scale),
-                       rise_every=1, diag=diag)
-        t.branch_detail(end, d)
-        t.blob((end[0], end[1] + 1, end[2]), 3.6 * scale, 1.3, 3.6 * scale, flat_bottom=True, hang=1)
-    t.blob((top[0], top[1] + 1, top[2]), 4.5 * scale, 1.5, 4.5 * scale, flat_bottom=True, hang=1)
+    H = int(r.randint(10, 13) * s)
+    top = t.trunk(H)
+    t.buttress(reach=2, tall=2)
+    t.trunk_bumps(1, H - 2, int(4 * s))
+    for d, side in limb_dirs(r, max(3, int(4 * s))):
+        end = t.branch(t.at(H * r.uniform(0.55, 0.8)), d, int(r.uniform(3, 5) * s), int(r.uniform(2, 4) * s),
+                       side)
+        t.twigs(end, d, n=2)
+        t.puff((end[0], end[1] + 1, end[2]), 3.4 * s, 1.1, ragged=0.25)
+    t.puff((top[0], top[1] + 1, top[2]), 3.8 * s, 1.2, ragged=0.25)
 
 
-def palm(t, scale):
+def palm(t, s):
     r = t.rng
-    H = int(r.randint(12, 15) * scale)
+    H = int(r.randint(12, 15) * s)
     lean = r.choice(list(DIR_VEC))
-    top = t.trunk(H, 1, lean=lean, lean_every=r.choice((3, 4)))
-    t.roots(1)
+    top = t.trunk(H, lean=lean, lean_every=r.choice((3, 4)))
+    t.buttress(reach=1, tall=1)
     crown = (top[0], top[1] + 1, top[2])
-    t.g.set(crown, blk(f"{NS}:{t.wood}_leaves_dark"))
-    t.blob(crown, 1.5, 1, 1.5)
+    t.puff(crown, 1.4, 1.0, ragged=0)
     arms = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
     for ax, az in arms:
-        L = int(r.randint(4, 6) * scale)
+        L = int(r.randint(4, 6) * s)
         x, y, z = crown
         for i in range(1, L + 1):
             x, z = x + ax, z + az
             if i in (L // 2 + 1, L):
                 y -= 1
-            t.leaf((x, y, z), 0.5)
-            if i > 1:
-                # frond edges and drooping tips
-                t.leaf((x + az, y, z - ax), -0.5) if r.random() < 0.6 else None
-                t.leaf((x - az, y, z + ax), -0.5) if r.random() < 0.6 else None
+            t.leaf((x, y, z), 0.6)
+            if 1 < i < L:
+                if r.random() < 0.7:
+                    t.leaf((x + az, y - 1, z - ax), -0.6)
+                if r.random() < 0.7:
+                    t.leaf((x - az, y - 1, z + ax), -0.6)
         t.leaf((x, y - 1, z), -1)
-    # coconuts: walnut wood blocks under the crown
-    for ax, az in r.sample(arms[:4], 2):
-        t.g.set((crown[0] + ax, crown[1] - 1, crown[2] + az), log("walnut", bark=True), P_WOOD)
+    for ax, az in r.sample(arms[:4], 3):   # coconuts
+        t.bark_block((crown[0] + ax, crown[1] - 1, crown[2] + az))
 
 
-def blossom(t, scale):
-    """Rosewood: short trunk forking into a wide, flat, flowery canopy."""
+def ghost(t, s):
+    """Ghostwood: crooked trunk, lots of bare stepped branches and twigs,
+    with thin, pale foliage."""
     r = t.rng
-    H = int(r.randint(7, 9) * scale)
-    top = t.trunk(H, 1)
-    t.roots(2)
-    for d, diag in horizontal_dirs(r, max(3, int(4 * scale))):
-        end = t.branch(t.at(H - 2), d, int(r.randint(3, 5) * scale),
-                       rise_every=1, diag=diag)
-        t.branch_detail(end, d)
-        t.blob((end[0], end[1] + 1, end[2]), 3.3 * scale, 1.8 * scale, 3.3 * scale,
-               hang=2, hang_chance=0.3)
-    t.blob((top[0], top[1] + 2, top[2]), 3.5 * scale, 2.2 * scale, 3.5 * scale, hang=2)
+    H = int(r.randint(13, 16) * s)
+    top = t.trunk(H, lean=r.choice(list(DIR_VEC)), lean_every=4)
+    t.buttress(reach=2, tall=2)
+    t.trunk_bumps(1, H - 2, int(6 * s))
+    for d, side in limb_dirs(r, int(7 * s)):
+        end = t.branch(t.at(H * r.uniform(0.35, 0.95)), d, int(r.uniform(2, 4) * s), int(r.uniform(1, 3) * s),
+                       side)
+        t.twigs(end, d, n=3, length=(1, 3))
+        if r.random() < 0.7:
+            t.puff((end[0], end[1] + 1, end[2]), 2.0 * s, 1.3, density=0.75, hang=3, hang_chance=0.3)
+    t.cluster((top[0], top[1] + 1, top[2]), 2.4 * s, density=0.8, hang=3)
 
 
-def dome(t, scale):
-    """Plumwood: tall trunk with a big mushroom-like dome and a drooping rim."""
+def dome(t, s):
+    """Plumwood: tall trunk carrying a big flowering dome with a drooping rim."""
     r = t.rng
-    H = int(r.randint(11, 13) * scale)
-    top = t.trunk(H, 1)
-    t.roots(2)
-    R = 4.8 * scale
+    H = int(r.randint(11, 13) * s)
+    top = t.trunk(H)
+    t.buttress(reach=2, tall=2)
+    t.trunk_bumps(1, H - 2, int(4 * s))
+    R = 4.8 * s
+    for d in DIR_VEC:   # ribs holding up the dome
+        end = t.branch(t.at(H - 3), d, int(R * 0.5), 2)
+        t.twigs(end, d, 1)
     for x in range(-int(R) - 1, int(R) + 2):
         for z in range(-int(R) - 1, int(R) + 2):
             d = math.hypot(x, z)
-            if d > R + r.uniform(-0.4, 0.3):
+            if d > R + r.uniform(-0.5, 0.3):
                 continue
             hgt = int(round(math.sqrt(max(0.0, R * R - d * d)) * 0.55))
             for y in range(0, hgt + 1):
-                t.leaf((top[0] + x, top[1] + y, top[2] + z), (y - hgt / 2) / max(1, hgt), inner=y < hgt - 1)
-            if d > R - 1.3:   # drooping rim
+                t.leaf((top[0] + x, top[1] + y, top[2] + z), (y / max(1, hgt)) * 2 - 1, inner=y < hgt - 1)
+            if d > R - 1.3:
                 for k in range(1, r.randint(1, 3) + 1):
                     t.leaf((top[0] + x, top[1] - k, top[2] + z), -1)
-    for d in DIR_VEC:   # ribs under the dome
-        end = t.branch((top[0], top[1] - 1, top[2]), d, int(R * 0.6), rise_every=0)
-        t.twigs(end, d, 1)
 
 
-def tiers(t, scale):
-    """Azurewood: tall trunk with stacked round puffs."""
-    r = t.rng
-    H = int(r.randint(14, 17) * scale)
-    top = t.trunk(H, 1)
-    t.roots(2)
-    y = int(H * 0.4)
-    rad = 3.4 * scale
-    while y <= H:
-        for d in r.sample(list(DIR_VEC), 2):
-            end = t.branch(t.at(y), d, max(1, int(rad - 1.5)), rise_every=0)
-            t.twigs(end, d, 1)
-        t.blob((top[0], y + 1, top[2]), rad, 1.6, rad, hang=1)
-        y += 4
-        rad = max(1.6, rad - 0.7)
-    t.blob((top[0], H + 2, top[2]), 1.6, 1.6, 1.6)
+# species -> (shape, kwargs, twig fence, palette)
+def _pal(main, shade, light, extra=None):
+    return Palette(main, shade, light, extra)
 
 
-def twisted(t, scale):
-    """Ghostwood: crooked, many-branched, with sparse pale foliage."""
-    r = t.rng
-    H = int(r.randint(13, 16) * scale)
-    top = t.trunk(H, 1, lean=r.choice(list(DIR_VEC)), lean_every=3)
-    t.roots(2)
-    for d, diag in horizontal_dirs(r, max(5, int(7 * scale))):
-        y = int(H * r.uniform(0.35, 0.95))
-        end = t.branch(t.at(y), d, int(r.randint(2, 5) * scale), rise_every=r.choice((1, 2)), diag=diag)
-        t.twigs(end, d, n=3)
-        if r.random() < 0.75:
-            t.blob((end[0], end[1] + 1, end[2]), 2.2 * scale, 1.4, 2.2 * scale, density=0.75, hang=2)
-    t.blob((top[0], top[1] + 1, top[2]), 2.8 * scale, 1.8, 2.8 * scale, density=0.8, hang=2)
-
-
-# species -> (shape function, kwargs, twig fence, accent leaves)
 SPECIES = {
-    "maple": (broadleaf, dict(h=(13, 16), crown=(4.2, 3.0), branches=(5, 6)), "spruce_fence",
-              [blk(f"{NS}:willow_leaves"), blk(f"{NS}:rosewood_leaves_dark")]),
-    "redwood": (conifer, dict(h=(20, 26), base_r=4.8, width=2), "mangrove_fence", [leaf_v("spruce_leaves")]),
-    "ebony": (umbrella, {}, "dark_oak_fence", [leaf_v("dark_oak_leaves")]),
-    "willow": (willow, {}, "spruce_fence", [leaf_v("azalea_leaves")]),
-    "ash": (broadleaf, dict(h=(16, 19), crown=(3.4, 4.0), branches=(4, 5), blen=(2, 4)), "pale_oak_fence",
-            [leaf_v("birch_leaves")]),
-    "azure": (tiers, {}, "dark_oak_fence", [blk(f"{NS}:ghostwood_leaves")]),
-    "walnut": (broadleaf, dict(h=(13, 16), crown=(4.6, 3.2), branches=(6, 7), blen=(4, 6), width=2),
-               "dark_oak_fence", [leaf_v("oak_leaves")]),
-    "rosewood": (blossom, {}, "crimson_fence",
-                 [leaf_v("cherry_leaves"), blk(f"{NS}:ghostwood_leaves"), leaf_v("azalea_leaves_flowered")]),
-    "palm": (palm, {}, "jungle_fence", [leaf_v("jungle_leaves")]),
-    "ironwood": (column, {}, "spruce_fence", [leaf_v("spruce_leaves")]),
-    "ghostwood": (twisted, {}, "pale_oak_fence", [leaf_v("pale_oak_leaves")]),
-    "plumwood": (dome, {}, "crimson_fence", [blk(f"{NS}:rosewood_leaves")]),
+    "maple": (oak, {}, "spruce_fence",
+              _pal(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "redwood": (spruce, {}, "mangrove_fence",
+                _pal(["spruce_leaves"], ["dark_oak_leaves", "spruce_leaves"], ["spruce_leaves"],
+                     ["azalea_leaves"])),
+    "ebony": (acacia, {}, "dark_oak_fence",
+              _pal(["acacia_leaves"], ["dark_oak_leaves"], ["acacia_leaves", "azalea_leaves"])),
+    "willow": (willow, {}, "spruce_fence",
+               _pal(["mangrove_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "ash": (birch, {}, "pale_oak_fence",
+            _pal(["birch_leaves"], ["dark_oak_leaves"], ["birch_leaves", "azalea_leaves"])),
+    "azure": (cypress, {}, "dark_oak_fence",
+              _pal(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "walnut": (oak, dict(h=(15, 18), puff=3.6, limbs=(5, 7)), "dark_oak_fence",
+               _pal(["oak_leaves", "dark_oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves", "oak_leaves"])),
+    "rosewood": (oak, dict(h=(11, 13), puff=3.0, limbs=(4, 5), hang=2), "crimson_fence",
+                 _pal(["cherry_leaves"], ["azalea_leaves_flowered", "cherry_leaves"], ["cherry_leaves"])),
+    "palm": (palm, {}, "jungle_fence",
+             _pal(["jungle_leaves"], ["jungle_leaves", "dark_oak_leaves"], ["azalea_leaves"])),
+    "ironwood": (pine, {}, "spruce_fence",
+                 _pal(["spruce_leaves"], ["dark_oak_leaves"], ["azalea_leaves", "spruce_leaves"])),
+    "ghostwood": (ghost, {}, "pale_oak_fence",
+                  _pal(["pale_oak_leaves"], ["pale_oak_leaves"], ["pale_oak_leaves", "birch_leaves"])),
+    "plumwood": (dome, {}, "crimson_fence",
+                 _pal(["azalea_leaves_flowered"], ["dark_oak_leaves", "azalea_leaves"], ["cherry_leaves"])),
 }
 
-SIZES = [("small", 0.85), ("medium", 1.1), ("large", 1.45)]
+SIZES = [("small", 0.85), ("medium", 1.1), ("large", 1.4)]
 
 
 # ======================================================================== bushes
@@ -710,35 +858,47 @@ def build(bp):
     made = []
 
     # ---- trees: every wood in 3 sizes
-    for wi, (wood, (shape, kwargs, fence, accent)) in enumerate(SPECIES.items()):
+    for wi, (wood, (shape, kwargs, fence, pal)) in enumerate(SPECIES.items()):
         for si, (size_name, scale) in enumerate(SIZES):
             rng = random.Random(5000 + wi * 31 + si * 7)
-            t = Tree(rng, wood, {"fence": fence, "accent": accent})
-            shape(t, scale, **kwargs) if kwargs else shape(t, scale)
+            t = Tree(rng, wood, pal, fence)
+            shape(t, scale, **kwargs)
             _save(bp, "trees", f"{wood}_tree_{size_name}", t.g, made)
 
-    # ---- bushes
-    def L(w, dark=False):
-        return blk(f"{NS}:{w}_leaves" + ("_dark" if dark else ""))
-
+    # ---- bushes (vanilla leaves only)
+    V = leaf_v
     bushes = [
-        ("maple_bush", L("maple"), L("maple", True), L("willow"), 1.0, log("maple"), None),
-        ("willow_bush", L("willow"), L("willow", True), leaf_v("azalea_leaves"), 1.0, None, None),
-        ("rosewood_bush", L("rosewood"), L("rosewood", True), L("ghostwood"), 1.0, log("rosewood"), None),
-        ("azure_bush", L("azure"), L("azure", True), L("ghostwood"), 0.9, None, None),
-        ("plumwood_bush", L("plumwood"), L("plumwood", True), L("rosewood"), 1.1, log("plumwood"), None),
-        ("ghostwood_bush", L("ghostwood"), L("ghostwood", True), None, 0.9, None, None),
-        ("walnut_bush_large", L("walnut"), L("walnut", True), leaf_v("oak_leaves"), 1.5, log("walnut"), None),
-        ("redwood_shrub", L("redwood"), L("redwood", True), leaf_v("spruce_leaves"), 1.2, log("redwood"), None),
-        ("azalea_bush", leaf_v("azalea_leaves"), L("willow", True), leaf_v("azalea_leaves_flowered"), 1.2,
-         None, blk("minecraft:moss_carpet")),
-        ("ash_hedge", L("ash"), L("ash", True), leaf_v("birch_leaves"), 1.3, None, None),
-        ("palm_shrub", L("palm"), L("palm", True), leaf_v("jungle_leaves"), 0.8, None, None),
-        ("ironwood_bush", L("ironwood"), L("ironwood", True), None, 1.0, log("ironwood"), None),
+        ("oak_bush", V("oak_leaves"), V("dark_oak_leaves"), V("azalea_leaves"), 1.0, log("maple"), None),
+        ("oak_bush_large", V("oak_leaves"), V("dark_oak_leaves"), V("azalea_leaves"), 1.5, log("walnut"), None),
+        ("azalea_bush", V("azalea_leaves"), V("dark_oak_leaves"), V("azalea_leaves_flowered"), 1.2, None,
+         blk("minecraft:moss_carpet")),
+        ("flowering_bush", V("azalea_leaves_flowered"), V("azalea_leaves"), V("cherry_leaves"), 1.0, None, None),
+        ("cherry_bush", V("cherry_leaves"), V("azalea_leaves_flowered"), None, 1.0, log("rosewood"), None),
+        ("birch_bush", V("birch_leaves"), V("dark_oak_leaves"), V("azalea_leaves"), 1.1, None, None),
+        ("spruce_shrub", V("spruce_leaves"), V("dark_oak_leaves"), None, 1.1, log("redwood"), None),
+        ("jungle_bush", V("jungle_leaves"), V("dark_oak_leaves"), V("azalea_leaves"), 1.2, log("palm"), None),
+        ("acacia_bush", V("acacia_leaves"), V("dark_oak_leaves"), None, 1.0, None, None),
+        ("mangrove_bush", V("mangrove_leaves"), V("dark_oak_leaves"), V("azalea_leaves"), 1.1, None, None),
+        ("pale_bush", V("pale_oak_leaves"), V("pale_oak_leaves"), V("birch_leaves"), 1.0, None, None),
     ]
     for i, (name, main, dark, acc, size, stem, flowers) in enumerate(bushes):
         rng = random.Random(7000 + i * 13)
         _save(bp, "bushes", name, bush(rng, main, dark, acc, size, stem, flowers), made)
+
+    # little "tree" bushes on a short stem, and a tall narrow bush
+    oak_pal = Palette(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])
+    for i, (name, wood, stem_h, size) in enumerate((("stemmed_bush", "maple", 2, 2.0),
+                                                    ("stemmed_bush_large", "walnut", 3, 2.5))):
+        t = Tree(random.Random(7700 + i), wood, oak_pal, "spruce_fence")
+        t.trunk(stem_h + 1)
+        t.buttress(reach=1, tall=1)
+        t.cluster((0, stem_h + 2, 0), size)
+        _save(bp, "bushes", name, t.g, made)
+    t = Tree(random.Random(7800), "maple", oak_pal, "spruce_fence")
+    t.trunk(2)
+    for k, rad in enumerate((1.8, 1.9, 1.7, 1.4, 1.0)):
+        t.puff((0, 2 + k * 1.3, 0), rad, 1.0, ragged=0.25)
+    _save(bp, "bushes", "tall_bush", t.g, made)
 
     # ---- rocks
     rocks = []

@@ -1,1 +1,1 @@
-structure load mbb:ash_tree_small ~-5 ~0 ~-3
+structure load mbb:ash_tree_small ~-4 ~0 ~-4

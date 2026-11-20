@@ -1,1 +1,1 @@
-structure load mbb:ebony_tree_medium ~-5 ~0 ~-8
+structure load mbb:ebony_tree_medium ~-8 ~0 ~-5

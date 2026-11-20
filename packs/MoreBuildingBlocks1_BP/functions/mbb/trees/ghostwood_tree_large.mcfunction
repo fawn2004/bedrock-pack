@@ -1,1 +1,1 @@
-structure load mbb:ghostwood_tree_large ~-6 ~0 ~-3
+structure load mbb:ghostwood_tree_large ~-5 ~0 ~-3
