@@ -1,0 +1,116 @@
+{
+  "resource_pack_name": "mbb",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "mbb_maple_planks": {
+      "textures": "textures/blocks/mbb/maple_planks"
+    },
+    "mbb_maple_door_top": {
+      "textures": "textures/blocks/mbb/maple_door_top"
+    },
+    "mbb_maple_door_bottom": {
+      "textures": "textures/blocks/mbb/maple_door_bottom"
+    },
+    "mbb_redwood_planks": {
+      "textures": "textures/blocks/mbb/redwood_planks"
+    },
+    "mbb_redwood_door_top": {
+      "textures": "textures/blocks/mbb/redwood_door_top"
+    },
+    "mbb_redwood_door_bottom": {
+      "textures": "textures/blocks/mbb/redwood_door_bottom"
+    },
+    "mbb_ebony_planks": {
+      "textures": "textures/blocks/mbb/ebony_planks"
+    },
+    "mbb_ebony_door_top": {
+      "textures": "textures/blocks/mbb/ebony_door_top"
+    },
+    "mbb_ebony_door_bottom": {
+      "textures": "textures/blocks/mbb/ebony_door_bottom"
+    },
+    "mbb_willow_planks": {
+      "textures": "textures/blocks/mbb/willow_planks"
+    },
+    "mbb_willow_door_top": {
+      "textures": "textures/blocks/mbb/willow_door_top"
+    },
+    "mbb_willow_door_bottom": {
+      "textures": "textures/blocks/mbb/willow_door_bottom"
+    },
+    "mbb_ash_planks": {
+      "textures": "textures/blocks/mbb/ash_planks"
+    },
+    "mbb_ash_door_top": {
+      "textures": "textures/blocks/mbb/ash_door_top"
+    },
+    "mbb_ash_door_bottom": {
+      "textures": "textures/blocks/mbb/ash_door_bottom"
+    },
+    "mbb_azure_planks": {
+      "textures": "textures/blocks/mbb/azure_planks"
+    },
+    "mbb_azure_door_top": {
+      "textures": "textures/blocks/mbb/azure_door_top"
+    },
+    "mbb_azure_door_bottom": {
+      "textures": "textures/blocks/mbb/azure_door_bottom"
+    },
+    "mbb_marble": {
+      "textures": "textures/blocks/mbb/marble"
+    },
+    "mbb_marble_door_top": {
+      "textures": "textures/blocks/mbb/marble_door_top"
+    },
+    "mbb_marble_door_bottom": {
+      "textures": "textures/blocks/mbb/marble_door_bottom"
+    },
+    "mbb_slate_tiles": {
+      "textures": "textures/blocks/mbb/slate_tiles"
+    },
+    "mbb_slate_tile_door_top": {
+      "textures": "textures/blocks/mbb/slate_tile_door_top"
+    },
+    "mbb_slate_tile_door_bottom": {
+      "textures": "textures/blocks/mbb/slate_tile_door_bottom"
+    },
+    "mbb_limestone_bricks": {
+      "textures": "textures/blocks/mbb/limestone_bricks"
+    },
+    "mbb_limestone_brick_door_top": {
+      "textures": "textures/blocks/mbb/limestone_brick_door_top"
+    },
+    "mbb_limestone_brick_door_bottom": {
+      "textures": "textures/blocks/mbb/limestone_brick_door_bottom"
+    },
+    "mbb_red_granite_bricks": {
+      "textures": "textures/blocks/mbb/red_granite_bricks"
+    },
+    "mbb_red_granite_brick_door_top": {
+      "textures": "textures/blocks/mbb/red_granite_brick_door_top"
+    },
+    "mbb_red_granite_brick_door_bottom": {
+      "textures": "textures/blocks/mbb/red_granite_brick_door_bottom"
+    },
+    "mbb_jade_bricks": {
+      "textures": "textures/blocks/mbb/jade_bricks"
+    },
+    "mbb_jade_brick_door_top": {
+      "textures": "textures/blocks/mbb/jade_brick_door_top"
+    },
+    "mbb_jade_brick_door_bottom": {
+      "textures": "textures/blocks/mbb/jade_brick_door_bottom"
+    },
+    "mbb_polished_onyx": {
+      "textures": "textures/blocks/mbb/polished_onyx"
+    },
+    "mbb_polished_onyx_door_top": {
+      "textures": "textures/blocks/mbb/polished_onyx_door_top"
+    },
+    "mbb_polished_onyx_door_bottom": {
+      "textures": "textures/blocks/mbb/polished_onyx_door_bottom"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:limestone_brick_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:limestone_bricks"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:limestone_bricks"
+      }
+    ],
+    "result": {
+      "item": "mbb:limestone_brick_slab",
+      "count": 6
+    }
+  }
+}

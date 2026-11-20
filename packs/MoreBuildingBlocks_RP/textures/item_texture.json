@@ -1,0 +1,42 @@
+{
+  "resource_pack_name": "mbb",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "mbb_maple_door": {
+      "textures": "textures/items/mbb/maple_door"
+    },
+    "mbb_redwood_door": {
+      "textures": "textures/items/mbb/redwood_door"
+    },
+    "mbb_ebony_door": {
+      "textures": "textures/items/mbb/ebony_door"
+    },
+    "mbb_willow_door": {
+      "textures": "textures/items/mbb/willow_door"
+    },
+    "mbb_ash_door": {
+      "textures": "textures/items/mbb/ash_door"
+    },
+    "mbb_azure_door": {
+      "textures": "textures/items/mbb/azure_door"
+    },
+    "mbb_marble_door": {
+      "textures": "textures/items/mbb/marble_door"
+    },
+    "mbb_slate_tile_door": {
+      "textures": "textures/items/mbb/slate_tile_door"
+    },
+    "mbb_limestone_brick_door": {
+      "textures": "textures/items/mbb/limestone_brick_door"
+    },
+    "mbb_red_granite_brick_door": {
+      "textures": "textures/items/mbb/red_granite_brick_door"
+    },
+    "mbb_jade_brick_door": {
+      "textures": "textures/items/mbb/jade_brick_door"
+    },
+    "mbb_polished_onyx_door": {
+      "textures": "textures/items/mbb/polished_onyx_door"
+    }
+  }
+}

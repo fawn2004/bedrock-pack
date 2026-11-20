@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:polished_onyx_door_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "##",
+      "##",
+      "##"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:polished_onyx"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:polished_onyx"
+      }
+    ],
+    "result": {
+      "item": "mbb:polished_onyx_door",
+      "count": 3
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:slate_tile_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:slate_tiles"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:slate_tiles"
+      }
+    ],
+    "result": {
+      "item": "mbb:slate_tile_slab",
+      "count": 6
+    }
+  }
+}

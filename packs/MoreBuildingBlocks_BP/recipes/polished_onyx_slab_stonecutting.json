@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:polished_onyx_slab_stonecutting"
+    },
+    "tags": [
+      "stonecutter"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:polished_onyx"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:polished_onyx"
+      }
+    ],
+    "result": {
+      "item": "mbb:polished_onyx_slab",
+      "count": 2
+    }
+  }
+}

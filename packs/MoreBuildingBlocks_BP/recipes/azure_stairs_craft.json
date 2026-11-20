@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:azure_stairs_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "#  ",
+      "## ",
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:azure_planks"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:azure_planks"
+      }
+    ],
+    "result": {
+      "item": "mbb:azure_stairs",
+      "count": 4
+    }
+  }
+}

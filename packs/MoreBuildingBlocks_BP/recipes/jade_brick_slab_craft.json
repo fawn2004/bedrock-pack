@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:jade_brick_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:jade_bricks"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:jade_bricks"
+      }
+    ],
+    "result": {
+      "item": "mbb:jade_brick_slab",
+      "count": 6
+    }
+  }
+}

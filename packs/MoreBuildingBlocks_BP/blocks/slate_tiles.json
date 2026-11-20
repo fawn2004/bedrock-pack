@@ -1,0 +1,30 @@
+{
+  "format_version": "1.26.20",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mbb:slate_tiles",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:map_color": "#4e5866",
+      "tag:mbb:stone": {},
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2.5
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 6
+      },
+      "tag:stone": {},
+      "tag:minecraft:is_pickaxe_item_destructible": {},
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "mbb_slate_tiles",
+          "render_method": "opaque"
+        }
+      }
+    }
+  }
+}

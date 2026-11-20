@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:slate_tile_from_dye"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###",
+      "#D#",
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "minecraft:stone"
+      },
+      "D": {
+        "item": "minecraft:blue_dye"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:blue_dye"
+      }
+    ],
+    "result": {
+      "item": "mbb:slate_tiles",
+      "count": 8
+    }
+  }
+}

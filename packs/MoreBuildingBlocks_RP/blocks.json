@@ -1,0 +1,147 @@
+{
+  "format_version": "1.1.0",
+  "mbb:maple_planks": {
+    "sound": "wood"
+  },
+  "mbb:maple_slab": {
+    "sound": "wood"
+  },
+  "mbb:maple_stairs": {
+    "sound": "wood"
+  },
+  "mbb:maple_door": {
+    "sound": "wood"
+  },
+  "mbb:redwood_planks": {
+    "sound": "wood"
+  },
+  "mbb:redwood_slab": {
+    "sound": "wood"
+  },
+  "mbb:redwood_stairs": {
+    "sound": "wood"
+  },
+  "mbb:redwood_door": {
+    "sound": "wood"
+  },
+  "mbb:ebony_planks": {
+    "sound": "wood"
+  },
+  "mbb:ebony_slab": {
+    "sound": "wood"
+  },
+  "mbb:ebony_stairs": {
+    "sound": "wood"
+  },
+  "mbb:ebony_door": {
+    "sound": "wood"
+  },
+  "mbb:willow_planks": {
+    "sound": "wood"
+  },
+  "mbb:willow_slab": {
+    "sound": "wood"
+  },
+  "mbb:willow_stairs": {
+    "sound": "wood"
+  },
+  "mbb:willow_door": {
+    "sound": "wood"
+  },
+  "mbb:ash_planks": {
+    "sound": "wood"
+  },
+  "mbb:ash_slab": {
+    "sound": "wood"
+  },
+  "mbb:ash_stairs": {
+    "sound": "wood"
+  },
+  "mbb:ash_door": {
+    "sound": "wood"
+  },
+  "mbb:azure_planks": {
+    "sound": "wood"
+  },
+  "mbb:azure_slab": {
+    "sound": "wood"
+  },
+  "mbb:azure_stairs": {
+    "sound": "wood"
+  },
+  "mbb:azure_door": {
+    "sound": "wood"
+  },
+  "mbb:marble": {
+    "sound": "stone"
+  },
+  "mbb:marble_slab": {
+    "sound": "stone"
+  },
+  "mbb:marble_stairs": {
+    "sound": "stone"
+  },
+  "mbb:marble_door": {
+    "sound": "stone"
+  },
+  "mbb:slate_tiles": {
+    "sound": "stone"
+  },
+  "mbb:slate_tile_slab": {
+    "sound": "stone"
+  },
+  "mbb:slate_tile_stairs": {
+    "sound": "stone"
+  },
+  "mbb:slate_tile_door": {
+    "sound": "stone"
+  },
+  "mbb:limestone_bricks": {
+    "sound": "stone"
+  },
+  "mbb:limestone_brick_slab": {
+    "sound": "stone"
+  },
+  "mbb:limestone_brick_stairs": {
+    "sound": "stone"
+  },
+  "mbb:limestone_brick_door": {
+    "sound": "stone"
+  },
+  "mbb:red_granite_bricks": {
+    "sound": "stone"
+  },
+  "mbb:red_granite_brick_slab": {
+    "sound": "stone"
+  },
+  "mbb:red_granite_brick_stairs": {
+    "sound": "stone"
+  },
+  "mbb:red_granite_brick_door": {
+    "sound": "stone"
+  },
+  "mbb:jade_bricks": {
+    "sound": "stone"
+  },
+  "mbb:jade_brick_slab": {
+    "sound": "stone"
+  },
+  "mbb:jade_brick_stairs": {
+    "sound": "stone"
+  },
+  "mbb:jade_brick_door": {
+    "sound": "stone"
+  },
+  "mbb:polished_onyx": {
+    "sound": "stone"
+  },
+  "mbb:polished_onyx_slab": {
+    "sound": "stone"
+  },
+  "mbb:polished_onyx_stairs": {
+    "sound": "stone"
+  },
+  "mbb:polished_onyx_door": {
+    "sound": "stone"
+  }
+}
