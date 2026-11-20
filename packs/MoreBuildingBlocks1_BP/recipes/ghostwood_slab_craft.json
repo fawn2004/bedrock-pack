@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:ghostwood_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:ghostwood_planks"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:ghostwood_planks"
+      }
+    ],
+    "result": {
+      "item": "mbb:ghostwood_slab",
+      "count": 6
+    }
+  }
+}

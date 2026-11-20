@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:plumwood_log_from_dye"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###",
+      "#D#",
+      "###"
+    ],
+    "key": {
+      "#": {
+        "tag": "minecraft:logs"
+      },
+      "D": {
+        "item": "minecraft:purple_dye"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:purple_dye"
+      }
+    ],
+    "result": {
+      "item": "mbb:plumwood_log",
+      "count": 8
+    }
+  }
+}

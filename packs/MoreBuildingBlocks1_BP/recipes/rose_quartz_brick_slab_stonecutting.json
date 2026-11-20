@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:rose_quartz_brick_slab_stonecutting"
+    },
+    "tags": [
+      "stonecutter"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:rose_quartz_bricks"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:rose_quartz_bricks"
+      }
+    ],
+    "result": {
+      "item": "mbb:rose_quartz_brick_slab",
+      "count": 2
+    }
+  }
+}

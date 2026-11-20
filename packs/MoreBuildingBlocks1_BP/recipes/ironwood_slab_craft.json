@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:ironwood_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:ironwood_planks"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:ironwood_planks"
+      }
+    ],
+    "result": {
+      "item": "mbb:ironwood_slab",
+      "count": 6
+    }
+  }
+}

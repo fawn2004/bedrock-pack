@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:gabbro_brick_slab_stonecutting"
+    },
+    "tags": [
+      "stonecutter"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:gabbro_bricks"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:gabbro_bricks"
+      }
+    ],
+    "result": {
+      "item": "mbb:gabbro_brick_slab",
+      "count": 2
+    }
+  }
+}

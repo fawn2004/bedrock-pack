@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:travertine_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:travertine"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:travertine"
+      }
+    ],
+    "result": {
+      "item": "mbb:travertine_slab",
+      "count": 6
+    }
+  }
+}

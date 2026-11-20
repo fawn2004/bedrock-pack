@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "mbb:rose_quartz_brick_door",
+      "menu_category": {
+        "category": "construction",
+        "group": "minecraft:itemGroup.name.door"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "mbb_rose_quartz_brick_door"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Rose Quartz Brick Door"
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:block_placer": {
+        "block": "mbb:rose_quartz_brick_door",
+        "replace_block_item": true
+      }
+    }
+  }
+}

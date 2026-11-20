@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:walnut_door_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "##",
+      "##",
+      "##"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:walnut_planks"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:walnut_planks"
+      }
+    ],
+    "result": {
+      "item": "mbb:walnut_door",
+      "count": 3
+    }
+  }
+}

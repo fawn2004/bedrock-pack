@@ -9,7 +9,7 @@
       }
     },
     "components": {
-      "minecraft:map_color": "#362a26",
+      "minecraft:map_color": "#3a2d28",
       "minecraft:tags": [
         "mbb:wood",
         "mbb:full",

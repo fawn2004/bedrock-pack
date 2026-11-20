@@ -21,7 +21,7 @@ from PIL import Image  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NS = "mbb"
 PACK = "MoreBuildingBlocks1"
-VERSION = [1, 0, 3]
+VERSION = [1, 1, 0]
 BLOCK_FMT = "1.26.20"
 ITEM_FMT = "1.21.60"
 MIN_ENGINE = [1, 26, 20]
@@ -37,35 +37,57 @@ def uid(name):
 
 
 # ------------------------------------------------------------ materials
-# (id, display name, base colour, dye used in its recipe, texture builder)
+# Woods: (id, name, plank colour, bark colour, dye for recipes, bark style)
 WOODS = [
-    ("maple", "Maple", (192, 104, 56), "orange_dye"),
-    ("redwood", "Redwood", (138, 56, 42), "red_dye"),
-    ("ebony", "Ebony", (54, 42, 38), "black_dye"),
-    ("willow", "Willow", (178, 172, 108), "lime_dye"),
-    ("ash", "Ash", (206, 190, 164), "white_dye"),
-    ("azure", "Azurewood", (72, 112, 152), "light_blue_dye"),
+    ("maple", "Maple", (192, 104, 56), (92, 66, 52), "orange_dye", "furrow"),
+    ("redwood", "Redwood", (138, 56, 42), (90, 44, 36), "red_dye", "furrow"),
+    ("ebony", "Ebony", (58, 45, 40), (38, 34, 33), "black_dye", "furrow"),
+    ("willow", "Willow", (178, 172, 108), (96, 92, 70), "lime_dye", "furrow"),
+    ("ash", "Ash", (206, 190, 164), (130, 122, 110), "white_dye", "smooth"),
+    ("azure", "Azurewood", (72, 112, 152), (54, 60, 80), "light_blue_dye", "furrow"),
+    ("walnut", "Walnut", (112, 74, 48), (66, 50, 40), "brown_dye", "furrow"),
+    ("rosewood", "Rosewood", (176, 88, 96), (98, 58, 62), "pink_dye", "furrow"),
+    ("palm", "Palm", (210, 178, 120), (140, 116, 84), "yellow_dye", "rings"),
+    ("ironwood", "Ironwood", (128, 124, 118), (78, 76, 74), "gray_dye", "furrow"),
+    ("ghostwood", "Ghostwood", (214, 222, 226), (176, 184, 190), "light_gray_dye", "smooth"),
+    ("plumwood", "Plumwood", (112, 64, 112), (66, 46, 70), "purple_dye", "furrow"),
 ]
 
+# Stones: (id, name, map colour, recipe, texture builder)
+# recipe is a dye (8 stone around it) or ("2x2", block id) for cut variants.
 STONES = [
     ("marble", "Marble", (226, 224, 218), "white_dye",
-     lambda s: T.marble((226, 224, 218), (150, 150, 158), s)),
+     lambda s: T.marble((230, 228, 222), (128, 130, 144), s)),
     ("slate_tiles", "Slate Tiles", (78, 88, 102), "blue_dye",
-     lambda s: T.tiles((78, 88, 102), (44, 48, 56), s)),
+     lambda s: T.tiles((80, 90, 106), (40, 44, 52), s)),
     ("limestone_bricks", "Limestone Bricks", (214, 200, 160), "yellow_dye",
-     lambda s: T.bricks((214, 200, 160), (160, 148, 118), s)),
+     lambda s: T.bricks((216, 202, 162), (150, 138, 110), s)),
     ("red_granite_bricks", "Red Granite Bricks", (160, 82, 70), "red_dye",
-     lambda s: T.bricks((160, 82, 70), (96, 60, 56), s)),
+     lambda s: T.gabbro((160, 82, 70), (90, 56, 52), s)),
     ("jade_bricks", "Jade Bricks", (72, 150, 108), "green_dye",
-     lambda s: T.bricks((72, 150, 108), (40, 86, 64), s, rows=2)),
+     lambda s: T.bricks((72, 150, 108), (36, 80, 60), s, rows=2)),
     ("polished_onyx", "Polished Onyx", (58, 44, 70), "purple_dye",
-     lambda s: T.polished((58, 44, 70), s)),
+     lambda s: T.polished((60, 46, 74), s)),
+    ("travertine", "Travertine", (210, 190, 150), "brown_dye",
+     lambda s: T.travertine((212, 192, 152), s)),
+    ("gabbro_bricks", "Gabbro Bricks", (60, 64, 62), "black_dye",
+     lambda s: T.gabbro((64, 68, 66), (30, 32, 32), s)),
+    ("rose_quartz_bricks", "Rose Quartz Bricks", (224, 170, 180), "pink_dye",
+     lambda s: T.bricks((226, 172, 182), (168, 118, 128), s)),
+    ("chalk_tiles", "Chalk Tiles", (236, 234, 226), "light_gray_dye",
+     lambda s: T.chalk_tiles((238, 236, 228), (194, 190, 180), s)),
+    ("shale_bricks", "Shale Bricks", (96, 88, 80), "gray_dye",
+     lambda s: T.shale_bricks((98, 90, 82), (58, 52, 48), s)),
+    ("marble_bricks", "Marble Bricks", (226, 224, 218), ("2x2", "marble"),
+     lambda s: T.bricks((230, 228, 222), (172, 172, 180), s)),
 ]
 
-# Rotation of a model built "facing north" so it faces the given direction.
-# +90 on Y turns north -> west (matches the vanilla-style trapdoor template).
-DIR_ROT = {"north": 0, "south": 180, "west": 90, "east": -90}
 DIRS = ["north", "south", "west", "east"]
+OPP = {"north": "south", "south": "north", "east": "west", "west": "east"}
+CCW = {"north": "west", "west": "south", "south": "east", "east": "north"}  # player's left
+CW = {v: k for k, v in CCW.items()}                                           # player's right
+# Logs: rotate the pillar to match the face it was placed against.
+LOG_ROT = {"north": [90, 0, 0], "south": [90, 0, 0], "east": [0, 0, 90], "west": [0, 0, 90]}
 
 
 def norm(a):
@@ -128,27 +150,55 @@ def box(origin, size):
 
 # ------------------------------------------------------------ geometry
 
-QUARTERS = {  # x0, z0 of each 8x8 quarter (model faces north = -z)
+QUARTERS = {  # world-space x0, z0 of each 8x8 quarter (north = -z, east = +x)
     "nw": (-8, -8), "ne": (0, -8), "sw": (-8, 0), "se": (0, 0),
 }
-# which upper quarters exist for each stair corner state (vanilla shapes)
-CORNER_QUARTERS = {
-    "none": ["nw", "ne"],
-    "outer_left": ["nw"],
-    "outer_right": ["ne"],
-    "inner_left": ["nw", "ne", "sw"],
-    "inner_right": ["nw", "ne", "se"],
+STAIR_SHAPES = ["straight", "inner_left", "inner_right", "outer_left", "outer_right"]
+
+
+def quarter(a, b):
+    ns = a if a in ("north", "south") else b
+    we = b if ns == a else a
+    return ns[0] + we[0]
+
+
+def stair_quarters(d, shape):
+    """World-space quarters of the step part, using vanilla's stair shapes.
+    d is the direction the stairs go up towards (where the player looked)."""
+    front, back, left, right = d, OPP[d], CCW[d], CW[d]
+    both = [quarter(front, left), quarter(front, right)]
+    return {
+        "straight": both,
+        "outer_left": [quarter(front, left)],
+        "outer_right": [quarter(front, right)],
+        "inner_left": both + [quarter(back, left)],
+        "inner_right": both + [quarter(back, right)],
+    }[shape]
+
+
+# Door panel positions (3px thick) on each edge of the block.
+DOOR_PANELS = {
+    "north": ([-8, 0, -8], [16, 16, 3]),
+    "south": ([-8, 0, 5], [16, 16, 3]),
+    "west": ([-8, 0, -8], [3, 16, 16]),
+    "east": ([5, 0, -8], [3, 16, 16]),
 }
+
+
+def door_edge(d, open_, hinge_right):
+    """Vanilla: a closed door sits on the edge nearest the player who placed
+    it, and swings open to the hinge side (player's left by default)."""
+    if not open_:
+        return OPP[d]
+    return CW[d] if hinge_right else CCW[d]
 
 
 def build_geometry():
     models = os.path.join(RP, "models", "blocks")
-    # Slab: two halves, shown by state (both = double slab)
     write_json(os.path.join(models, "mbb_slab.geo.json"), geo("geometry.mbb_slab", [
         ("bottom", [cube([-8, 0, -8], [16, 8, 16])]),
         ("top", [cube([-8, 8, -8], [16, 8, 16])]),
     ]))
-    # Stairs: full half-slab base + four step quarters for each half
     bones = [
         ("base_bottom", [cube([-8, 0, -8], [16, 8, 16])]),
         ("base_top", [cube([-8, 8, -8], [16, 8, 16])]),
@@ -157,55 +207,46 @@ def build_geometry():
         bones.append(("upper_" + q, [cube([x, 8, z], [8, 8, 8])]))
         bones.append(("lower_" + q, [cube([x, 0, z], [8, 8, 8])]))
     write_json(os.path.join(models, "mbb_stairs.geo.json"), geo("geometry.mbb_stairs", bones))
-    # Door: 3px panel on the north edge of the block (same as vanilla)
-    full = {"uv": [0, 0], "uv_size": [16, 16]}
-    door_uv = {
-        "north": full, "south": {"uv": [16, 0], "uv_size": [-16, 16]},
-        "east": {"uv": [0, 0], "uv_size": [3, 16]},
-        "west": {"uv": [13, 0], "uv_size": [3, 16]},
-        "up": {"uv": [0, 0], "uv_size": [16, 3]},
-        "down": {"uv": [0, 13], "uv_size": [16, 3]},
-    }
-    def with_mat(name):
-        return {f: dict(v, material_instance=name) for f, v in door_uv.items()}
-    write_json(os.path.join(models, "mbb_door.geo.json"), geo("geometry.mbb_door", [
-        ("lower", [cube([-8, 0, -8], [16, 16, 3], with_mat("door_bottom"))]),
-        ("upper", [cube([-8, 0, -8], [16, 16, 3], with_mat("door_top"))]),
-    ]))
+    bones = []
+    for half, mat_name in (("lower", "door_bottom"), ("upper", "door_top")):
+        for edge, (origin, size) in DOOR_PANELS.items():
+            def f(uv, size_):
+                return {"uv": uv, "uv_size": size_, "material_instance": mat_name}
+            if edge in ("north", "south"):
+                uv = {"north": f([0, 0], [16, 16]), "south": f([16, 0], [-16, 16]),
+                      "east": f([0, 0], [3, 16]), "west": f([13, 0], [3, 16]),
+                      "up": f([0, 0], [16, 3]), "down": f([0, 13], [16, 3])}
+            else:
+                uv = {"east": f([0, 0], [16, 16]), "west": f([16, 0], [-16, 16]),
+                      "north": f([0, 0], [3, 16]), "south": f([13, 0], [3, 16]),
+                      "up": f([0, 0], [3, 16]), "down": f([13, 0], [3, 16])}
+            bones.append((f"{half}_{edge}", [cube(origin, size, uv)]))
+    write_json(os.path.join(models, "mbb_door.geo.json"), geo("geometry.mbb_door", bones))
 
 
 def stairs_bone_visibility():
     half = "q.block_state('minecraft:vertical_half')"
-    corner = "q.block_state('minecraft:corner')"
-    vis = {
-        "base_bottom": f"{half} == 'bottom'",
-        "base_top": f"{half} == 'top'",
-    }
+    vis = {"base_bottom": f"{half} == 'bottom'", "base_top": f"{half} == 'top'"}
     for q in QUARTERS:
-        corners = [c for c, qs in CORNER_QUARTERS.items() if q in qs]
-        cond = " || ".join(f"{corner} == '{c}'" for c in corners)
-        vis["upper_" + q] = f"{half} == 'bottom' && ({cond})"
-        vis["lower_" + q] = f"{half} == 'top' && ({cond})"
+        terms = []
+        for d in DIRS:
+            shapes = [sh for sh in STAIR_SHAPES if q in stair_quarters(d, sh)]
+            if not shapes:
+                continue
+            sh_cond = " || ".join(f"q.block_state('{NS}:shape') == '{sh}'" for sh in shapes)
+            terms.append(f"(q.block_state('minecraft:cardinal_direction') == '{d}' && ({sh_cond}))")
+        any_cond = " || ".join(terms)
+        vis["upper_" + q] = f"{half} == 'bottom' && ({any_cond})"
+        vis["lower_" + q] = f"{half} == 'top' && ({any_cond})"
     return vis
 
 
-def stairs_collision(half, corner):
-    if half == "bottom":
-        boxes = [box([-8, 0, -8], [16, 8, 16])]
-        y = 8
-    else:
-        boxes = [box([-8, 8, -8], [16, 8, 16])]
-        y = 0
-    qs = CORNER_QUARTERS[corner]
-    # merge quarters into as few boxes as possible
-    if set(["nw", "ne"]).issubset(qs):
-        boxes.append(box([-8, y, -8], [16, 8, 8]))
-        rest = [q for q in qs if q not in ("nw", "ne")]
-    else:
-        rest = qs
-    for q in rest:
+def stairs_collision(d, half, shape):
+    y_base, y_step = (0, 8) if half == "bottom" else (8, 0)
+    boxes = [box([-8, y_base, -8], [16, 8, 16])]
+    for q in stair_quarters(d, shape):
         x, z = QUARTERS[q]
-        boxes.append(box([x, y, z], [8, 8, 8]))
+        boxes.append(box([x, y_step, z], [8, 8, 8]))
     return boxes
 
 
@@ -214,7 +255,7 @@ def stairs_collision(half, corner):
 def common_components(kind, mat_kind, color):
     c = {
         "minecraft:map_color": hexcol(color),
-        "minecraft:tags": [f"{NS}:{mat_kind}", f"{NS}:{kind}"],
+        "minecraft:tags": [f"{NS}:{mat_kind}", f"{NS}:{kind}"] + (["log"] if kind == "log" else []),
     }
     if mat_kind == "wood":
         c["minecraft:destructible_by_mining"] = {"seconds_to_destroy": 2 if kind != "door" else 3}
@@ -311,33 +352,47 @@ def stairs_block(base, mat_kind, color, tex):
             "bone_visibility": stairs_bone_visibility(),
         },
         "minecraft:material_instances": mat(tex),
-        "minecraft:collision_box": stairs_collision("bottom", "none"),
+        "minecraft:collision_box": stairs_collision("south", "bottom", "straight"),
         "minecraft:selection_box": box([-8, 0, -8], [16, 16, 16]),
     })
     perms = []
     for d in DIRS:
         for half in ("bottom", "top"):
-            for corner in CORNER_QUARTERS:
+            for shape in STAIR_SHAPES:
                 perms.append({
                     "condition": (f"q.block_state('minecraft:cardinal_direction') == '{d}' && "
                                   f"q.block_state('minecraft:vertical_half') == '{half}' && "
-                                  f"q.block_state('minecraft:corner') == '{corner}'"),
-                    "components": {
-                        "minecraft:transformation": {"rotation": [0, DIR_ROT[d], 0]},
-                        "minecraft:collision_box": stairs_collision(half, corner),
-                    },
+                                  f"q.block_state('{NS}:shape') == '{shape}'"),
+                    "components": {"minecraft:collision_box": stairs_collision(d, half, shape)},
                 })
     block_file(ident, {
         "menu_category": {"category": "construction", "group": "minecraft:itemGroup.name.stairs"},
+        # corner shapes are worked out by the script, exactly like vanilla stairs
+        "states": {f"{NS}:shape": STAIR_SHAPES},
         "traits": {
-            "minecraft:placement_direction": {
-                "enabled_states": ["minecraft:corner_and_cardinal_direction"],
-                "blocks_to_corner_with": [
-                    {"tags": f"q.any_tag('{NS}:stairs', 'minecraft:cornerable_stairs')"}
-                ],
-            },
+            "minecraft:placement_direction": {"enabled_states": ["minecraft:cardinal_direction"]},
             "minecraft:placement_position": {"enabled_states": ["minecraft:vertical_half"]},
         },
+    }, comps, perms)
+    return ident
+
+
+def log_block(ident, mat_kind, color, side_tex, end_tex):
+    comps = common_components("log", mat_kind, color)
+    comps.update({
+        "minecraft:geometry": "minecraft:geometry.full_block",
+        "minecraft:material_instances": {
+            "*": {"texture": side_tex, "render_method": "opaque"},
+            "up": {"texture": end_tex, "render_method": "opaque"},
+            "down": {"texture": end_tex, "render_method": "opaque"},
+        },
+    })
+    perms = [{"condition": " || ".join(f"q.block_state('minecraft:block_face') == '{f}'" for f in fs),
+              "components": {"minecraft:transformation": {"rotation": LOG_ROT[fs[0]]}}}
+             for fs in (("north", "south"), ("east", "west"))]
+    block_file(ident, {
+        "menu_category": {"category": "nature", "group": "minecraft:itemGroup.name.log"},
+        "traits": {"minecraft:placement_position": {"enabled_states": ["minecraft:block_face"]}},
     }, comps, perms)
     return ident
 
@@ -346,19 +401,27 @@ def door_block(base, display, mat_kind, color, tex_top, tex_bottom, icon):
     ident = f"{NS}:{base}_door"
     comps = common_components("door", mat_kind, color)
     upper = f"q.block_state('{NS}:upper')"
+    upper = f"q.block_state('{NS}:upper')"
+    vis = {}
+    for half, cond in (("lower", f"!{upper}"), ("upper", upper)):
+        for edge in DOOR_PANELS:
+            combos = [(d, o, h) for d in DIRS for o in (False, True) for h in (False, True)
+                      if door_edge(d, o, h) == edge]
+            terms = " || ".join(
+                f"(q.block_state('minecraft:cardinal_direction') == '{d}' && "
+                f"{'' if o else '!'}q.block_state('{NS}:open') && "
+                f"{'' if h else '!'}q.block_state('{NS}:hinge_right'))" for d, o, h in combos)
+            vis[f"{half}_{edge}"] = f"{cond} && ({terms})"
     comps.update({
         # one block per door half; the script places/removes the top half
-        "minecraft:geometry": {
-            "identifier": "geometry.mbb_door",
-            "bone_visibility": {"lower": f"!{upper}", "upper": upper},
-        },
+        "minecraft:geometry": {"identifier": "geometry.mbb_door", "bone_visibility": vis},
         "minecraft:material_instances": {
             "*": {"texture": tex_bottom, "render_method": "alpha_test"},
             "door_bottom": {"texture": tex_bottom, "render_method": "alpha_test"},
             "door_top": {"texture": tex_top, "render_method": "alpha_test"},
         },
-        "minecraft:collision_box": [box([-8, 0, -8], [16, 16, 3])],
-        "minecraft:selection_box": box([-8, 0, -8], [16, 16, 3]),
+        "minecraft:collision_box": [box(*DOOR_PANELS["north"])],
+        "minecraft:selection_box": box(*DOOR_PANELS["north"]),
         # drops are handled by the script so a door always drops exactly one item
         "minecraft:loot": "loot_tables/empty.json",
         f"{NS}:door": {},
@@ -367,14 +430,14 @@ def door_block(base, display, mat_kind, color, tex_top, tex_bottom, icon):
     for d in DIRS:
         for open_ in (False, True):
             for hinge_right in (False, True):
-                rot = DIR_ROT[d]
-                if open_:
-                    rot += -90 if hinge_right else 90
+                edge = door_edge(d, open_, hinge_right)
                 cond = (f"q.block_state('minecraft:cardinal_direction') == '{d}' && "
                         f"{'' if open_ else '!'}q.block_state('{NS}:open') && "
                         f"{'' if hinge_right else '!'}q.block_state('{NS}:hinge_right')")
                 perms.append({"condition": cond, "components": {
-                    "minecraft:transformation": {"rotation": [0, norm(rot), 0]}}})
+                    "minecraft:collision_box": [box(*DOOR_PANELS[edge])],
+                    "minecraft:selection_box": box(*DOOR_PANELS[edge]),
+                }})
     block_file(ident, {
         "menu_category": {"category": "none"},
         "states": {f"{NS}:open": [False, True], f"{NS}:hinge_right": [False, True],
@@ -433,11 +496,36 @@ def stonecut(ident, ingredient, result, count):
     })
 
 
-def material_recipes(mid, mat_kind, dye, block, slab, stairs, door):
-    base_ing = {"tag": "minecraft:planks"} if mat_kind == "wood" else {"item": "minecraft:stone"}
-    dye_item = "minecraft:" + dye
-    shaped(f"{NS}:{mid}_from_dye", ["###", "#D#", "###"],
-           {"#": base_ing, "D": {"item": dye_item}}, block, 8, {"item": dye_item})
+def shapeless(ident, ingredient, result, count):
+    name = ident.split(":")[1]
+    write_json(os.path.join(BP, "recipes", name + ".json"), {
+        "format_version": "1.21.50",
+        "minecraft:recipe_shapeless": {
+            "description": {"identifier": ident},
+            "tags": ["crafting_table"],
+            "ingredients": [{"item": ingredient}],
+            "unlock": [{"item": ingredient}],
+            "result": {"item": result, "count": count},
+        },
+    })
+
+
+def material_recipes(mid, mat_kind, recipe, block, slab, stairs, door, log=None, stripped=None):
+    if isinstance(recipe, tuple):            # e.g. marble bricks from 4 marble
+        src = {"item": f"{NS}:{recipe[1]}"}
+        shaped(f"{NS}:{mid}_from_{recipe[1]}", ["##", "##"], {"#": src}, block, 4, src)
+        stonecut(f"{NS}:{mid}_from_{recipe[1]}_stonecutting", src["item"], block, 1)
+    else:
+        base_ing = {"tag": "minecraft:planks"} if mat_kind == "wood" else {"item": "minecraft:stone"}
+        dye_item = {"item": "minecraft:" + recipe}
+        shaped(f"{NS}:{mid}_from_dye", ["###", "#D#", "###"],
+               {"#": base_ing, "D": dye_item}, block, 8, dye_item)
+        if log:
+            shaped(f"{NS}:{mid}_log_from_dye", ["###", "#D#", "###"],
+                   {"#": {"tag": "minecraft:logs"}, "D": dye_item}, log, 8, dye_item)
+    if log:
+        shapeless(f"{NS}:{mid}_planks_from_log", log, block, 4)
+        shapeless(f"{NS}:{mid}_planks_from_stripped_log", stripped, block, 4)
     b = {"item": block}
     shaped(f"{NS}:{mid}_slab_craft", ["###"], {"#": b}, slab, 6, b)
     shaped(f"{NS}:{mid}_stairs_craft", ["#  ", "## ", "###"], {"#": b}, stairs, 4, b)
@@ -462,53 +550,71 @@ def main():
     terrain, items, blocks_json, lang = {}, {}, {"format_version": "1.1.0"}, []
     slabs, doors, icon_tiles = [], [], []
 
-    mats = [(w[0], w[1], w[2], w[3], "wood", None) for w in WOODS] + \
-           [(s[0], s[1], s[2], s[3], "stone", s[4]) for s in STONES]
+    stairs_ids, logs = [], {}
+    mats = [dict(mid=w[0], display=w[1], color=w[2], bark=w[3], recipe=w[4], style=w[5], kind="wood")
+            for w in WOODS] + \
+           [dict(mid=s_[0], display=s_[1], color=s_[2], recipe=s_[3], builder=s_[4], kind="stone")
+            for s_ in STONES]
 
-    for i, (mid, display, color, dye, kind, builder) in enumerate(mats):
+    def add_tex(name, img, folder="blocks"):
+        save_png(img, f"textures/{folder}/{NS}/{name}")
+        (terrain if folder == "blocks" else items)[f"{NS}_{name}"] = {
+            "textures": f"textures/{folder}/{NS}/{name}"}
+        return f"{NS}_{name}"
+
+    for i, m in enumerate(mats):
+        mid, display, color, kind = m["mid"], m["display"], m["color"], m["kind"]
         seed = 1000 + i * 17
+        snd = "wood" if kind == "wood" else "stone"
+        names = []
         if kind == "wood":
-            full_id, full_name = f"{mid}_planks", f"{display} Planks"
+            full_id, full_name, base = f"{mid}_planks", f"{display} Planks", mid
             img = T.planks(color, seed)
-            base = mid
         else:
             full_id, full_name = mid, display
-            img = builder(seed)
+            img = m["builder"](seed)
             # "marble_slab", "slate_tile_slab", "limestone_brick_slab", ...
             base = mid[:-1] if mid.endswith("s") else mid
         icon_tiles.append(img)
-        tex = f"{NS}_{full_id}"
-        save_png(img, f"textures/blocks/{NS}/{full_id}")
-        terrain[tex] = {"textures": f"textures/blocks/{NS}/{full_id}"}
+        tex = add_tex(full_id, img)
 
-        dcol = T.shade(color, 0.92) if kind == "wood" else T.shade(color, 0.85)
-        top = T.door_half(dcol, seed, True, stone=(kind == "stone"))
-        bottom = T.door_half(dcol, seed, False, stone=(kind == "stone"))
-        save_png(top, f"textures/blocks/{NS}/{base}_door_top")
-        save_png(bottom, f"textures/blocks/{NS}/{base}_door_bottom")
-        save_png(T.door_item(top, bottom), f"textures/items/{NS}/{base}_door")
-        terrain[f"{NS}_{base}_door_top"] = {"textures": f"textures/blocks/{NS}/{base}_door_top"}
-        terrain[f"{NS}_{base}_door_bottom"] = {"textures": f"textures/blocks/{NS}/{base}_door_bottom"}
-        items[f"{NS}_{base}_door"] = {"textures": f"textures/items/{NS}/{base}_door"}
+        if kind == "wood":
+            door_col, metal = T.shade(color, 0.92), (196, 180, 110)
+        else:
+            door_col, metal = T.shade(color, 0.88), (92, 92, 98)
+        top = T.door_half(door_col, seed, True, stone=(kind == "stone"), metal=metal)
+        bottom = T.door_half(door_col, seed, False, stone=(kind == "stone"), metal=metal)
+        tex_top = add_tex(f"{base}_door_top", top)
+        tex_bottom = add_tex(f"{base}_door_bottom", bottom)
+        icon_name = add_tex(f"{base}_door", T.door_item(top, bottom), "items")
 
+        short = display.replace(" Bricks", " Brick").replace(" Tiles", " Tile")
         block = full_block(full_id, kind, color, tex)
         slab = slab_block(base, kind, color, tex)
         stairs = stairs_block(base, kind, color, tex)
-        door = door_block(base, display.replace(" Bricks", " Brick").replace(" Tiles", " Tile"),
-                          kind, color, f"{NS}_{base}_door_top", f"{NS}_{base}_door_bottom",
-                          f"{NS}_{base}_door")
+        door = door_block(base, short, kind, color, tex_top, tex_bottom, icon_name)
         slabs.append(slab)
         doors.append(door)
-        material_recipes(base, kind, dye, block, slab, stairs, door)
+        stairs_ids.append(stairs)
+        names += [(block, full_name), (slab, f"{short} Slab"), (stairs, f"{short} Stairs"),
+                  (door, f"{short} Door")]
 
-        short = display.replace(" Bricks", " Brick").replace(" Tiles", " Tile")
-        snd = "wood" if kind == "wood" else "stone"
-        for ident, name in ((block, full_name), (slab, f"{short} Slab"),
-                            (stairs, f"{short} Stairs"), (door, f"{short} Door")):
+        log = stripped = None
+        if kind == "wood":
+            side = add_tex(f"{mid}_log", T.bark(m["bark"], seed, m["style"]))
+            end = add_tex(f"{mid}_log_top", T.log_top(color, m["bark"], seed))
+            s_side = add_tex(f"stripped_{mid}_log", T.stripped_side(color, seed))
+            s_end = add_tex(f"stripped_{mid}_log_top", T.log_top(color, m["bark"], seed, with_bark=False))
+            log = log_block(f"{NS}:{mid}_log", kind, m["bark"], side, end)
+            stripped = log_block(f"{NS}:stripped_{mid}_log", kind, color, s_side, s_end)
+            logs[log] = stripped
+            names += [(log, f"{display} Log"), (stripped, f"Stripped {display} Log")]
+
+        material_recipes(base, kind, m["recipe"], block, slab, stairs, door, log, stripped)
+        for ident, name in names:
             blocks_json[ident] = {"sound": snd}
             lang.append(f"tile.{ident}.name={name}")
-        lang.append(f"item.{door}.name={short} Door")
-        lang.append(f"item.{door}={short} Door")
+
 
     write_json(os.path.join(BP, "loot_tables", "empty.json"), {"pools": []})
     build_geometry()
@@ -516,8 +622,10 @@ def main():
     # ---- script
     script_src = open(os.path.join(ROOT, "tools", "main.js"), encoding="utf-8").read()
     mat_lookup = {d: ("wood" if any(d == f"{NS}:{w[0]}_door" for w in WOODS) else "stone") for d in doors}
-    script_src = script_src.replace("__SLABS__", json.dumps(slabs)).replace(
-        "__DOORS__", json.dumps(mat_lookup))
+    script_src = (script_src.replace("__SLABS__", json.dumps(slabs))
+                  .replace("__DOORS__", json.dumps(mat_lookup))
+                  .replace("__STAIRS__", json.dumps(stairs_ids))
+                  .replace("__LOGS__", json.dumps(logs)))
     os.makedirs(os.path.join(BP, "scripts"), exist_ok=True)
     with open(os.path.join(BP, "scripts", "main.js"), "w", encoding="utf-8") as f:
         f.write(script_src)
@@ -533,21 +641,21 @@ def main():
         os.makedirs(os.path.join(pack_dir, "texts"), exist_ok=True)
         with open(os.path.join(pack_dir, "texts", "en_US.lang"), "w", encoding="utf-8") as f:
             f.write(f"pack.name=More Building Blocks 1 {label}\n")
-            f.write("pack.description=6 new woods and 6 new stones with slabs, stairs and doors\n")
+            f.write("pack.description=12 new woods and 12 new stones with logs, slabs, stairs and doors\n")
             if pack_dir == RP:
                 f.write("\n".join(lang) + "\n")
         write_json(os.path.join(pack_dir, "texts", "languages.json"), ["en_US"])
 
-    # ---- pack icon (4x3 grid of the full block textures)
+    # ---- pack icon (6x4 grid of the full block textures)
     icon = Image.new("RGBA", (128, 128), (30, 30, 34, 255))
     for i, t in enumerate(icon_tiles):
-        x, y = (i % 4) * 32, 16 + (i // 4) * 32
-        icon.paste(t.resize((32, 32), Image.NEAREST), (x, y))
+        x, y = 1 + (i % 6) * 21, 22 + (i // 6) * 21
+        icon.paste(t.resize((21, 21), Image.NEAREST), (x, y))
     for d in (BP, RP):
         icon.save(os.path.join(d, "pack_icon.png"))
 
     # ---- manifests
-    desc = "6 new woods + 6 new stones, each with slabs, stairs and doors."
+    desc = "12 new woods (with logs) + 12 new stones, each with slabs, stairs and doors."
     write_json(os.path.join(RP, "manifest.json"), {
         "format_version": 2,
         "header": {"name": "More Building Blocks 1 (Resources)", "description": desc,

@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:marble_brick_from_marble"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "##",
+      "##"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:marble"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:marble"
+      }
+    ],
+    "result": {
+      "item": "mbb:marble_bricks",
+      "count": 4
+    }
+  }
+}

@@ -20,6 +20,24 @@
     "mbb_azure_door": {
       "textures": "textures/items/mbb/azure_door"
     },
+    "mbb_walnut_door": {
+      "textures": "textures/items/mbb/walnut_door"
+    },
+    "mbb_rosewood_door": {
+      "textures": "textures/items/mbb/rosewood_door"
+    },
+    "mbb_palm_door": {
+      "textures": "textures/items/mbb/palm_door"
+    },
+    "mbb_ironwood_door": {
+      "textures": "textures/items/mbb/ironwood_door"
+    },
+    "mbb_ghostwood_door": {
+      "textures": "textures/items/mbb/ghostwood_door"
+    },
+    "mbb_plumwood_door": {
+      "textures": "textures/items/mbb/plumwood_door"
+    },
     "mbb_marble_door": {
       "textures": "textures/items/mbb/marble_door"
     },
@@ -37,6 +55,24 @@
     },
     "mbb_polished_onyx_door": {
       "textures": "textures/items/mbb/polished_onyx_door"
+    },
+    "mbb_travertine_door": {
+      "textures": "textures/items/mbb/travertine_door"
+    },
+    "mbb_gabbro_brick_door": {
+      "textures": "textures/items/mbb/gabbro_brick_door"
+    },
+    "mbb_rose_quartz_brick_door": {
+      "textures": "textures/items/mbb/rose_quartz_brick_door"
+    },
+    "mbb_chalk_tile_door": {
+      "textures": "textures/items/mbb/chalk_tile_door"
+    },
+    "mbb_shale_brick_door": {
+      "textures": "textures/items/mbb/shale_brick_door"
+    },
+    "mbb_marble_brick_door": {
+      "textures": "textures/items/mbb/marble_brick_door"
     }
   }
 }

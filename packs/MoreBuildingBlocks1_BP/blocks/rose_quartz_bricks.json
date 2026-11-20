@@ -1,0 +1,33 @@
+{
+  "format_version": "1.26.20",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mbb:rose_quartz_bricks",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:map_color": "#e0aab4",
+      "minecraft:tags": [
+        "mbb:stone",
+        "mbb:full",
+        "stone",
+        "minecraft:is_pickaxe_item_destructible"
+      ],
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2.5
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 6
+      },
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "mbb_rose_quartz_bricks",
+          "render_method": "opaque"
+        }
+      }
+    }
+  }
+}

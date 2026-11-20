@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:ghostwood_log_from_dye"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###",
+      "#D#",
+      "###"
+    ],
+    "key": {
+      "#": {
+        "tag": "minecraft:logs"
+      },
+      "D": {
+        "item": "minecraft:light_gray_dye"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:light_gray_dye"
+      }
+    ],
+    "result": {
+      "item": "mbb:ghostwood_log",
+      "count": 8
+    }
+  }
+}

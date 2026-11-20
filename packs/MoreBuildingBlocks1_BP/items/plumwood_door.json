@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "mbb:plumwood_door",
+      "menu_category": {
+        "category": "construction",
+        "group": "minecraft:itemGroup.name.door"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "mbb_plumwood_door"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Plumwood Door"
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:block_placer": {
+        "block": "mbb:plumwood_door",
+        "replace_block_item": true
+      }
+    }
+  }
+}

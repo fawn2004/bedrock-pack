@@ -1,10 +1,12 @@
 // More Building Blocks - door and slab behaviour.
 // Generated into the behavior pack by tools/build.py (lists below are filled in).
-import { system, world, ItemStack } from "@minecraft/server";
+import { system, world, ItemStack, BlockPermutation } from "@minecraft/server";
 
 const NS = "mbb";
-const SLABS = new Set(["mbb:maple_slab", "mbb:redwood_slab", "mbb:ebony_slab", "mbb:willow_slab", "mbb:ash_slab", "mbb:azure_slab", "mbb:marble_slab", "mbb:slate_tile_slab", "mbb:limestone_brick_slab", "mbb:red_granite_brick_slab", "mbb:jade_brick_slab", "mbb:polished_onyx_slab"]);
-const DOORS = {"mbb:maple_door": "wood", "mbb:redwood_door": "wood", "mbb:ebony_door": "wood", "mbb:willow_door": "wood", "mbb:ash_door": "wood", "mbb:azure_door": "wood", "mbb:marble_door": "stone", "mbb:slate_tile_door": "stone", "mbb:limestone_brick_door": "stone", "mbb:red_granite_brick_door": "stone", "mbb:jade_brick_door": "stone", "mbb:polished_onyx_door": "stone"}; // door id -> "wood" | "stone"
+const SLABS = new Set(["mbb:maple_slab", "mbb:redwood_slab", "mbb:ebony_slab", "mbb:willow_slab", "mbb:ash_slab", "mbb:azure_slab", "mbb:walnut_slab", "mbb:rosewood_slab", "mbb:palm_slab", "mbb:ironwood_slab", "mbb:ghostwood_slab", "mbb:plumwood_slab", "mbb:marble_slab", "mbb:slate_tile_slab", "mbb:limestone_brick_slab", "mbb:red_granite_brick_slab", "mbb:jade_brick_slab", "mbb:polished_onyx_slab", "mbb:travertine_slab", "mbb:gabbro_brick_slab", "mbb:rose_quartz_brick_slab", "mbb:chalk_tile_slab", "mbb:shale_brick_slab", "mbb:marble_brick_slab"]);
+const DOORS = {"mbb:maple_door": "wood", "mbb:redwood_door": "wood", "mbb:ebony_door": "wood", "mbb:willow_door": "wood", "mbb:ash_door": "wood", "mbb:azure_door": "wood", "mbb:walnut_door": "wood", "mbb:rosewood_door": "wood", "mbb:palm_door": "wood", "mbb:ironwood_door": "wood", "mbb:ghostwood_door": "wood", "mbb:plumwood_door": "wood", "mbb:marble_door": "stone", "mbb:slate_tile_door": "stone", "mbb:limestone_brick_door": "stone", "mbb:red_granite_brick_door": "stone", "mbb:jade_brick_door": "stone", "mbb:polished_onyx_door": "stone", "mbb:travertine_door": "stone", "mbb:gabbro_brick_door": "stone", "mbb:rose_quartz_brick_door": "stone", "mbb:chalk_tile_door": "stone", "mbb:shale_brick_door": "stone", "mbb:marble_brick_door": "stone"}; // door id -> "wood" | "stone"
+const STAIRS = new Set(["mbb:maple_stairs", "mbb:redwood_stairs", "mbb:ebony_stairs", "mbb:willow_stairs", "mbb:ash_stairs", "mbb:azure_stairs", "mbb:walnut_stairs", "mbb:rosewood_stairs", "mbb:palm_stairs", "mbb:ironwood_stairs", "mbb:ghostwood_stairs", "mbb:plumwood_stairs", "mbb:marble_stairs", "mbb:slate_tile_stairs", "mbb:limestone_brick_stairs", "mbb:red_granite_brick_stairs", "mbb:jade_brick_stairs", "mbb:polished_onyx_stairs", "mbb:travertine_stairs", "mbb:gabbro_brick_stairs", "mbb:rose_quartz_brick_stairs", "mbb:chalk_tile_stairs", "mbb:shale_brick_stairs", "mbb:marble_brick_stairs"]);
+const LOGS = {"mbb:maple_log": "mbb:stripped_maple_log", "mbb:redwood_log": "mbb:stripped_redwood_log", "mbb:ebony_log": "mbb:stripped_ebony_log", "mbb:willow_log": "mbb:stripped_willow_log", "mbb:ash_log": "mbb:stripped_ash_log", "mbb:azure_log": "mbb:stripped_azure_log", "mbb:walnut_log": "mbb:stripped_walnut_log", "mbb:rosewood_log": "mbb:stripped_rosewood_log", "mbb:palm_log": "mbb:stripped_palm_log", "mbb:ironwood_log": "mbb:stripped_ironwood_log", "mbb:ghostwood_log": "mbb:stripped_ghostwood_log", "mbb:plumwood_log": "mbb:stripped_plumwood_log"}; // log id -> stripped log id
 
 const isCreative = (player) => String(player.getGameMode()).toLowerCase() === "creative";
 
@@ -168,6 +170,102 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
     } else {
       container.setItem(slot, undefined);
     }
+  });
+});
+
+// ---------------------------------------------------------------- stairs
+// Corner shapes use the same rules as vanilla stairs, so corners always line
+// up. Our stairs also join up with vanilla stairs.
+
+const OPPOSITE = { north: "south", south: "north", east: "west", west: "east" };
+const AXIS = { north: "z", south: "z", east: "x", west: "x" };
+const VANILLA_DIR = ["east", "west", "south", "north"]; // weirdo_direction 0..3
+
+function stairInfo(block) {
+  if (!block) return undefined;
+  const id = block.typeId;
+  const p = block.permutation;
+  if (STAIRS.has(id)) {
+    return { dir: p.getState("minecraft:cardinal_direction"), top: p.getState("minecraft:vertical_half") === "top" };
+  }
+  if (id.startsWith("minecraft:") && id.endsWith("_stairs")) {
+    const w = p.getState("weirdo_direction");
+    if (w === undefined) return undefined;
+    return { dir: VANILLA_DIR[w], top: !!p.getState("upside_down_bit") };
+  }
+  return undefined;
+}
+
+function stairShape(block, me) {
+  const canTakeShape = (dir) => {
+    const n = stairInfo(offset(block, dir));
+    return !n || n.dir !== me.dir || n.top !== me.top;
+  };
+  const front = stairInfo(offset(block, me.dir));
+  if (front && front.top === me.top && AXIS[front.dir] !== AXIS[me.dir] && canTakeShape(OPPOSITE[front.dir])) {
+    return front.dir === LEFT_OF[me.dir] ? "outer_left" : "outer_right";
+  }
+  const back = stairInfo(offset(block, OPPOSITE[me.dir]));
+  if (back && back.top === me.top && AXIS[back.dir] !== AXIS[me.dir] && canTakeShape(back.dir)) {
+    return back.dir === LEFT_OF[me.dir] ? "inner_left" : "inner_right";
+  }
+  return "straight";
+}
+
+function refreshStairs(block) {
+  try {
+    if (!block || !STAIRS.has(block.typeId)) return;
+    const shape = stairShape(block, stairInfo(block));
+    if (block.permutation.getState(`${NS}:shape`) !== shape) {
+      block.setPermutation(block.permutation.withState(`${NS}:shape`, shape));
+    }
+  } catch { /* unloaded */ }
+}
+
+function refreshStairsAround(block) {
+  refreshStairs(block);
+  for (const dir of ["north", "south", "east", "west"]) refreshStairs(offset(block, dir));
+}
+
+world.afterEvents.playerPlaceBlock.subscribe(({ block }) => refreshStairsAround(block));
+world.afterEvents.playerBreakBlock.subscribe(({ block }) => refreshStairsAround(block));
+
+// ---------------------------------------------------------------- logs
+// Use an axe on a log to strip it, like vanilla.
+
+function damageHeldItem(player) {
+  if (isCreative(player)) return;
+  const container = player.getComponent("minecraft:inventory")?.container;
+  if (!container) return;
+  const slot = player.selectedSlotIndex;
+  const item = container.getItem(slot);
+  const durability = item?.getComponent("minecraft:durability");
+  if (!durability) return;
+  if (durability.damage + 1 >= durability.maxDurability) {
+    container.setItem(slot, undefined);
+    player.dimension.playSound("random.break", player.location);
+  } else {
+    durability.damage += 1;
+    container.setItem(slot, item);
+  }
+}
+
+world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+  const stripped = LOGS[event.block.typeId];
+  const item = event.itemStack;
+  if (!stripped || !item) return;
+  let isAxe = false;
+  try { isAxe = item.hasTag("minecraft:is_axe"); } catch { /* ignore */ }
+  if (!isAxe && !item.typeId.endsWith("_axe")) return;
+  event.cancel = true;
+  if (event.isFirstEvent === false) return;
+  const { block, player } = event;
+  system.run(() => {
+    if (LOGS[block.typeId] !== stripped) return;
+    const face = block.permutation.getState("minecraft:block_face");
+    block.setPermutation(BlockPermutation.resolve(stripped, { "minecraft:block_face": face }));
+    block.dimension.playSound("use.wood", block.center());
+    damageHeldItem(player);
   });
 });
 

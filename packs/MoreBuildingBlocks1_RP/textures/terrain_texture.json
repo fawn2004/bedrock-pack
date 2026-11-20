@@ -13,6 +13,18 @@
     "mbb_maple_door_bottom": {
       "textures": "textures/blocks/mbb/maple_door_bottom"
     },
+    "mbb_maple_log": {
+      "textures": "textures/blocks/mbb/maple_log"
+    },
+    "mbb_maple_log_top": {
+      "textures": "textures/blocks/mbb/maple_log_top"
+    },
+    "mbb_stripped_maple_log": {
+      "textures": "textures/blocks/mbb/stripped_maple_log"
+    },
+    "mbb_stripped_maple_log_top": {
+      "textures": "textures/blocks/mbb/stripped_maple_log_top"
+    },
     "mbb_redwood_planks": {
       "textures": "textures/blocks/mbb/redwood_planks"
     },
@@ -21,6 +33,18 @@
     },
     "mbb_redwood_door_bottom": {
       "textures": "textures/blocks/mbb/redwood_door_bottom"
+    },
+    "mbb_redwood_log": {
+      "textures": "textures/blocks/mbb/redwood_log"
+    },
+    "mbb_redwood_log_top": {
+      "textures": "textures/blocks/mbb/redwood_log_top"
+    },
+    "mbb_stripped_redwood_log": {
+      "textures": "textures/blocks/mbb/stripped_redwood_log"
+    },
+    "mbb_stripped_redwood_log_top": {
+      "textures": "textures/blocks/mbb/stripped_redwood_log_top"
     },
     "mbb_ebony_planks": {
       "textures": "textures/blocks/mbb/ebony_planks"
@@ -31,6 +55,18 @@
     "mbb_ebony_door_bottom": {
       "textures": "textures/blocks/mbb/ebony_door_bottom"
     },
+    "mbb_ebony_log": {
+      "textures": "textures/blocks/mbb/ebony_log"
+    },
+    "mbb_ebony_log_top": {
+      "textures": "textures/blocks/mbb/ebony_log_top"
+    },
+    "mbb_stripped_ebony_log": {
+      "textures": "textures/blocks/mbb/stripped_ebony_log"
+    },
+    "mbb_stripped_ebony_log_top": {
+      "textures": "textures/blocks/mbb/stripped_ebony_log_top"
+    },
     "mbb_willow_planks": {
       "textures": "textures/blocks/mbb/willow_planks"
     },
@@ -39,6 +75,18 @@
     },
     "mbb_willow_door_bottom": {
       "textures": "textures/blocks/mbb/willow_door_bottom"
+    },
+    "mbb_willow_log": {
+      "textures": "textures/blocks/mbb/willow_log"
+    },
+    "mbb_willow_log_top": {
+      "textures": "textures/blocks/mbb/willow_log_top"
+    },
+    "mbb_stripped_willow_log": {
+      "textures": "textures/blocks/mbb/stripped_willow_log"
+    },
+    "mbb_stripped_willow_log_top": {
+      "textures": "textures/blocks/mbb/stripped_willow_log_top"
     },
     "mbb_ash_planks": {
       "textures": "textures/blocks/mbb/ash_planks"
@@ -49,6 +97,18 @@
     "mbb_ash_door_bottom": {
       "textures": "textures/blocks/mbb/ash_door_bottom"
     },
+    "mbb_ash_log": {
+      "textures": "textures/blocks/mbb/ash_log"
+    },
+    "mbb_ash_log_top": {
+      "textures": "textures/blocks/mbb/ash_log_top"
+    },
+    "mbb_stripped_ash_log": {
+      "textures": "textures/blocks/mbb/stripped_ash_log"
+    },
+    "mbb_stripped_ash_log_top": {
+      "textures": "textures/blocks/mbb/stripped_ash_log_top"
+    },
     "mbb_azure_planks": {
       "textures": "textures/blocks/mbb/azure_planks"
     },
@@ -57,6 +117,144 @@
     },
     "mbb_azure_door_bottom": {
       "textures": "textures/blocks/mbb/azure_door_bottom"
+    },
+    "mbb_azure_log": {
+      "textures": "textures/blocks/mbb/azure_log"
+    },
+    "mbb_azure_log_top": {
+      "textures": "textures/blocks/mbb/azure_log_top"
+    },
+    "mbb_stripped_azure_log": {
+      "textures": "textures/blocks/mbb/stripped_azure_log"
+    },
+    "mbb_stripped_azure_log_top": {
+      "textures": "textures/blocks/mbb/stripped_azure_log_top"
+    },
+    "mbb_walnut_planks": {
+      "textures": "textures/blocks/mbb/walnut_planks"
+    },
+    "mbb_walnut_door_top": {
+      "textures": "textures/blocks/mbb/walnut_door_top"
+    },
+    "mbb_walnut_door_bottom": {
+      "textures": "textures/blocks/mbb/walnut_door_bottom"
+    },
+    "mbb_walnut_log": {
+      "textures": "textures/blocks/mbb/walnut_log"
+    },
+    "mbb_walnut_log_top": {
+      "textures": "textures/blocks/mbb/walnut_log_top"
+    },
+    "mbb_stripped_walnut_log": {
+      "textures": "textures/blocks/mbb/stripped_walnut_log"
+    },
+    "mbb_stripped_walnut_log_top": {
+      "textures": "textures/blocks/mbb/stripped_walnut_log_top"
+    },
+    "mbb_rosewood_planks": {
+      "textures": "textures/blocks/mbb/rosewood_planks"
+    },
+    "mbb_rosewood_door_top": {
+      "textures": "textures/blocks/mbb/rosewood_door_top"
+    },
+    "mbb_rosewood_door_bottom": {
+      "textures": "textures/blocks/mbb/rosewood_door_bottom"
+    },
+    "mbb_rosewood_log": {
+      "textures": "textures/blocks/mbb/rosewood_log"
+    },
+    "mbb_rosewood_log_top": {
+      "textures": "textures/blocks/mbb/rosewood_log_top"
+    },
+    "mbb_stripped_rosewood_log": {
+      "textures": "textures/blocks/mbb/stripped_rosewood_log"
+    },
+    "mbb_stripped_rosewood_log_top": {
+      "textures": "textures/blocks/mbb/stripped_rosewood_log_top"
+    },
+    "mbb_palm_planks": {
+      "textures": "textures/blocks/mbb/palm_planks"
+    },
+    "mbb_palm_door_top": {
+      "textures": "textures/blocks/mbb/palm_door_top"
+    },
+    "mbb_palm_door_bottom": {
+      "textures": "textures/blocks/mbb/palm_door_bottom"
+    },
+    "mbb_palm_log": {
+      "textures": "textures/blocks/mbb/palm_log"
+    },
+    "mbb_palm_log_top": {
+      "textures": "textures/blocks/mbb/palm_log_top"
+    },
+    "mbb_stripped_palm_log": {
+      "textures": "textures/blocks/mbb/stripped_palm_log"
+    },
+    "mbb_stripped_palm_log_top": {
+      "textures": "textures/blocks/mbb/stripped_palm_log_top"
+    },
+    "mbb_ironwood_planks": {
+      "textures": "textures/blocks/mbb/ironwood_planks"
+    },
+    "mbb_ironwood_door_top": {
+      "textures": "textures/blocks/mbb/ironwood_door_top"
+    },
+    "mbb_ironwood_door_bottom": {
+      "textures": "textures/blocks/mbb/ironwood_door_bottom"
+    },
+    "mbb_ironwood_log": {
+      "textures": "textures/blocks/mbb/ironwood_log"
+    },
+    "mbb_ironwood_log_top": {
+      "textures": "textures/blocks/mbb/ironwood_log_top"
+    },
+    "mbb_stripped_ironwood_log": {
+      "textures": "textures/blocks/mbb/stripped_ironwood_log"
+    },
+    "mbb_stripped_ironwood_log_top": {
+      "textures": "textures/blocks/mbb/stripped_ironwood_log_top"
+    },
+    "mbb_ghostwood_planks": {
+      "textures": "textures/blocks/mbb/ghostwood_planks"
+    },
+    "mbb_ghostwood_door_top": {
+      "textures": "textures/blocks/mbb/ghostwood_door_top"
+    },
+    "mbb_ghostwood_door_bottom": {
+      "textures": "textures/blocks/mbb/ghostwood_door_bottom"
+    },
+    "mbb_ghostwood_log": {
+      "textures": "textures/blocks/mbb/ghostwood_log"
+    },
+    "mbb_ghostwood_log_top": {
+      "textures": "textures/blocks/mbb/ghostwood_log_top"
+    },
+    "mbb_stripped_ghostwood_log": {
+      "textures": "textures/blocks/mbb/stripped_ghostwood_log"
+    },
+    "mbb_stripped_ghostwood_log_top": {
+      "textures": "textures/blocks/mbb/stripped_ghostwood_log_top"
+    },
+    "mbb_plumwood_planks": {
+      "textures": "textures/blocks/mbb/plumwood_planks"
+    },
+    "mbb_plumwood_door_top": {
+      "textures": "textures/blocks/mbb/plumwood_door_top"
+    },
+    "mbb_plumwood_door_bottom": {
+      "textures": "textures/blocks/mbb/plumwood_door_bottom"
+    },
+    "mbb_plumwood_log": {
+      "textures": "textures/blocks/mbb/plumwood_log"
+    },
+    "mbb_plumwood_log_top": {
+      "textures": "textures/blocks/mbb/plumwood_log_top"
+    },
+    "mbb_stripped_plumwood_log": {
+      "textures": "textures/blocks/mbb/stripped_plumwood_log"
+    },
+    "mbb_stripped_plumwood_log_top": {
+      "textures": "textures/blocks/mbb/stripped_plumwood_log_top"
     },
     "mbb_marble": {
       "textures": "textures/blocks/mbb/marble"
@@ -111,6 +309,60 @@
     },
     "mbb_polished_onyx_door_bottom": {
       "textures": "textures/blocks/mbb/polished_onyx_door_bottom"
+    },
+    "mbb_travertine": {
+      "textures": "textures/blocks/mbb/travertine"
+    },
+    "mbb_travertine_door_top": {
+      "textures": "textures/blocks/mbb/travertine_door_top"
+    },
+    "mbb_travertine_door_bottom": {
+      "textures": "textures/blocks/mbb/travertine_door_bottom"
+    },
+    "mbb_gabbro_bricks": {
+      "textures": "textures/blocks/mbb/gabbro_bricks"
+    },
+    "mbb_gabbro_brick_door_top": {
+      "textures": "textures/blocks/mbb/gabbro_brick_door_top"
+    },
+    "mbb_gabbro_brick_door_bottom": {
+      "textures": "textures/blocks/mbb/gabbro_brick_door_bottom"
+    },
+    "mbb_rose_quartz_bricks": {
+      "textures": "textures/blocks/mbb/rose_quartz_bricks"
+    },
+    "mbb_rose_quartz_brick_door_top": {
+      "textures": "textures/blocks/mbb/rose_quartz_brick_door_top"
+    },
+    "mbb_rose_quartz_brick_door_bottom": {
+      "textures": "textures/blocks/mbb/rose_quartz_brick_door_bottom"
+    },
+    "mbb_chalk_tiles": {
+      "textures": "textures/blocks/mbb/chalk_tiles"
+    },
+    "mbb_chalk_tile_door_top": {
+      "textures": "textures/blocks/mbb/chalk_tile_door_top"
+    },
+    "mbb_chalk_tile_door_bottom": {
+      "textures": "textures/blocks/mbb/chalk_tile_door_bottom"
+    },
+    "mbb_shale_bricks": {
+      "textures": "textures/blocks/mbb/shale_bricks"
+    },
+    "mbb_shale_brick_door_top": {
+      "textures": "textures/blocks/mbb/shale_brick_door_top"
+    },
+    "mbb_shale_brick_door_bottom": {
+      "textures": "textures/blocks/mbb/shale_brick_door_bottom"
+    },
+    "mbb_marble_bricks": {
+      "textures": "textures/blocks/mbb/marble_bricks"
+    },
+    "mbb_marble_brick_door_top": {
+      "textures": "textures/blocks/mbb/marble_brick_door_top"
+    },
+    "mbb_marble_brick_door_bottom": {
+      "textures": "textures/blocks/mbb/marble_brick_door_bottom"
     }
   }
 }

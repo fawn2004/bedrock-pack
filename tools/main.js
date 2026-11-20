@@ -1,10 +1,12 @@
 // More Building Blocks - door and slab behaviour.
 // Generated into the behavior pack by tools/build.py (lists below are filled in).
-import { system, world, ItemStack } from "@minecraft/server";
+import { system, world, ItemStack, BlockPermutation } from "@minecraft/server";
 
 const NS = "mbb";
 const SLABS = new Set(__SLABS__);
 const DOORS = __DOORS__; // door id -> "wood" | "stone"
+const STAIRS = new Set(__STAIRS__);
+const LOGS = __LOGS__; // log id -> stripped log id
 
 const isCreative = (player) => String(player.getGameMode()).toLowerCase() === "creative";
 
@@ -168,6 +170,102 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
     } else {
       container.setItem(slot, undefined);
     }
+  });
+});
+
+// ---------------------------------------------------------------- stairs
+// Corner shapes use the same rules as vanilla stairs, so corners always line
+// up. Our stairs also join up with vanilla stairs.
+
+const OPPOSITE = { north: "south", south: "north", east: "west", west: "east" };
+const AXIS = { north: "z", south: "z", east: "x", west: "x" };
+const VANILLA_DIR = ["east", "west", "south", "north"]; // weirdo_direction 0..3
+
+function stairInfo(block) {
+  if (!block) return undefined;
+  const id = block.typeId;
+  const p = block.permutation;
+  if (STAIRS.has(id)) {
+    return { dir: p.getState("minecraft:cardinal_direction"), top: p.getState("minecraft:vertical_half") === "top" };
+  }
+  if (id.startsWith("minecraft:") && id.endsWith("_stairs")) {
+    const w = p.getState("weirdo_direction");
+    if (w === undefined) return undefined;
+    return { dir: VANILLA_DIR[w], top: !!p.getState("upside_down_bit") };
+  }
+  return undefined;
+}
+
+function stairShape(block, me) {
+  const canTakeShape = (dir) => {
+    const n = stairInfo(offset(block, dir));
+    return !n || n.dir !== me.dir || n.top !== me.top;
+  };
+  const front = stairInfo(offset(block, me.dir));
+  if (front && front.top === me.top && AXIS[front.dir] !== AXIS[me.dir] && canTakeShape(OPPOSITE[front.dir])) {
+    return front.dir === LEFT_OF[me.dir] ? "outer_left" : "outer_right";
+  }
+  const back = stairInfo(offset(block, OPPOSITE[me.dir]));
+  if (back && back.top === me.top && AXIS[back.dir] !== AXIS[me.dir] && canTakeShape(back.dir)) {
+    return back.dir === LEFT_OF[me.dir] ? "inner_left" : "inner_right";
+  }
+  return "straight";
+}
+
+function refreshStairs(block) {
+  try {
+    if (!block || !STAIRS.has(block.typeId)) return;
+    const shape = stairShape(block, stairInfo(block));
+    if (block.permutation.getState(`${NS}:shape`) !== shape) {
+      block.setPermutation(block.permutation.withState(`${NS}:shape`, shape));
+    }
+  } catch { /* unloaded */ }
+}
+
+function refreshStairsAround(block) {
+  refreshStairs(block);
+  for (const dir of ["north", "south", "east", "west"]) refreshStairs(offset(block, dir));
+}
+
+world.afterEvents.playerPlaceBlock.subscribe(({ block }) => refreshStairsAround(block));
+world.afterEvents.playerBreakBlock.subscribe(({ block }) => refreshStairsAround(block));
+
+// ---------------------------------------------------------------- logs
+// Use an axe on a log to strip it, like vanilla.
+
+function damageHeldItem(player) {
+  if (isCreative(player)) return;
+  const container = player.getComponent("minecraft:inventory")?.container;
+  if (!container) return;
+  const slot = player.selectedSlotIndex;
+  const item = container.getItem(slot);
+  const durability = item?.getComponent("minecraft:durability");
+  if (!durability) return;
+  if (durability.damage + 1 >= durability.maxDurability) {
+    container.setItem(slot, undefined);
+    player.dimension.playSound("random.break", player.location);
+  } else {
+    durability.damage += 1;
+    container.setItem(slot, item);
+  }
+}
+
+world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
+  const stripped = LOGS[event.block.typeId];
+  const item = event.itemStack;
+  if (!stripped || !item) return;
+  let isAxe = false;
+  try { isAxe = item.hasTag("minecraft:is_axe"); } catch { /* ignore */ }
+  if (!isAxe && !item.typeId.endsWith("_axe")) return;
+  event.cancel = true;
+  if (event.isFirstEvent === false) return;
+  const { block, player } = event;
+  system.run(() => {
+    if (LOGS[block.typeId] !== stripped) return;
+    const face = block.permutation.getState("minecraft:block_face");
+    block.setPermutation(BlockPermutation.resolve(stripped, { "minecraft:block_face": face }));
+    block.dimension.playSound("use.wood", block.center());
+    damageHeldItem(player);
   });
 });
 

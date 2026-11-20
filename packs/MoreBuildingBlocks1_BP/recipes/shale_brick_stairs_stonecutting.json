@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:shale_brick_stairs_stonecutting"
+    },
+    "tags": [
+      "stonecutter"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:shale_bricks"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:shale_bricks"
+      }
+    ],
+    "result": {
+      "item": "mbb:shale_brick_stairs",
+      "count": 1
+    }
+  }
+}

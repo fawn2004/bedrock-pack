@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:marble_brick_from_marble_stonecutting"
+    },
+    "tags": [
+      "stonecutter"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:marble"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:marble"
+      }
+    ],
+    "result": {
+      "item": "mbb:marble_bricks",
+      "count": 1
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:gabbro_brick_from_dye"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###",
+      "#D#",
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "minecraft:stone"
+      },
+      "D": {
+        "item": "minecraft:black_dye"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:black_dye"
+      }
+    ],
+    "result": {
+      "item": "mbb:gabbro_bricks",
+      "count": 8
+    }
+  }
+}

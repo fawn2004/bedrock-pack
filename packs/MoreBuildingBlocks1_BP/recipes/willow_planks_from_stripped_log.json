@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:willow_planks_from_stripped_log"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:stripped_willow_log"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:stripped_willow_log"
+      }
+    ],
+    "result": {
+      "item": "mbb:willow_planks",
+      "count": 4
+    }
+  }
+}

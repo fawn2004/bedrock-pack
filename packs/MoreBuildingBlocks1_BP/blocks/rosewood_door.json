@@ -1,0 +1,606 @@
+{
+  "format_version": "1.26.20",
+  "minecraft:block": {
+    "description": {
+      "identifier": "mbb:rosewood_door",
+      "menu_category": {
+        "category": "none"
+      },
+      "states": {
+        "mbb:open": [
+          false,
+          true
+        ],
+        "mbb:hinge_right": [
+          false,
+          true
+        ],
+        "mbb:upper": [
+          false,
+          true
+        ]
+      },
+      "traits": {
+        "minecraft:placement_direction": {
+          "enabled_states": [
+            "minecraft:cardinal_direction"
+          ]
+        }
+      }
+    },
+    "components": {
+      "minecraft:map_color": "#b05860",
+      "minecraft:tags": [
+        "mbb:wood",
+        "mbb:door",
+        "wood",
+        "minecraft:is_axe_item_destructible",
+        "door"
+      ],
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 3
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 3
+      },
+      "minecraft:flammable": {
+        "catch_chance_modifier": 5,
+        "destroy_chance_modifier": 20
+      },
+      "minecraft:light_dampening": 0,
+      "minecraft:geometry": {
+        "identifier": "geometry.mbb_door",
+        "bone_visibility": {
+          "lower_north": "!q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')))",
+          "lower_south": "!q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')))",
+          "lower_west": "!q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')))",
+          "lower_east": "!q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')))",
+          "upper_north": "q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')))",
+          "upper_south": "q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')))",
+          "upper_west": "q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')))",
+          "upper_east": "q.block_state('mbb:upper') && ((q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')) || (q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')))"
+        }
+      },
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "mbb_rosewood_door_bottom",
+          "render_method": "alpha_test"
+        },
+        "door_bottom": {
+          "texture": "mbb_rosewood_door_bottom",
+          "render_method": "alpha_test"
+        },
+        "door_top": {
+          "texture": "mbb_rosewood_door_top",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:collision_box": [
+        {
+          "origin": [
+            -8,
+            0,
+            -8
+          ],
+          "size": [
+            16,
+            16,
+            3
+          ]
+        }
+      ],
+      "minecraft:selection_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          3
+        ]
+      },
+      "minecraft:loot": "loot_tables/empty.json",
+      "mbb:door": {}
+    },
+    "permutations": [
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                5
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              5
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                5
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              5
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                5,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              5,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                5,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              5,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                5,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              5,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                5,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              5,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                5
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              5
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                3,
+                16,
+                16
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              3,
+              16,
+              16
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "components": {
+          "minecraft:collision_box": [
+            {
+              "origin": [
+                -8,
+                0,
+                5
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ]
+            }
+          ],
+          "minecraft:selection_box": {
+            "origin": [
+              -8,
+              0,
+              5
+            ],
+            "size": [
+              16,
+              16,
+              3
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
