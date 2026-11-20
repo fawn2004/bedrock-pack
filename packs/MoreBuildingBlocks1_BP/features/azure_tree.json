@@ -1,0 +1,76 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:tree_feature": {
+    "description": {
+      "identifier": "mbb:azure_tree"
+    },
+    "trunk": {
+      "trunk_height": {
+        "range_min": 9,
+        "range_max": 13
+      },
+      "trunk_block": {
+        "name": "mbb:azure_wood",
+        "states": {
+          "minecraft:block_face": "up"
+        }
+      }
+    },
+    "spruce_canopy": {
+      "lower_offset": 2,
+      "upper_offset": 2,
+      "max_radius": 3,
+      "leaf_block": {
+        "name": "minecraft:spruce_leaves",
+        "states": {
+          "persistent_bit": true
+        }
+      }
+    },
+    "base_block": [
+      "minecraft:dirt"
+    ],
+    "may_grow_on": [
+      "minecraft:grass_block",
+      "minecraft:dirt",
+      "minecraft:coarse_dirt",
+      "minecraft:podzol",
+      "minecraft:dirt_with_roots",
+      "minecraft:moss_block",
+      "minecraft:mud",
+      "minecraft:mycelium",
+      "minecraft:farmland",
+      "minecraft:sand",
+      "minecraft:red_sand",
+      "minecraft:snow"
+    ],
+    "may_replace": [
+      "minecraft:air",
+      "minecraft:short_grass",
+      "minecraft:tall_grass",
+      "minecraft:fern",
+      "minecraft:large_fern",
+      "minecraft:snow_layer",
+      "minecraft:moss_carpet",
+      "minecraft:oak_leaves",
+      "minecraft:spruce_leaves",
+      "minecraft:birch_leaves",
+      "minecraft:jungle_leaves",
+      "minecraft:acacia_leaves",
+      "minecraft:dark_oak_leaves",
+      "minecraft:mangrove_leaves",
+      "minecraft:cherry_leaves",
+      "minecraft:azalea_leaves",
+      "minecraft:azalea_leaves_flowered",
+      "minecraft:pale_oak_leaves",
+      "minecraft:vine"
+    ],
+    "may_grow_through": [
+      "minecraft:short_grass",
+      "minecraft:tall_grass",
+      "minecraft:fern",
+      "minecraft:snow_layer",
+      "minecraft:moss_carpet"
+    ]
+  }
+}

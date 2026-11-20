@@ -1,0 +1,94 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:tree_feature": {
+    "description": {
+      "identifier": "mbb:ebony_tree"
+    },
+    "acacia_trunk": {
+      "trunk_width": 1,
+      "trunk_height": {
+        "base": 6,
+        "intervals": [
+          3,
+          3
+        ],
+        "min_height_for_canopy": 3
+      },
+      "trunk_lean": {
+        "allow_diagonal_growth": true,
+        "lean_height": {
+          "range_min": 2,
+          "range_max": 4
+        },
+        "lean_steps": {
+          "range_min": 2,
+          "range_max": 4
+        },
+        "lean_length": {
+          "range_min": 1,
+          "range_max": 3
+        }
+      },
+      "trunk_block": {
+        "name": "mbb:ebony_wood",
+        "states": {
+          "minecraft:block_face": "up"
+        }
+      }
+    },
+    "acacia_canopy": {
+      "canopy_size": 3,
+      "leaf_block": {
+        "name": "minecraft:acacia_leaves",
+        "states": {
+          "persistent_bit": true
+        }
+      }
+    },
+    "base_block": [
+      "minecraft:dirt"
+    ],
+    "may_grow_on": [
+      "minecraft:grass_block",
+      "minecraft:dirt",
+      "minecraft:coarse_dirt",
+      "minecraft:podzol",
+      "minecraft:dirt_with_roots",
+      "minecraft:moss_block",
+      "minecraft:mud",
+      "minecraft:mycelium",
+      "minecraft:farmland",
+      "minecraft:sand",
+      "minecraft:red_sand",
+      "minecraft:snow"
+    ],
+    "may_replace": [
+      "minecraft:air",
+      "minecraft:short_grass",
+      "minecraft:tall_grass",
+      "minecraft:fern",
+      "minecraft:large_fern",
+      "minecraft:snow_layer",
+      "minecraft:moss_carpet",
+      "minecraft:oak_leaves",
+      "minecraft:spruce_leaves",
+      "minecraft:birch_leaves",
+      "minecraft:jungle_leaves",
+      "minecraft:acacia_leaves",
+      "minecraft:dark_oak_leaves",
+      "minecraft:mangrove_leaves",
+      "minecraft:cherry_leaves",
+      "minecraft:azalea_leaves",
+      "minecraft:azalea_leaves_flowered",
+      "minecraft:pale_oak_leaves",
+      "minecraft:vine"
+    ],
+    "may_grow_through": [
+      "minecraft:short_grass",
+      "minecraft:tall_grass",
+      "minecraft:fern",
+      "minecraft:snow_layer",
+      "minecraft:moss_carpet"
+    ]
+  }
+}

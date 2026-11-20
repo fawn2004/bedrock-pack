@@ -1,6 +1,6 @@
 # More Building Blocks 1 (Minecraft Bedrock add-on)
 
-**12 new woods** and **12 new stones**: 180 blocks in total, plus **68 ready-made trees, bushes and rocks**.
+**12 new woods** and **12 new stones**: 180 blocks in total, plus **12 trees grown by Minecraft's own tree generators** and **32 ready-made bushes and rocks**.
 Each wood has a log, stripped log, wood (bark) block, bark stairs and slab, two leaf colours, planks, slab, stairs and door.
 Each stone has a block, slab, stairs and door.
 Shapes and collision work like the vanilla blocks.
@@ -60,18 +60,33 @@ Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 - **Shapes:** a slab is 3 in a row (makes 6), stairs take 6 (makes 4), and a door takes 6 in a 2x3 (makes 3).
   Stone slabs and stairs can also be made in the stonecutter.
 
-## Trees, bushes and rocks (structures)
-The pack includes 36 trees (every wood in small, medium and large), 14 bushes and 18 rocks.
-Trees use your custom logs and bark with **vanilla leaves**. Each has a visible trunk and limbs (stair-smoothed, with fence twigs). Every limb ends in its own leaf puff: a sparse dark underside, a wide body and a lighter rounded top. The puffs sit at different heights with space between them. Conifers are stacked flat tiers that alternate wide and narrow.
-- **Easiest:** stand where you want it and run, for example, `/function mbb/trees/maple_tree_large`.
-  Trees appear with their trunk at your feet. Rocks sink 1 block into the ground so they look natural.
-- **Structure block or command:** use the name `mbb:<name>`, e.g. `/structure load mbb:redwood_tree_large ~ ~ ~`.
-  This places the structure's corner (not its trunk) at your feet.
-  Add a rotation to vary them: `/structure load mbb:maple_tree_large ~ ~ ~ 90_degrees`.
-- **See them all:** `/function mbb/showcase` lays every structure out in rows in front of you. Use it on a flat creative world.
-- Empty space in a structure doesn't erase anything, so you can drop trees right next to your builds.
+## Trees, bushes and rocks
+### Trees (Minecraft's own tree generators)
+Each wood has a tree that uses Minecraft's built-in tree generation, with that wood's bark as the trunk and vanilla leaves.
+Every tree you place comes out different, just like natural trees.
 
-Trees: `<wood>_tree_small|medium|large` for maple, redwood, ebony, willow, ash, azure, walnut, rosewood, palm, ironwood, ghostwood, plumwood.
+| Command | Generator |
+|---|---|
+| `/function mbb/trees/maple_tree` | Fancy (big) oak |
+| `/function mbb/trees/walnut_tree` | Dark oak, 2×2 trunk |
+| `/function mbb/trees/redwood_tree` | Mega spruce, 2×2 trunk |
+| `/function mbb/trees/ironwood_tree` | Tall pine |
+| `/function mbb/trees/azure_tree` | Spruce |
+| `/function mbb/trees/ash_tree` | Tall fancy tree, birch leaves |
+| `/function mbb/trees/ghostwood_tree` | Fancy tree, pale oak leaves |
+| `/function mbb/trees/ebony_tree` | Acacia |
+| `/function mbb/trees/palm_tree` | Leaning acacia trunk, jungle leaves |
+| `/function mbb/trees/rosewood_tree` | Cherry |
+| `/function mbb/trees/willow_tree` | Wide spreading crown, mangrove leaves |
+| `/function mbb/trees/plumwood_tree` | Flowering azalea |
+
+You can also use `/place feature mbb:maple_tree ~ ~ ~`. Stand on grass or dirt, because trees only grow on soil, like vanilla ones.
+
+### Bushes and rocks (structures)
+- **Easiest:** `/function mbb/bushes/<name>` or `/function mbb/rocks/<name>` places one centred on you.
+- **Command:** `/structure load mbb:<name> ~ ~ ~` places the structure's corner at your feet.
+- **See everything:** `/function mbb/showcase` grows 3 of every tree and lays out all the bushes and rocks. Use it on a flat creative world.
+
 Bushes: oak_bush, oak_bush_large, azalea_bush, flowering_bush, cherry_bush, birch_bush, spruce_shrub, jungle_bush, acacia_bush, mangrove_bush, pale_bush, stemmed_bush, stemmed_bush_large, tall_bush.
 Rocks: `grey|mossy|marble|travertine|dark` + `_boulder`, `_boulder_large`, `_rock_pile`; plus grey_spire, dark_outcrop, mossy_ledge.
 
