@@ -1,1 +1,1 @@
-structure load mbb:willow_tree_small ~-5 ~0 ~-6
+structure load mbb:willow_tree_small ~-4 ~0 ~-4

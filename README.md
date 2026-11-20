@@ -62,7 +62,7 @@ Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 
 ## Trees, bushes and rocks (structures)
 The pack includes 36 trees (every wood in small, medium and large), 14 bushes and 18 rocks.
-Trees use your custom logs and bark with **vanilla leaves**. Each one has buttress roots, a bumpy trunk, stair-smoothed branches, fence twigs and a canopy of separate leaf clumps in light, mid and dark tones.
+Trees use your custom logs and bark with **vanilla leaves**. Broadleaf trees are *grown* with a space-colonisation algorithm (`tools/growth.py`): branches split naturally, thickness follows the load each limb carries (tapering trunk, then logs, then fence twigs), every diagonal step is smoothed with stairs, and leaves sit in many small clumps round the twig tips in light, mid and dark tones. Conifers grow as whorls of drooping branches.
 - **Easiest:** stand where you want it and run, for example, `/function mbb/trees/maple_tree_large`.
   Trees appear with their trunk at your feet. Rocks sink 1 block into the ground so they look natural.
 - **Structure block or command:** use the name `mbb:<name>`, e.g. `/structure load mbb:redwood_tree_large ~ ~ ~`.

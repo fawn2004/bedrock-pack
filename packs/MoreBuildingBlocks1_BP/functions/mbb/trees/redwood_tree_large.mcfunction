@@ -1,1 +1,1 @@
-structure load mbb:redwood_tree_large ~-8 ~0 ~-8
+structure load mbb:redwood_tree_large ~-11 ~0 ~-10

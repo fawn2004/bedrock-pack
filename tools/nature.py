@@ -10,6 +10,11 @@ import math
 import os
 import random
 import struct
+import sys
+
+import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 NS = "mbb"
 BLOCK_VERSION = 18168832  # 1.21.60; the game upgrades older palette entries itself
@@ -307,6 +312,31 @@ class Tree:
             rad = size * r.uniform(0.6, 1.0)
             self.puff((c[0] + ox, c[1] + oy, c[2] + oz), rad, max(1.1, rad * flat), hang=hang,
                       density=density)
+
+    def clump(self, c, rx, ry, bias=0.0, density=0.9, hang=0, hang_chance=0.25):
+        """Small leaf clump; bias shifts its tone (+ lighter, - darker)."""
+        r = self.rng
+        cx, cy, cz = (float(v) for v in c)
+        cells = []
+        for x in range(int(math.floor(cx - rx - 1)), int(math.ceil(cx + rx + 1)) + 1):
+            for y in range(int(math.floor(cy - ry - 1)), int(math.ceil(cy + ry + 1)) + 1):
+                for z in range(int(math.floor(cz - rx - 1)), int(math.ceil(cz + rx + 1)) + 1):
+                    dx, dy, dz = (x - cx) / rx, (y - cy) / ry, (z - cz) / rx
+                    d = dx * dx + dy * dy + dz * dz
+                    if d <= 1 + r.uniform(-0.35, 0.1) and r.random() < density and not self.g.has((x, y, z)):
+                        self.leaf((x, y, z), dy + bias, inner=d < 0.25)
+                        cells.append((x, y, z))
+        if hang:
+            cs = set(cells)
+            for (x, y, z) in cells:
+                if (x, y - 1, z) in cs or r.random() > hang_chance:
+                    continue
+                for k in range(1, r.randint(1, hang) + 1):
+                    q = (x, y - k, z)
+                    if self.g.has(q):
+                        break
+                    self.leaf(q, -1)
+        return cells
 
     # ------------------------------------------------------------ trunk
     def trunk(self, h, base_w=1, narrow_at=None, lean=None, lean_every=99, top_w=1):
@@ -730,6 +760,146 @@ SPECIES = {
 }
 
 SIZES = [("small", 0.85), ("medium", 1.1), ("large", 1.4)]
+
+
+# ======================================================================== organic trees (v3)
+import growth as GR  # noqa: E402
+
+
+def organic(t, s, trunk_h, crown, shape="ellipsoid", points=302, lumps=9, rmax=0.9,
+            leaf_r=2.4, tropism=(0, 0.12, 0), influence=6.5, lean=(0.0, 0.0), sprout_from=0.55,
+            n_roots=5, root_reach=3.5, hang=0, hang_chance=0.25, flat=0.75, density=0.9,
+            skip=0.0, along=0.3, max_w=3, dead=0, lump_r=0.22, fence_chance=0.45, kill=2.4):
+    """Space-colonisation broadleaf. crown = (rx, ry, rz, centre height above trunk top)."""
+    r = t.rng
+    sk = GR.Skeleton()
+    H = max(3, int(trunk_h * s))
+    lx, lz = lean
+    top = GR.grow_trunk(sk, r, H, lean=(lx, lz))
+    trunk_nodes = [i for i, k in enumerate(sk.kind) if k == "trunk"]
+    rx, ry, rz, up = crown
+    tp = sk.pos[top]
+    pts = GR.crown_points(r, shape, int(points * s), (tp[0], tp[1] + up * s, tp[2]),
+                          rx * s, ry * s, rz * s, lumps=lumps, lump_r=lump_r)
+    GR.colonise(sk, r, pts, trunk_nodes[int(len(trunk_nodes) * sprout_from):], influence=influence * s ** 0.5,
+                tropism=tropism, kill=kill * s ** 0.5)
+    for _ in range(dead):   # dead stubs low on the trunk
+        base = trunk_nodes[r.randint(int(H * 0.25), int(H * 0.6))]
+        ang = r.uniform(0, math.tau)
+        p = sk.pos[base]
+        prev = base
+        for k in range(r.randint(1, 3)):
+            p = p + np.array([math.cos(ang), 0.3, math.sin(ang)])
+            prev = sk.add(p, prev, "dead")
+    GR.roots(sk, r, 0, n_roots, root_reach * s)
+    w, ch, radius = GR.voxelise(t, sk, rmax * (0.62 + (s - 0.85) * 1.2), fence_chance=fence_chance)
+    GR.smooth_steps(t)
+    GR.leaves_at_tips(t, sk, w, ch, radius, leaf_r=leaf_r * s ** 0.5, hang=hang, hang_chance=hang_chance,
+                      flat=flat, density=density, skip=skip, along=along, max_w=max_w)
+
+
+def conifer3(t, s, height=22, base_len=6.0, rmax=0.9, start=0.25, profile="cone", per=(5, 7),
+             gap=(2, 3), leaf_r=1.4, dead=0, n_roots=6):
+    r = t.rng
+    sk = GR.Skeleton()
+    H = int(height * s)
+    GR.grow_trunk(sk, r, H, wobble=0.06 if profile == "cone" else 0.1)
+    trunk_nodes = [i for i, k in enumerate(sk.kind) if k == "trunk"]
+    GR.whorls(sk, r, trunk_nodes, int(H * start), H - 1, base_len * s, per_whorl=per, gap=gap,
+              profile=profile)
+    for _ in range(dead):
+        base = trunk_nodes[r.randint(int(H * 0.2), int(H * start))]
+        ang = r.uniform(0, math.tau)
+        p, prev = sk.pos[base], base
+        for k in range(r.randint(1, 3)):
+            p = p + np.array([math.cos(ang), -0.1, math.sin(ang)])
+            prev = sk.add(p, prev, "dead")
+    GR.roots(sk, r, 0, n_roots, 3.5 * s)
+    w, ch, radius = GR.voxelise(t, sk, rmax * (0.62 + (s - 0.85) * 1.2), fence_chance=0.2)
+    GR.smooth_steps(t)
+    GR.leaves_at_tips(t, sk, w, ch, radius, leaf_r=leaf_r * s ** 0.4, flat=0.6, along=0.8, max_w=4,
+                      density=0.92)
+    top = sk.pos[trunk_nodes[-1]]
+    for k in range(3):   # leader at the very top
+        t.leaf((int(round(top[0])), int(round(top[1])) + 1 + k, int(round(top[2]))), 0.8)
+
+
+def oak3(t, s):
+    organic(t, s, 7, (6.5, 4.5, 6.5, 3.0), points=273, lumps=7, rmax=1.05, leaf_r=2.0, sprout_from=0.35)
+
+
+def walnut3(t, s):
+    organic(t, s, 8, (7.5, 4.6, 7.0, 5.0), points=467, lumps=12, rmax=1.25, leaf_r=2.5, n_roots=6,
+            root_reach=4.5)
+
+
+def ash3(t, s):
+    organic(t, s, 9, (5.0, 7.0, 5.0, 4.5), points=360, lumps=8, rmax=0.85, leaf_r=2.2, sprout_from=0.4,
+            tropism=(0, 0.25, 0), dead=2)
+
+
+def willow3(t, s):
+    organic(t, s, 6, (6.5, 3.5, 6.5, 3.0), shape="dome", points=345, lumps=9, rmax=0.95, leaf_r=2.2,
+            tropism=(0, -0.05, 0), hang=7, hang_chance=0.45, flat=0.6, lean=(0.08, 0.0))
+
+
+def acacia3(t, s):
+    organic(t, s, 7, (7.0, 1.6, 6.5, 4.0), shape="disc", points=302, lumps=7, rmax=0.85, leaf_r=2.3,
+            tropism=(0, 0.35, 0), flat=0.45, sprout_from=0.6, lean=(0.06, 0.04))
+
+
+def cherry3(t, s):
+    organic(t, s, 5, (6.0, 3.0, 6.0, 3.5), shape="dome", points=331, lumps=9, rmax=0.9, leaf_r=2.4,
+            hang=2, hang_chance=0.3, flat=0.7)
+
+
+def ghost3(t, s):
+    organic(t, s, 8, (4.5, 5.0, 4.5, 4.0), points=216, lumps=6, rmax=0.85, leaf_r=1.9, skip=0.45,
+            density=0.75, hang=3, hang_chance=0.35, lean=(0.1, 0.05), dead=4, max_w=2)
+
+
+def dome3(t, s):
+    organic(t, s, 8, (5.5, 3.6, 5.5, 2.5), shape="dome", points=374, lumps=8, rmax=0.95, leaf_r=2.5,
+            hang=3, hang_chance=0.35, flat=0.7)
+
+
+def redwood3(t, s):
+    conifer3(t, s, height=24, base_len=6.5, rmax=1.25, start=0.3, leaf_r=1.45, dead=3)
+
+
+def pine3(t, s):
+    conifer3(t, s, height=30, base_len=3.0, rmax=0.85, start=0.55, profile="pine", per=(3, 5),
+             gap=(2, 3), leaf_r=1.5, dead=6, n_roots=4)
+
+
+SPECIES = {
+    "maple": (oak3, {}, "spruce_fence",
+              _pal(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "redwood": (redwood3, {}, "mangrove_fence",
+                _pal(["spruce_leaves"], ["dark_oak_leaves", "spruce_leaves"], ["spruce_leaves"],
+                     ["azalea_leaves"])),
+    "ebony": (acacia3, {}, "dark_oak_fence",
+              _pal(["acacia_leaves"], ["dark_oak_leaves"], ["acacia_leaves", "azalea_leaves"])),
+    "willow": (willow3, {}, "spruce_fence",
+               _pal(["mangrove_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "ash": (ash3, {}, "pale_oak_fence",
+            _pal(["birch_leaves"], ["dark_oak_leaves"], ["birch_leaves", "azalea_leaves"])),
+    "azure": (cypress, {}, "dark_oak_fence",
+              _pal(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "walnut": (walnut3, {}, "dark_oak_fence",
+               _pal(["oak_leaves", "dark_oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves", "oak_leaves"])),
+    "rosewood": (cherry3, {}, "crimson_fence",
+                 _pal(["cherry_leaves"], ["azalea_leaves_flowered", "cherry_leaves"], ["cherry_leaves"])),
+    "palm": (palm, {}, "jungle_fence",
+             _pal(["jungle_leaves"], ["jungle_leaves", "dark_oak_leaves"], ["azalea_leaves"])),
+    "ironwood": (pine3, {}, "spruce_fence",
+                 _pal(["spruce_leaves"], ["dark_oak_leaves"], ["azalea_leaves", "spruce_leaves"])),
+    "ghostwood": (ghost3, {}, "pale_oak_fence",
+                  _pal(["pale_oak_leaves"], ["pale_oak_leaves"], ["pale_oak_leaves", "birch_leaves"])),
+    "plumwood": (dome3, {}, "crimson_fence",
+                 _pal(["azalea_leaves_flowered"], ["dark_oak_leaves", "azalea_leaves"], ["cherry_leaves"])),
+}
+
 
 
 # ======================================================================== bushes

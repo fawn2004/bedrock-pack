@@ -1,1 +1,1 @@
-structure load mbb:maple_tree_medium ~-3 ~0 ~-6
+structure load mbb:maple_tree_medium ~-6 ~0 ~-7

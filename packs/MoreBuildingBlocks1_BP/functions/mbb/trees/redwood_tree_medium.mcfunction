@@ -1,1 +1,1 @@
-structure load mbb:redwood_tree_medium ~-7 ~0 ~-7
+structure load mbb:redwood_tree_medium ~-8 ~0 ~-8

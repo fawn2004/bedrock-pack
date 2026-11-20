@@ -1,1 +1,1 @@
-structure load mbb:rosewood_tree_medium ~-4 ~0 ~-4
+structure load mbb:rosewood_tree_medium ~-5 ~0 ~-6
