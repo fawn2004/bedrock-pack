@@ -25,6 +25,12 @@
     "mbb_stripped_maple_log_top": {
       "textures": "textures/blocks/mbb/stripped_maple_log_top"
     },
+    "mbb_maple_leaves": {
+      "textures": "textures/blocks/mbb/maple_leaves"
+    },
+    "mbb_maple_leaves_dark": {
+      "textures": "textures/blocks/mbb/maple_leaves_dark"
+    },
     "mbb_redwood_planks": {
       "textures": "textures/blocks/mbb/redwood_planks"
     },
@@ -45,6 +51,12 @@
     },
     "mbb_stripped_redwood_log_top": {
       "textures": "textures/blocks/mbb/stripped_redwood_log_top"
+    },
+    "mbb_redwood_leaves": {
+      "textures": "textures/blocks/mbb/redwood_leaves"
+    },
+    "mbb_redwood_leaves_dark": {
+      "textures": "textures/blocks/mbb/redwood_leaves_dark"
     },
     "mbb_ebony_planks": {
       "textures": "textures/blocks/mbb/ebony_planks"
@@ -67,6 +79,12 @@
     "mbb_stripped_ebony_log_top": {
       "textures": "textures/blocks/mbb/stripped_ebony_log_top"
     },
+    "mbb_ebony_leaves": {
+      "textures": "textures/blocks/mbb/ebony_leaves"
+    },
+    "mbb_ebony_leaves_dark": {
+      "textures": "textures/blocks/mbb/ebony_leaves_dark"
+    },
     "mbb_willow_planks": {
       "textures": "textures/blocks/mbb/willow_planks"
     },
@@ -87,6 +105,12 @@
     },
     "mbb_stripped_willow_log_top": {
       "textures": "textures/blocks/mbb/stripped_willow_log_top"
+    },
+    "mbb_willow_leaves": {
+      "textures": "textures/blocks/mbb/willow_leaves"
+    },
+    "mbb_willow_leaves_dark": {
+      "textures": "textures/blocks/mbb/willow_leaves_dark"
     },
     "mbb_ash_planks": {
       "textures": "textures/blocks/mbb/ash_planks"
@@ -109,6 +133,12 @@
     "mbb_stripped_ash_log_top": {
       "textures": "textures/blocks/mbb/stripped_ash_log_top"
     },
+    "mbb_ash_leaves": {
+      "textures": "textures/blocks/mbb/ash_leaves"
+    },
+    "mbb_ash_leaves_dark": {
+      "textures": "textures/blocks/mbb/ash_leaves_dark"
+    },
     "mbb_azure_planks": {
       "textures": "textures/blocks/mbb/azure_planks"
     },
@@ -129,6 +159,12 @@
     },
     "mbb_stripped_azure_log_top": {
       "textures": "textures/blocks/mbb/stripped_azure_log_top"
+    },
+    "mbb_azure_leaves": {
+      "textures": "textures/blocks/mbb/azure_leaves"
+    },
+    "mbb_azure_leaves_dark": {
+      "textures": "textures/blocks/mbb/azure_leaves_dark"
     },
     "mbb_walnut_planks": {
       "textures": "textures/blocks/mbb/walnut_planks"
@@ -151,6 +187,12 @@
     "mbb_stripped_walnut_log_top": {
       "textures": "textures/blocks/mbb/stripped_walnut_log_top"
     },
+    "mbb_walnut_leaves": {
+      "textures": "textures/blocks/mbb/walnut_leaves"
+    },
+    "mbb_walnut_leaves_dark": {
+      "textures": "textures/blocks/mbb/walnut_leaves_dark"
+    },
     "mbb_rosewood_planks": {
       "textures": "textures/blocks/mbb/rosewood_planks"
     },
@@ -171,6 +213,12 @@
     },
     "mbb_stripped_rosewood_log_top": {
       "textures": "textures/blocks/mbb/stripped_rosewood_log_top"
+    },
+    "mbb_rosewood_leaves": {
+      "textures": "textures/blocks/mbb/rosewood_leaves"
+    },
+    "mbb_rosewood_leaves_dark": {
+      "textures": "textures/blocks/mbb/rosewood_leaves_dark"
     },
     "mbb_palm_planks": {
       "textures": "textures/blocks/mbb/palm_planks"
@@ -193,6 +241,12 @@
     "mbb_stripped_palm_log_top": {
       "textures": "textures/blocks/mbb/stripped_palm_log_top"
     },
+    "mbb_palm_leaves": {
+      "textures": "textures/blocks/mbb/palm_leaves"
+    },
+    "mbb_palm_leaves_dark": {
+      "textures": "textures/blocks/mbb/palm_leaves_dark"
+    },
     "mbb_ironwood_planks": {
       "textures": "textures/blocks/mbb/ironwood_planks"
     },
@@ -213,6 +267,12 @@
     },
     "mbb_stripped_ironwood_log_top": {
       "textures": "textures/blocks/mbb/stripped_ironwood_log_top"
+    },
+    "mbb_ironwood_leaves": {
+      "textures": "textures/blocks/mbb/ironwood_leaves"
+    },
+    "mbb_ironwood_leaves_dark": {
+      "textures": "textures/blocks/mbb/ironwood_leaves_dark"
     },
     "mbb_ghostwood_planks": {
       "textures": "textures/blocks/mbb/ghostwood_planks"
@@ -235,6 +295,12 @@
     "mbb_stripped_ghostwood_log_top": {
       "textures": "textures/blocks/mbb/stripped_ghostwood_log_top"
     },
+    "mbb_ghostwood_leaves": {
+      "textures": "textures/blocks/mbb/ghostwood_leaves"
+    },
+    "mbb_ghostwood_leaves_dark": {
+      "textures": "textures/blocks/mbb/ghostwood_leaves_dark"
+    },
     "mbb_plumwood_planks": {
       "textures": "textures/blocks/mbb/plumwood_planks"
     },
@@ -255,6 +321,12 @@
     },
     "mbb_stripped_plumwood_log_top": {
       "textures": "textures/blocks/mbb/stripped_plumwood_log_top"
+    },
+    "mbb_plumwood_leaves": {
+      "textures": "textures/blocks/mbb/plumwood_leaves"
+    },
+    "mbb_plumwood_leaves_dark": {
+      "textures": "textures/blocks/mbb/plumwood_leaves_dark"
     },
     "mbb_marble": {
       "textures": "textures/blocks/mbb/marble"

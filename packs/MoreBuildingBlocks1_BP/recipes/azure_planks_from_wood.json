@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:azure_planks_from_wood"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:azure_wood"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:azure_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:azure_planks",
+      "count": 4
+    }
+  }
+}

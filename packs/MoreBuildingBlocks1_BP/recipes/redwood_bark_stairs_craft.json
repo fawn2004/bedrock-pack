@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:redwood_bark_stairs_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "#  ",
+      "## ",
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:redwood_wood"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:redwood_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:redwood_bark_stairs",
+      "count": 4
+    }
+  }
+}

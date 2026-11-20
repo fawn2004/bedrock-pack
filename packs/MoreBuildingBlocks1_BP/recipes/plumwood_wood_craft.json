@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:plumwood_wood_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "##",
+      "##"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:plumwood_log"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:plumwood_log"
+      }
+    ],
+    "result": {
+      "item": "mbb:plumwood_wood",
+      "count": 3
+    }
+  }
+}

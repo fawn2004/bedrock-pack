@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:rosewood_bark_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:rosewood_wood"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:rosewood_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:rosewood_bark_slab",
+      "count": 6
+    }
+  }
+}

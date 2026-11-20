@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:willow_wood_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "##",
+      "##"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:willow_log"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:willow_log"
+      }
+    ],
+    "result": {
+      "item": "mbb:willow_wood",
+      "count": 3
+    }
+  }
+}

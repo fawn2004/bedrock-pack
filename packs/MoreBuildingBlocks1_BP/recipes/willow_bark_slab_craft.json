@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:willow_bark_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:willow_wood"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:willow_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:willow_bark_slab",
+      "count": 6
+    }
+  }
+}

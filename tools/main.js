@@ -7,6 +7,7 @@ const SLABS = new Set(__SLABS__);
 const DOORS = __DOORS__; // door id -> "wood" | "stone"
 const STAIRS = new Set(__STAIRS__);
 const LOGS = __LOGS__; // log id -> stripped log id
+const WOOD_SLABS = new Set(__WOOD_SLABS__);
 
 const isCreative = (player) => String(player.getGameMode()).toLowerCase() === "creative";
 
@@ -156,8 +157,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   system.run(() => {
     if (target.typeId !== slabId || target.permutation.getState(`${NS}:double`)) return;
     target.setPermutation(target.permutation.withState(`${NS}:double`, true));
-    target.dimension.playSound(DOORS[slabId.replace("_slab", "_door")] === "wood"
-      ? "use.wood" : "use.stone", target.center());
+    target.dimension.playSound(WOOD_SLABS.has(slabId) ? "use.wood" : "use.stone", target.center());
     if (isCreative(player)) return;
     const container = player.getComponent("minecraft:inventory")?.container;
     if (!container) return;

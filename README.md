@@ -1,7 +1,8 @@
 # More Building Blocks 1 (Minecraft Bedrock add-on)
 
-**12 new woods** (each with a log, stripped log, planks, slab, stairs and door) and
-**12 new stones** (each with a block, slab, stairs and door): 120 blocks in total.
+**12 new woods** and **12 new stones**: 180 blocks in total, plus **66 ready-made trees, bushes and rocks**.
+Each wood has a log, stripped log, wood (bark) block, bark stairs and slab, two leaf colours, planks, slab, stairs and door.
+Each stone has a block, slab, stairs and door.
 Shapes and collision work like the vanilla blocks.
 
 | Woods | Stones |
@@ -58,6 +59,20 @@ Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 - **Marble Bricks:** 4 Marble in a 2x2 makes 4. You can also make them in the stonecutter.
 - **Shapes:** a slab is 3 in a row (makes 6), stairs take 6 (makes 4), and a door takes 6 in a 2x3 (makes 3).
   Stone slabs and stairs can also be made in the stonecutter.
+
+## Trees, bushes and rocks (structures)
+The pack includes 36 trees (every wood in small, medium and large), 12 bushes and 18 rocks.
+- **Easiest:** stand where you want it and run, for example, `/function mbb/trees/maple_tree_large`.
+  Trees appear with their trunk at your feet. Rocks sink 1 block into the ground so they look natural.
+- **Structure block or command:** use the name `mbb:<name>`, e.g. `/structure load mbb:redwood_tree_large ~ ~ ~`.
+  This places the structure's corner (not its trunk) at your feet.
+  Add a rotation to vary them: `/structure load mbb:maple_tree_large ~ ~ ~ 90_degrees`.
+- **See them all:** `/function mbb/showcase` lays every structure out in rows in front of you. Use it on a flat creative world.
+- Empty space in a structure doesn't erase anything, so you can drop trees right next to your builds.
+
+Trees: `<wood>_tree_small|medium|large` for maple, redwood, ebony, willow, ash, azure, walnut, rosewood, palm, ironwood, ghostwood, plumwood.
+Bushes: maple_bush, willow_bush, rosewood_bush, azure_bush, plumwood_bush, ghostwood_bush, walnut_bush_large, redwood_shrub, azalea_bush, ash_hedge, palm_shrub, ironwood_bush.
+Rocks: `grey|mossy|marble|travertine|dark` + `_boulder`, `_boulder_large`, `_rock_pile`; plus grey_spire, dark_outcrop, mossy_ledge.
 
 ## Rebuilding
 `python3 tools/build.py` (needs Pillow) regenerates everything in `packs/` and `dist/`.

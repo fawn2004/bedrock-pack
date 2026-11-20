@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:ash_planks_from_wood"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:ash_wood"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:ash_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:ash_planks",
+      "count": 4
+    }
+  }
+}

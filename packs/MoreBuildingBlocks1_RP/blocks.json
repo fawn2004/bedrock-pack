@@ -18,6 +18,21 @@
   "mbb:stripped_maple_log": {
     "sound": "wood"
   },
+  "mbb:maple_wood": {
+    "sound": "wood"
+  },
+  "mbb:maple_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:maple_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:maple_leaves": {
+    "sound": "grass"
+  },
+  "mbb:maple_leaves_dark": {
+    "sound": "grass"
+  },
   "mbb:redwood_planks": {
     "sound": "wood"
   },
@@ -35,6 +50,21 @@
   },
   "mbb:stripped_redwood_log": {
     "sound": "wood"
+  },
+  "mbb:redwood_wood": {
+    "sound": "wood"
+  },
+  "mbb:redwood_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:redwood_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:redwood_leaves": {
+    "sound": "grass"
+  },
+  "mbb:redwood_leaves_dark": {
+    "sound": "grass"
   },
   "mbb:ebony_planks": {
     "sound": "wood"
@@ -54,6 +84,21 @@
   "mbb:stripped_ebony_log": {
     "sound": "wood"
   },
+  "mbb:ebony_wood": {
+    "sound": "wood"
+  },
+  "mbb:ebony_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:ebony_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:ebony_leaves": {
+    "sound": "grass"
+  },
+  "mbb:ebony_leaves_dark": {
+    "sound": "grass"
+  },
   "mbb:willow_planks": {
     "sound": "wood"
   },
@@ -71,6 +116,21 @@
   },
   "mbb:stripped_willow_log": {
     "sound": "wood"
+  },
+  "mbb:willow_wood": {
+    "sound": "wood"
+  },
+  "mbb:willow_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:willow_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:willow_leaves": {
+    "sound": "grass"
+  },
+  "mbb:willow_leaves_dark": {
+    "sound": "grass"
   },
   "mbb:ash_planks": {
     "sound": "wood"
@@ -90,6 +150,21 @@
   "mbb:stripped_ash_log": {
     "sound": "wood"
   },
+  "mbb:ash_wood": {
+    "sound": "wood"
+  },
+  "mbb:ash_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:ash_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:ash_leaves": {
+    "sound": "grass"
+  },
+  "mbb:ash_leaves_dark": {
+    "sound": "grass"
+  },
   "mbb:azure_planks": {
     "sound": "wood"
   },
@@ -107,6 +182,21 @@
   },
   "mbb:stripped_azure_log": {
     "sound": "wood"
+  },
+  "mbb:azure_wood": {
+    "sound": "wood"
+  },
+  "mbb:azure_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:azure_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:azure_leaves": {
+    "sound": "grass"
+  },
+  "mbb:azure_leaves_dark": {
+    "sound": "grass"
   },
   "mbb:walnut_planks": {
     "sound": "wood"
@@ -126,6 +216,21 @@
   "mbb:stripped_walnut_log": {
     "sound": "wood"
   },
+  "mbb:walnut_wood": {
+    "sound": "wood"
+  },
+  "mbb:walnut_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:walnut_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:walnut_leaves": {
+    "sound": "grass"
+  },
+  "mbb:walnut_leaves_dark": {
+    "sound": "grass"
+  },
   "mbb:rosewood_planks": {
     "sound": "wood"
   },
@@ -143,6 +248,21 @@
   },
   "mbb:stripped_rosewood_log": {
     "sound": "wood"
+  },
+  "mbb:rosewood_wood": {
+    "sound": "wood"
+  },
+  "mbb:rosewood_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:rosewood_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:rosewood_leaves": {
+    "sound": "grass"
+  },
+  "mbb:rosewood_leaves_dark": {
+    "sound": "grass"
   },
   "mbb:palm_planks": {
     "sound": "wood"
@@ -162,6 +282,21 @@
   "mbb:stripped_palm_log": {
     "sound": "wood"
   },
+  "mbb:palm_wood": {
+    "sound": "wood"
+  },
+  "mbb:palm_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:palm_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:palm_leaves": {
+    "sound": "grass"
+  },
+  "mbb:palm_leaves_dark": {
+    "sound": "grass"
+  },
   "mbb:ironwood_planks": {
     "sound": "wood"
   },
@@ -179,6 +314,21 @@
   },
   "mbb:stripped_ironwood_log": {
     "sound": "wood"
+  },
+  "mbb:ironwood_wood": {
+    "sound": "wood"
+  },
+  "mbb:ironwood_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:ironwood_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:ironwood_leaves": {
+    "sound": "grass"
+  },
+  "mbb:ironwood_leaves_dark": {
+    "sound": "grass"
   },
   "mbb:ghostwood_planks": {
     "sound": "wood"
@@ -198,6 +348,21 @@
   "mbb:stripped_ghostwood_log": {
     "sound": "wood"
   },
+  "mbb:ghostwood_wood": {
+    "sound": "wood"
+  },
+  "mbb:ghostwood_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:ghostwood_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:ghostwood_leaves": {
+    "sound": "grass"
+  },
+  "mbb:ghostwood_leaves_dark": {
+    "sound": "grass"
+  },
   "mbb:plumwood_planks": {
     "sound": "wood"
   },
@@ -215,6 +380,21 @@
   },
   "mbb:stripped_plumwood_log": {
     "sound": "wood"
+  },
+  "mbb:plumwood_wood": {
+    "sound": "wood"
+  },
+  "mbb:plumwood_bark_slab": {
+    "sound": "wood"
+  },
+  "mbb:plumwood_bark_stairs": {
+    "sound": "wood"
+  },
+  "mbb:plumwood_leaves": {
+    "sound": "grass"
+  },
+  "mbb:plumwood_leaves_dark": {
+    "sound": "grass"
   },
   "mbb:marble": {
     "sound": "stone"

@@ -449,3 +449,42 @@ def chalk_tiles(base, grout, seed):
             if px[x, y][:3] != tuple(grout) and nz.value(x, y, 16) > 0.85:
                 put(px, x, y, darken(base, 0.08))
     return img
+
+
+# ------------------------------------------------------------ leaves
+
+def leaves(base, seed, dark=False):
+    """Leaf block with see-through gaps, lit tops and shaded undersides."""
+    rng = random.Random(seed + (31 if dark else 13))
+    nz = Noise(seed + (37 if dark else 17))
+    img = new()
+    px = img.load()
+    col = darken(base, 0.28) if dark else base
+    light, shadow = lighten(col, 0.22), darken(col, 0.35)
+    hole = 0.24 if dark else 0.3
+    for y in range(S):
+        for x in range(S):
+            n = nz.fbm(x, y, ((4, 0.5), (8, 0.3), (16, 0.2)))
+            if n < hole and rng.random() < 0.85:
+                px[x, y] = (0, 0, 0, 0)
+                continue
+            c = shade(col, 0.85 + n * 0.3)
+            c = hue_shift(c, (nz.value(x, y, 2) - 0.5) * 0.8)
+            put(px, x, y, c)
+    # light on the top edge of each clump, shadow underneath
+    src = img.copy().load()
+    for y in range(S):
+        for x in range(S):
+            if src[x, y][3] == 0:
+                continue
+            above, below = src[x, (y - 1) % S][3], src[x, (y + 1) % S][3]
+            if above == 0:
+                put(px, x, y, mix(src[x, y], light, 0.5))
+            elif below == 0:
+                put(px, x, y, mix(src[x, y], shadow, 0.5))
+    # a few single-leaf sparkles
+    for _ in range(6):
+        x, y = rng.randrange(S), rng.randrange(S)
+        if px[x, y][3]:
+            put(px, x, y, lighten(col, 0.35))
+    return img

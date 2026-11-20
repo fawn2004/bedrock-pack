@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:palm_wood_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "##",
+      "##"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:palm_log"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:palm_log"
+      }
+    ],
+    "result": {
+      "item": "mbb:palm_wood",
+      "count": 3
+    }
+  }
+}

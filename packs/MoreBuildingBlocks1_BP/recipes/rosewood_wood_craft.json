@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:rosewood_wood_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "##",
+      "##"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:rosewood_log"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:rosewood_log"
+      }
+    ],
+    "result": {
+      "item": "mbb:rosewood_wood",
+      "count": 3
+    }
+  }
+}

@@ -16,12 +16,13 @@ import zipfile
 
 sys.path.insert(0, os.path.dirname(__file__))
 import textures as T  # noqa: E402
+import nature  # noqa: E402
 from PIL import Image  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NS = "mbb"
 PACK = "MoreBuildingBlocks1"
-VERSION = [1, 1, 0]
+VERSION = [1, 2, 0]
 BLOCK_FMT = "1.26.20"
 ITEM_FMT = "1.21.60"
 MIN_ENGINE = [1, 26, 20]
@@ -37,20 +38,20 @@ def uid(name):
 
 
 # ------------------------------------------------------------ materials
-# Woods: (id, name, plank colour, bark colour, dye for recipes, bark style)
+# Woods: (id, leaf colour, name, plank colour, bark colour, dye for recipes, bark style)
 WOODS = [
-    ("maple", "Maple", (192, 104, 56), (92, 66, 52), "orange_dye", "furrow"),
-    ("redwood", "Redwood", (138, 56, 42), (90, 44, 36), "red_dye", "furrow"),
-    ("ebony", "Ebony", (58, 45, 40), (38, 34, 33), "black_dye", "furrow"),
-    ("willow", "Willow", (178, 172, 108), (96, 92, 70), "lime_dye", "furrow"),
-    ("ash", "Ash", (206, 190, 164), (130, 122, 110), "white_dye", "smooth"),
-    ("azure", "Azurewood", (72, 112, 152), (54, 60, 80), "light_blue_dye", "furrow"),
-    ("walnut", "Walnut", (112, 74, 48), (66, 50, 40), "brown_dye", "furrow"),
-    ("rosewood", "Rosewood", (176, 88, 96), (98, 58, 62), "pink_dye", "furrow"),
-    ("palm", "Palm", (210, 178, 120), (140, 116, 84), "yellow_dye", "rings"),
-    ("ironwood", "Ironwood", (128, 124, 118), (78, 76, 74), "gray_dye", "furrow"),
-    ("ghostwood", "Ghostwood", (214, 222, 226), (176, 184, 190), "light_gray_dye", "smooth"),
-    ("plumwood", "Plumwood", (112, 64, 112), (66, 46, 70), "purple_dye", "furrow"),
+    ("maple", (206, 92, 40), "Maple", (192, 104, 56), (92, 66, 52), "orange_dye", "furrow"),
+    ("redwood", (56, 104, 58), "Redwood", (138, 56, 42), (90, 44, 36), "red_dye", "furrow"),
+    ("ebony", (44, 86, 52), "Ebony", (58, 45, 40), (38, 34, 33), "black_dye", "furrow"),
+    ("willow", (140, 176, 72), "Willow", (178, 172, 108), (96, 92, 70), "lime_dye", "furrow"),
+    ("ash", (100, 152, 72), "Ash", (206, 190, 164), (130, 122, 110), "white_dye", "smooth"),
+    ("azure", (74, 136, 206), "Azurewood", (72, 112, 152), (54, 60, 80), "light_blue_dye", "furrow"),
+    ("walnut", (82, 132, 62), "Walnut", (112, 74, 48), (66, 50, 40), "brown_dye", "furrow"),
+    ("rosewood", (238, 150, 184), "Rosewood", (176, 88, 96), (98, 58, 62), "pink_dye", "furrow"),
+    ("palm", (96, 164, 62), "Palm", (210, 178, 120), (140, 116, 84), "yellow_dye", "rings"),
+    ("ironwood", (108, 132, 112), "Ironwood", (128, 124, 118), (78, 76, 74), "gray_dye", "furrow"),
+    ("ghostwood", (206, 228, 238), "Ghostwood", (214, 222, 226), (176, 184, 190), "light_gray_dye", "smooth"),
+    ("plumwood", (156, 84, 176), "Plumwood", (112, 64, 112), (66, 46, 70), "purple_dye", "furrow"),
 ]
 
 # Stones: (id, name, map colour, recipe, texture builder)
@@ -377,6 +378,24 @@ def stairs_block(base, mat_kind, color, tex):
     return ident
 
 
+def leaves_block(ident, color, tex):
+    block_file(ident, {
+        "menu_category": {"category": "nature", "group": "minecraft:itemGroup.name.leaves"},
+    }, {
+        "minecraft:map_color": hexcol(color),
+        "minecraft:tags": ["leaves", f"{NS}:leaves", "minecraft:is_hoe_item_destructible",
+                           "minecraft:is_shears_item_destructible"],
+        "minecraft:geometry": "minecraft:geometry.full_block",
+        "minecraft:material_instances": mat(tex, "alpha_test"),
+        "minecraft:destructible_by_mining": {"seconds_to_destroy": 0.3},
+        "minecraft:destructible_by_explosion": {"explosion_resistance": 0.2},
+        "minecraft:flammable": {"catch_chance_modifier": 30, "destroy_chance_modifier": 60},
+        "minecraft:light_dampening": 1,
+        "minecraft:loot": "loot_tables/blocks/mbb_leaves.json",
+    })
+    return ident
+
+
 def log_block(ident, mat_kind, color, side_tex, end_tex):
     comps = common_components("log", mat_kind, color)
     comps.update({
@@ -550,8 +569,8 @@ def main():
     terrain, items, blocks_json, lang = {}, {}, {"format_version": "1.1.0"}, []
     slabs, doors, icon_tiles = [], [], []
 
-    stairs_ids, logs = [], {}
-    mats = [dict(mid=w[0], display=w[1], color=w[2], bark=w[3], recipe=w[4], style=w[5], kind="wood")
+    stairs_ids, logs, wood_slabs, leaf_ids = [], {}, [], []
+    mats = [dict(mid=w[0], leaf=w[1], display=w[2], color=w[3], bark=w[4], recipe=w[5], style=w[6], kind="wood")
             for w in WOODS] + \
            [dict(mid=s_[0], display=s_[1], color=s_[2], recipe=s_[3], builder=s_[4], kind="stone")
             for s_ in STONES]
@@ -609,14 +628,42 @@ def main():
             stripped = log_block(f"{NS}:stripped_{mid}_log", kind, color, s_side, s_end)
             logs[log] = stripped
             names += [(log, f"{display} Log"), (stripped, f"Stripped {display} Log")]
+            # bark wood + bark stairs/slab (used for roots and branch brackets)
+            bark_wood = log_block(f"{NS}:{mid}_wood", kind, m["bark"], side, side)
+            bark_slab = slab_block(f"{mid}_bark", kind, m["bark"], side)
+            bark_stairs = stairs_block(f"{mid}_bark", kind, m["bark"], side)
+            slabs.append(bark_slab)
+            stairs_ids.append(bark_stairs)
+            wood_slabs.append(bark_slab)
+            names += [(bark_wood, f"{display} Wood"), (bark_slab, f"{display} Bark Slab"),
+                      (bark_stairs, f"{display} Bark Stairs")]
+            bw = {"item": bark_wood}
+            lg = {"item": log}
+            shaped(f"{NS}:{mid}_wood_craft", ["##", "##"], {"#": lg}, bark_wood, 3, lg)
+            shaped(f"{NS}:{mid}_bark_slab_craft", ["###"], {"#": bw}, bark_slab, 6, bw)
+            shaped(f"{NS}:{mid}_bark_stairs_craft", ["#  ", "## ", "###"], {"#": bw}, bark_stairs, 4, bw)
+            shapeless(f"{NS}:{mid}_planks_from_wood", bark_wood, block, 4)
+            # leaves: a main colour and a darker shade for depth
+            for dark in (False, True):
+                lid = f"{mid}_leaves" + ("_dark" if dark else "")
+                ltex = add_tex(lid, T.leaves(m["leaf"], seed, dark))
+                leaves_block(f"{NS}:{lid}", m["leaf"], ltex)
+                names.append((f"{NS}:{lid}", ("Dark " if dark else "") + f"{display} Leaves"))
+                leaf_ids.append(f"{NS}:{lid}")
+            wood_slabs.append(slab)
 
         material_recipes(base, kind, m["recipe"], block, slab, stairs, door, log, stripped)
         for ident, name in names:
-            blocks_json[ident] = {"sound": snd}
+            blocks_json[ident] = {"sound": "grass" if ident in leaf_ids else snd}
             lang.append(f"tile.{ident}.name={name}")
 
 
     write_json(os.path.join(BP, "loot_tables", "empty.json"), {"pools": []})
+    write_json(os.path.join(BP, "loot_tables", "blocks", "mbb_leaves.json"), {"pools": [{
+        "rolls": 1, "entries": [
+            {"type": "item", "name": "minecraft:stick", "weight": 1},
+            {"type": "empty", "weight": 9}]}]})
+    structures = nature.build(BP)
     build_geometry()
 
     # ---- script
@@ -625,7 +672,8 @@ def main():
     script_src = (script_src.replace("__SLABS__", json.dumps(slabs))
                   .replace("__DOORS__", json.dumps(mat_lookup))
                   .replace("__STAIRS__", json.dumps(stairs_ids))
-                  .replace("__LOGS__", json.dumps(logs)))
+                  .replace("__LOGS__", json.dumps(logs))
+                  .replace("__WOOD_SLABS__", json.dumps(wood_slabs)))
     os.makedirs(os.path.join(BP, "scripts"), exist_ok=True)
     with open(os.path.join(BP, "scripts", "main.js"), "w", encoding="utf-8") as f:
         f.write(script_src)
@@ -641,7 +689,7 @@ def main():
         os.makedirs(os.path.join(pack_dir, "texts"), exist_ok=True)
         with open(os.path.join(pack_dir, "texts", "en_US.lang"), "w", encoding="utf-8") as f:
             f.write(f"pack.name=More Building Blocks 1 {label}\n")
-            f.write("pack.description=12 new woods and 12 new stones with logs, slabs, stairs and doors\n")
+            f.write("pack.description=12 woods and 12 stones with logs, leaves, slabs, stairs, doors and ready-made trees, bushes and rocks\n")
             if pack_dir == RP:
                 f.write("\n".join(lang) + "\n")
         write_json(os.path.join(pack_dir, "texts", "languages.json"), ["en_US"])
@@ -655,7 +703,7 @@ def main():
         icon.save(os.path.join(d, "pack_icon.png"))
 
     # ---- manifests
-    desc = "12 new woods (with logs) + 12 new stones, each with slabs, stairs and doors."
+    desc = "12 woods + 12 stones with logs, leaves, slabs, stairs, doors, plus ready-made trees, bushes and rocks."
     write_json(os.path.join(RP, "manifest.json"), {
         "format_version": 2,
         "header": {"name": "More Building Blocks 1 (Resources)", "description": desc,
@@ -693,7 +741,7 @@ def main():
         add_dir(z, BP, PACK + "_BP")
         add_dir(z, RP, PACK + "_RP")
     n_blocks = len(os.listdir(os.path.join(BP, "blocks")))
-    print(f"built {n_blocks} blocks -> {DIST}")
+    print(f"built {n_blocks} blocks and {len(structures)} structures -> {DIST}")
 
 
 if __name__ == "__main__":

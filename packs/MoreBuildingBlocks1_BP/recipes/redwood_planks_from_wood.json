@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:redwood_planks_from_wood"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:redwood_wood"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:redwood_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:redwood_planks",
+      "count": 4
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "mbb:palm_planks_from_wood"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "mbb:palm_wood"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "mbb:palm_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:palm_planks",
+      "count": 4
+    }
+  }
+}

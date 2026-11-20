@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:azure_bark_slab_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:azure_wood"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:azure_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:azure_bark_slab",
+      "count": 6
+    }
+  }
+}

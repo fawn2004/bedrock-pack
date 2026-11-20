@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "mbb:maple_bark_stairs_craft"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "#  ",
+      "## ",
+      "###"
+    ],
+    "key": {
+      "#": {
+        "item": "mbb:maple_wood"
+      }
+    },
+    "unlock": [
+      {
+        "item": "mbb:maple_wood"
+      }
+    ],
+    "result": {
+      "item": "mbb:maple_bark_stairs",
+      "count": 4
+    }
+  }
+}
