@@ -1,4 +1,4 @@
-# More Building Blocks 1 (Minecraft Bedrock add-on)
+# More Building Blocks 2 (Minecraft Bedrock add-on)
 
 **12 new woods** and **12 new stones**: 180 blocks in total, plus **12 trees grown by Minecraft's own tree generators** and **32 ready-made bushes and rocks**.
 Each wood has a log, stripped log, wood (bark) block, bark stairs and slab, two leaf colours, planks, slab, stairs and door.
@@ -10,7 +10,7 @@ Shapes and collision work like the vanilla blocks.
 | Maple, Redwood, Ebony, Willow, Ash, Azurewood, Walnut, Rosewood, Palm, Ironwood, Ghostwood, Plumwood | Marble, Marble Bricks, Slate Tiles, Limestone Bricks, Red Granite Bricks, Jade Bricks, Polished Onyx, Travertine, Gabbro Bricks, Rose Quartz Bricks, Chalk Tiles, Shale Bricks |
 
 ## Install
-Double-click `dist/MoreBuildingBlocks1.mcaddon`, then turn on the behavior pack in your world.
+Double-click `dist/MoreBuildingBlocks2.mcaddon`, then turn on the behavior pack in your world.
 Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 
 ## How the blocks behave

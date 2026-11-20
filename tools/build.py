@@ -21,8 +21,8 @@ from PIL import Image  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NS = "mbb"
-PACK = "MoreBuildingBlocks1"
-VERSION = [1, 6, 0]
+PACK = "MoreBuildingBlocks2"
+VERSION = [1, 6, 1]
 BLOCK_FMT = "1.26.20"
 ITEM_FMT = "1.21.60"
 MIN_ENGINE = [1, 26, 20]
@@ -688,7 +688,7 @@ def main():
     for pack_dir, label in ((RP, "RP"), (BP, "BP")):
         os.makedirs(os.path.join(pack_dir, "texts"), exist_ok=True)
         with open(os.path.join(pack_dir, "texts", "en_US.lang"), "w", encoding="utf-8") as f:
-            f.write(f"pack.name=More Building Blocks 1 {label}\n")
+            f.write(f"pack.name=More Building Blocks 2 {label}\n")
             f.write("pack.description=12 woods and 12 stones with logs, leaves, slabs, stairs, doors and ready-made trees, bushes and rocks\n")
             if pack_dir == RP:
                 f.write("\n".join(lang) + "\n")
@@ -706,13 +706,13 @@ def main():
     desc = "12 woods + 12 stones with logs, leaves, slabs, stairs, doors, plus ready-made trees, bushes and rocks."
     write_json(os.path.join(RP, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "More Building Blocks 1 (Resources)", "description": desc,
+        "header": {"name": "More Building Blocks 2 (Resources)", "description": desc,
                    "uuid": uid("rp-header"), "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [{"type": "resources", "uuid": uid("rp-module"), "version": VERSION}],
     })
     write_json(os.path.join(BP, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "More Building Blocks 1", "description": desc,
+        "header": {"name": "More Building Blocks 2", "description": desc,
                    "uuid": uid("bp-header"), "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [
             {"type": "data", "uuid": uid("bp-data"), "version": VERSION},
