@@ -21,10 +21,10 @@ from PIL import Image  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NS = "mbb"
 PACK = "MoreBuildingBlocks"
-VERSION = [1, 0, 0]
-BLOCK_FMT = "1.26.20"
+VERSION = [1, 0, 1]
+BLOCK_FMT = "1.26.50"
 ITEM_FMT = "1.21.60"
-MIN_ENGINE = [1, 26, 20]
+MIN_ENGINE = [1, 26, 50]
 SCRIPT_API = "2.7.0"
 
 BP = os.path.join(ROOT, "packs", PACK + "_BP")
@@ -211,19 +211,19 @@ def stairs_collision(half, corner):
 def common_components(kind, mat_kind, color):
     c = {
         "minecraft:map_color": hexcol(color),
-        f"tag:{NS}:{mat_kind}": {},
+        "minecraft:tags": [f"{NS}:{mat_kind}", f"{NS}:{kind}"],
     }
     if mat_kind == "wood":
         c["minecraft:destructible_by_mining"] = {"seconds_to_destroy": 2 if kind != "door" else 3}
         c["minecraft:destructible_by_explosion"] = {"explosion_resistance": 3}
         c["minecraft:flammable"] = {"catch_chance_modifier": 5, "destroy_chance_modifier": 20}
-        c["tag:wood"] = {}
-        c["tag:minecraft:is_axe_item_destructible"] = {}
+        c["minecraft:tags"] += ["wood", "minecraft:is_axe_item_destructible"]
     else:
         c["minecraft:destructible_by_mining"] = {"seconds_to_destroy": 2.5 if kind != "door" else 4}
         c["minecraft:destructible_by_explosion"] = {"explosion_resistance": 6}
-        c["tag:stone"] = {}
-        c["tag:minecraft:is_pickaxe_item_destructible"] = {}
+        c["minecraft:tags"] += ["stone", "minecraft:is_pickaxe_item_destructible"]
+    c["minecraft:tags"] += {"slab": ["slab"], "stairs": ["minecraft:cornerable_stairs"],
+                            "door": ["door"]}.get(kind, [])
     if kind != "full":
         c["minecraft:light_dampening"] = 0
     return c
@@ -274,8 +274,6 @@ def slab_block(base, mat_kind, color, tex):
         "minecraft:material_instances": mat(tex),
         "minecraft:collision_box": [box([-8, 0, -8], [16, 8, 16])],
         "minecraft:selection_box": box([-8, 0, -8], [16, 8, 16]),
-        f"tag:{NS}:slab": {},
-        "tag:slab": {},
     })
     perms = [
         {"condition": f"{half} == 'top' && !{dbl}", "components": {
@@ -312,8 +310,6 @@ def stairs_block(base, mat_kind, color, tex):
         "minecraft:material_instances": mat(tex),
         "minecraft:collision_box": stairs_collision("bottom", "none"),
         "minecraft:selection_box": box([-8, 0, -8], [16, 16, 16]),
-        f"tag:{NS}:stairs": {},
-        "tag:minecraft:cornerable_stairs": {},
     })
     perms = []
     for d in DIRS:
@@ -355,8 +351,6 @@ def door_block(base, display, mat_kind, color, tex_top, tex_bottom, icon):
         # drops are handled by the script so a door always drops exactly one item
         "minecraft:loot": "loot_tables/empty.json",
         f"{NS}:door": {},
-        f"tag:{NS}:door": {},
-        "tag:door": {},
     })
     perms = []
     for part in (0, 1):

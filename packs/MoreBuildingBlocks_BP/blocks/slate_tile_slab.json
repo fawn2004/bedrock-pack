@@ -1,5 +1,5 @@
 {
-  "format_version": "1.26.20",
+  "format_version": "1.26.50",
   "minecraft:block": {
     "description": {
       "identifier": "mbb:slate_tile_slab",
@@ -23,15 +23,19 @@
     },
     "components": {
       "minecraft:map_color": "#4e5866",
-      "tag:mbb:stone": {},
+      "minecraft:tags": [
+        "mbb:stone",
+        "mbb:slab",
+        "stone",
+        "minecraft:is_pickaxe_item_destructible",
+        "slab"
+      ],
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 2.5
       },
       "minecraft:destructible_by_explosion": {
         "explosion_resistance": 6
       },
-      "tag:stone": {},
-      "tag:minecraft:is_pickaxe_item_destructible": {},
       "minecraft:light_dampening": 0,
       "minecraft:geometry": {
         "identifier": "geometry.mbb_slab",
@@ -71,9 +75,7 @@
           8,
           16
         ]
-      },
-      "tag:mbb:slab": {},
-      "tag:slab": {}
+      }
     },
     "permutations": [
       {

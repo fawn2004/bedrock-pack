@@ -1,5 +1,5 @@
 {
-  "format_version": "1.26.20",
+  "format_version": "1.26.50",
   "minecraft:block": {
     "description": {
       "identifier": "mbb:willow_door",
@@ -33,7 +33,13 @@
     },
     "components": {
       "minecraft:map_color": "#b2ac6c",
-      "tag:mbb:wood": {},
+      "minecraft:tags": [
+        "mbb:wood",
+        "mbb:door",
+        "wood",
+        "minecraft:is_axe_item_destructible",
+        "door"
+      ],
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 3
       },
@@ -44,8 +50,6 @@
         "catch_chance_modifier": 5,
         "destroy_chance_modifier": 20
       },
-      "tag:wood": {},
-      "tag:minecraft:is_axe_item_destructible": {},
       "minecraft:light_dampening": 0,
       "minecraft:geometry": "geometry.mbb_door",
       "minecraft:material_instances": {
@@ -84,9 +88,7 @@
         "movement_type": "popped"
       },
       "minecraft:loot": "loot_tables/empty.json",
-      "mbb:door": {},
-      "tag:mbb:door": {},
-      "tag:door": {}
+      "mbb:door": {}
     },
     "permutations": [
       {

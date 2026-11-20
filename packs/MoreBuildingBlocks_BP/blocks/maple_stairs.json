@@ -1,5 +1,5 @@
 {
-  "format_version": "1.26.20",
+  "format_version": "1.26.50",
   "minecraft:block": {
     "description": {
       "identifier": "mbb:maple_stairs",
@@ -27,7 +27,13 @@
     },
     "components": {
       "minecraft:map_color": "#c06838",
-      "tag:mbb:wood": {},
+      "minecraft:tags": [
+        "mbb:wood",
+        "mbb:stairs",
+        "wood",
+        "minecraft:is_axe_item_destructible",
+        "minecraft:cornerable_stairs"
+      ],
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 2
       },
@@ -38,8 +44,6 @@
         "catch_chance_modifier": 5,
         "destroy_chance_modifier": 20
       },
-      "tag:wood": {},
-      "tag:minecraft:is_axe_item_destructible": {},
       "minecraft:light_dampening": 0,
       "minecraft:geometry": {
         "identifier": "geometry.mbb_stairs",
@@ -99,9 +103,7 @@
           16,
           16
         ]
-      },
-      "tag:mbb:stairs": {},
-      "tag:minecraft:cornerable_stairs": {}
+      }
     },
     "permutations": [
       {

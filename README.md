@@ -11,7 +11,7 @@ Shapes and collision work like the vanilla blocks.
 Double-click `dist/MoreBuildingBlocks.mcaddon`. It imports both packs.
 You can also open `dist/MoreBuildingBlocks_BP.mcpack` and `dist/MoreBuildingBlocks_RP.mcpack` one at a time.
 Then turn on the **behavior pack** in your world's settings. The resource pack is added with it.
-Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
+Requires Minecraft Bedrock **1.26.50 or newer**. No experiments are needed.
 
 ## How the blocks behave
 - **Slabs** go in the top or bottom half depending on where you click. Click a slab with the same slab to make a double slab, which drops 2.
