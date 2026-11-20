@@ -1,4 +1,4 @@
-# More Building Blocks (Minecraft Bedrock add-on)
+# More Building Blocks 1 (Minecraft Bedrock add-on)
 
 6 new woods and 6 new stones. Each one has a **full block, slab, stairs and door**.
 Shapes and collision work like the vanilla blocks.
@@ -8,8 +8,8 @@ Shapes and collision work like the vanilla blocks.
 | Maple, Redwood, Ebony, Willow, Ash, Azurewood | Marble, Slate Tiles, Limestone Bricks, Red Granite Bricks, Jade Bricks, Polished Onyx |
 
 ## Install
-Double-click `dist/MoreBuildingBlocks.mcaddon`. It imports both packs.
-You can also open `dist/MoreBuildingBlocks_BP.mcpack` and `dist/MoreBuildingBlocks_RP.mcpack` one at a time.
+Double-click `dist/MoreBuildingBlocks1.mcaddon`. It imports both packs.
+You can also open `dist/MoreBuildingBlocks1_BP.mcpack` and `dist/MoreBuildingBlocks1_RP.mcpack` one at a time.
 Then turn on the **behavior pack** in your world's settings. The resource pack is added with it.
 Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 

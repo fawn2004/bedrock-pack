@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "More Building Blocks",
+    "name": "More Building Blocks 1",
     "description": "6 new woods + 6 new stones, each with slabs, stairs and doors.",
     "uuid": "579effbc-7213-5166-ab81-4e5ed2667001",
     "version": [
       1,
       0,
-      2
+      3
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         1,
         0,
-        2
+        3
       ]
     },
     {
@@ -33,7 +33,7 @@
       "version": [
         1,
         0,
-        2
+        3
       ]
     }
   ],
@@ -43,7 +43,7 @@
       "version": [
         1,
         0,
-        2
+        3
       ]
     },
     {
