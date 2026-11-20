@@ -1,1 +1,1 @@
-structure load mbb:ebony_tree_large ~-10 ~0 ~-5
+structure load mbb:ebony_tree_large ~-11 ~0 ~-10

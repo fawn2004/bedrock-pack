@@ -1,1 +1,1 @@
-structure load mbb:ironwood_tree_medium ~-4 ~0 ~-4
+structure load mbb:ironwood_tree_medium ~-3 ~0 ~-3

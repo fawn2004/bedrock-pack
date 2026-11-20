@@ -902,6 +902,245 @@ SPECIES = {
 
 
 
+
+
+# ======================================================================== trees v5: limbs + leaf pads
+# Readable trees: a clear trunk and limbs, each limb ending in a flat leaf
+# pad (wide middle layer, smaller top, sparse dark underside), pads at
+# different heights with open space between them. Conifers are stacked rings.
+
+
+def limb(t, start, ang, elev, length):
+    """A straight limb at any angle, as connected logs; stairs are added
+    later by GR.smooth_steps so diagonals read as smooth slopes."""
+    sx, sy, sz = (float(v) for v in start)
+    ex = sx + math.cos(ang) * math.cos(elev) * length
+    ey = sy + math.sin(elev) * length
+    ez = sz + math.sin(ang) * math.cos(elev) * length
+    cells = GR._line((sx, sy, sz), (ex, ey, ez))
+    for j, p in enumerate(cells):
+        if j == 0:
+            continue
+        d = np.subtract(p, cells[j - 1])
+        t.wood_at(p, GR.axis_of(d))
+    return cells[-1]
+
+
+def pad(t, c, R, layers=3, bias=0.0, hole=0.06, hang=0, hang_chance=0.3):
+    """A leaf puff: sparse dark underside, wide body, then rounding over
+    on top in lighter leaves. layers 1-3 sets how tall it is."""
+    r = t.rng
+    cx, cy, cz = (int(round(v)) for v in c)
+    spec = {1: [(0, R, 0.0, 1.0), (1, R - 1.3, 0.7, 0.9)],
+            2: [(-1, R - 1.3, -0.9, 0.7), (0, R, -0.2, 1.0), (1, R - 0.7, 0.4, 1.0), (2, R - 2.0, 0.9, 0.9)],
+            3: [(-1, R - 1.2, -0.9, 0.75), (0, R, -0.3, 1.0), (1, R - 0.3, 0.2, 1.0), (2, R - 1.1, 0.6, 1.0),
+                (3, R - 2.3, 0.95, 0.85)]}[layers]
+    ox, oz = r.uniform(-0.5, 0.5), r.uniform(-0.5, 0.5)
+    placed = []
+    for dy, rr, tone, dens in spec:
+        rr = max(0.7, rr)
+        ir = int(math.ceil(rr + 1))
+        for x in range(-ir, ir + 1):
+            for z in range(-ir, ir + 1):
+                d = math.hypot(x - ox, z - oz)
+                if d <= rr + r.uniform(-0.6, 0.3) and r.random() < dens and r.random() > hole:
+                    p = (cx + x, cy + dy, cz + z)
+                    if not t.g.has(p):
+                        t.leaf(p, tone + bias + (0.25 if d < rr - 1.5 and dy >= 0 else 0), inner=d < rr - 1.8 and 0 <= dy < 2)
+                        placed.append(p)
+    if hang:
+        ps = set(placed)
+        for (x, y, z) in placed:
+            if (x, y - 1, z) in ps or r.random() > hang_chance:
+                continue
+            for k in range(1, r.randint(1, hang) + 1):
+                q = (x, y - k, z)
+                if t.g.has(q):
+                    break
+                t.leaf(q, -1)
+    return placed
+
+
+def broad5(t, s, trunk=(9, 11), limbs=(4, 6), reach=(4, 6), elev=(0.35, 0.7), pad_r=(2.4, 3.2),
+           secondary=0.7, low=1, top=True, hang=0, hang_chance=0.3, layers=3, lean=None):
+    """Oak-style: visible trunk, limbs radiating at different heights, each
+    with a side branch, every tip carrying its own pad."""
+    r = t.rng
+    H = int(r.randint(*trunk) * s)
+    big = s >= 1.3
+    t.trunk(H, base_w=2 if big else 1, narrow_at=int(H * 0.3) if big else None,
+            lean=lean, lean_every=5 if lean else 99)
+    t.buttress(reach=1 if not big else 2, tall=2 if big else 1)
+    t.trunk_bumps(1, H - 2, int(2 * s))
+    k = s ** 0.5
+    n = r.randint(*limbs)
+    a0 = r.uniform(0, math.tau)
+    for i in range(n):
+        ang = a0 + i * math.tau / n + r.uniform(-0.35, 0.35)
+        y = int(H * (0.5 + 0.45 * i / max(1, n - 1))) + r.randint(-1, 1)
+        x0, y0, z0 = t.at(y)
+        L = r.uniform(*reach) * s
+        e = r.uniform(*elev)
+        end = limb(t, (x0, y0, z0), ang, e, L)
+        t.twigs(end, r.choice(list(DIR_VEC)), n=r.randint(1, 2))
+        pad(t, (end[0], end[1] + 1, end[2]), r.uniform(*pad_r) * k, layers, hang=hang, hang_chance=hang_chance)
+        if r.random() < secondary:
+            # side branch from part-way along the limb, angled away
+            f = r.uniform(0.45, 0.65)
+            mid = (x0 + (end[0] - x0) * f, y0 + (end[1] - y0) * f, z0 + (end[2] - z0) * f)
+            a2 = ang + r.choice((-1, 1)) * r.uniform(0.7, 1.2)
+            e2 = end2 = limb(t, mid, a2, e + 0.15, L * r.uniform(0.45, 0.6))
+            t.twigs(end2, r.choice(list(DIR_VEC)), n=1)
+            pad(t, (e2[0], e2[1] + 1, e2[2]), r.uniform(*pad_r) * k * 0.75, max(1, layers - 1),
+                hang=hang, hang_chance=hang_chance)
+    for _ in range(low):   # a small low pad on a stubby branch
+        x0, y0, z0 = t.at(int(H * r.uniform(0.3, 0.42)))
+        end = limb(t, (x0, y0, z0), r.uniform(0, math.tau), 0.5, 2.5 * s)
+        pad(t, (end[0], end[1] + 1, end[2]), 1.9 * k, 1)
+    if top:
+        tx, ty, tz = t.at(H - 1)
+        pad(t, (tx, ty + 1, tz), r.uniform(*pad_r) * k * 0.9, layers, hang=hang, hang_chance=hang_chance)
+        pad(t, (tx + r.randint(-1, 1), ty + 3, tz + r.randint(-1, 1)), r.uniform(*pad_r) * k * 0.55, 2)
+    GR.smooth_steps(t)
+
+
+def flat_ring(t, c, R):
+    """One conifer tier: a flat ragged disc whose tips droop a block,
+    with a small darker layer underneath near the trunk."""
+    r = t.rng
+    cx, cy, cz = c
+    ir = int(math.ceil(R + 1))
+    for x in range(-ir, ir + 1):
+        for z in range(-ir, ir + 1):
+            d = math.hypot(x, z)
+            lim = R + r.uniform(-0.7, 0.4)
+            if d <= lim:
+                drop = 1 if d > R - 0.8 and R > 2 and r.random() < 0.6 else 0
+                p = (int(round(cx + x)), cy - drop, int(round(cz + z)))
+                if not t.g.has(p):
+                    t.leaf(p, 0.5 if d < R - 1 else 0.0)
+            if d <= R * 0.45 and r.random() < 0.7:
+                q = (int(round(cx + x)), cy - 1, int(round(cz + z)))
+                if not t.g.has(q):
+                    t.leaf(q, -1)
+            if d <= R * 0.55 + r.uniform(-0.4, 0.4):   # smaller layer on top
+                q = (int(round(cx + x)), cy + 1, int(round(cz + z)))
+                if not t.g.has(q):
+                    t.leaf(q, 0.9)
+
+
+def rings5(t, s, height=(20, 24), start=0.28, base_r=5.5, gap=2, pine=False, dead=0):
+    """Spruce-style: stacked flat rings, alternating wide and narrow, with
+    hidden branches inside each ring and a pointed leader on top."""
+    r = t.rng
+    H = int(r.randint(*height) * s)
+    big = s >= 1.3 and not pine
+    top = t.trunk(H, base_w=2 if big else 1, narrow_at=int(H * 0.25) if big else None)
+    t.buttress(reach=3 if not pine else 1, tall=3 if big else 2)
+    t.trunk_bumps(1, int(H * start), int(4 * s))
+    y0 = int(H * start)
+    i = 0
+    y = y0
+    while y < H:
+        frac = (y - y0) / max(1, H - y0)
+        if pine:
+            R = (2.4 * s) * (0.55 + 0.45 * (1 - frac)) + 0.6
+        else:
+            R = (base_r * s) * (1 - frac) ** 0.85 + 1.0
+        R *= 1.0 if i % 2 == 0 else 0.65          # wide / narrow zig-zag
+        x, _, z = t.at(y)
+        cx, cz = x + (t.width - 1) / 2, z + (t.width - 1) / 2
+        # branches hidden inside the ring, poking out as twigs
+        for k in range(r.randint(2, 3)):
+            ang = r.uniform(0, math.tau)
+            end = limb(t, (x, y, z), ang, -0.05, max(1.0, R - 2.2))
+            if r.random() < 0.2:
+                t.fence((end[0] + int(round(math.cos(ang))), end[1], end[2] + int(round(math.sin(ang)))))
+        flat_ring(t, (x, y, z), R)
+        y += 3 if not pine else r.choice((2, 3))
+        i += 1
+    tx, ty, tz = top
+    for k in range(1, 4):
+        t.leaf((tx, ty + k, tz), 0.9)
+    for _ in range(dead):   # dead twigs on the bare trunk
+        x, y, z = t.at(r.randint(int(H * 0.15), max(int(H * 0.16), y0 - 1)))
+        d = r.choice(list(DIR_VEC))
+        t.twigs((x, y, z), d, n=1, length=(1, 3))
+    GR.smooth_steps(t)
+
+
+def oak5(t, s):
+    broad5(t, s)
+
+
+def walnut5(t, s):
+    broad5(t, s, trunk=(10, 12), limbs=(5, 7), reach=(5, 7), pad_r=(2.8, 3.6), low=2)
+
+
+def ash5(t, s):
+    broad5(t, s, trunk=(11, 13), limbs=(5, 6), reach=(3, 4.5), elev=(0.6, 0.9), pad_r=(2.6, 3.2), low=1)
+
+
+def willow5(t, s):
+    broad5(t, s, trunk=(8, 10), limbs=(5, 6), reach=(4, 6), elev=(0.3, 0.6), pad_r=(2.6, 3.2),
+           hang=6, hang_chance=0.45, layers=2, lean=r_choice_dir(t))
+
+
+def acacia5(t, s):
+    broad5(t, s, trunk=(7, 9), limbs=(3, 4), reach=(5, 7), elev=(0.55, 0.8), pad_r=(3.0, 3.8),
+           secondary=0.5, low=0, layers=2)
+
+
+def cherry5(t, s):
+    broad5(t, s, trunk=(6, 8), limbs=(4, 6), reach=(4, 6), elev=(0.35, 0.6), pad_r=(2.8, 3.4),
+           hang=2, hang_chance=0.3)
+
+
+def ghost5(t, s):
+    broad5(t, s, trunk=(10, 12), limbs=(6, 8), reach=(3, 5), elev=(0.4, 0.9), pad_r=(1.6, 2.2),
+           secondary=0.9, low=2, layers=2, hang=3, hang_chance=0.3, lean=r_choice_dir(t))
+
+
+def redwood5(t, s):
+    rings5(t, s, height=(22, 26), start=0.3, base_r=5.5, dead=3)
+
+
+def pine5(t, s):
+    rings5(t, s, height=(26, 32), start=0.58, pine=True, dead=6)
+
+
+def r_choice_dir(t):
+    return t.rng.choice(list(DIR_VEC))
+
+
+SPECIES = {
+    "maple": (oak5, {}, "spruce_fence",
+              _pal(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "redwood": (redwood5, {}, "mangrove_fence",
+                _pal(["spruce_leaves"], ["dark_oak_leaves", "spruce_leaves"], ["spruce_leaves"])),
+    "ebony": (acacia5, {}, "dark_oak_fence",
+              _pal(["acacia_leaves"], ["dark_oak_leaves"], ["acacia_leaves", "azalea_leaves"])),
+    "willow": (willow5, {}, "spruce_fence",
+               _pal(["mangrove_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "ash": (ash5, {}, "pale_oak_fence",
+            _pal(["birch_leaves"], ["dark_oak_leaves"], ["birch_leaves", "azalea_leaves"])),
+    "azure": (cypress, {}, "dark_oak_fence",
+              _pal(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves"])),
+    "walnut": (walnut5, {}, "dark_oak_fence",
+               _pal(["oak_leaves"], ["dark_oak_leaves"], ["azalea_leaves", "oak_leaves"])),
+    "rosewood": (cherry5, {}, "crimson_fence",
+                 _pal(["cherry_leaves"], ["azalea_leaves_flowered", "cherry_leaves"], ["cherry_leaves"])),
+    "palm": (palm, {}, "jungle_fence",
+             _pal(["jungle_leaves"], ["jungle_leaves", "dark_oak_leaves"], ["azalea_leaves"])),
+    "ironwood": (pine5, {}, "spruce_fence",
+                 _pal(["spruce_leaves"], ["dark_oak_leaves"], ["spruce_leaves"])),
+    "ghostwood": (ghost5, {}, "pale_oak_fence",
+                  _pal(["pale_oak_leaves"], ["pale_oak_leaves"], ["pale_oak_leaves", "birch_leaves"])),
+    "plumwood": (dome, {}, "crimson_fence",
+                 _pal(["azalea_leaves_flowered"], ["dark_oak_leaves", "azalea_leaves"], ["cherry_leaves"])),
+}
+
+
 # ======================================================================== bushes
 
 def bush(rng, main, dark, accent=None, size=1.0, stem=None, flowers=None):

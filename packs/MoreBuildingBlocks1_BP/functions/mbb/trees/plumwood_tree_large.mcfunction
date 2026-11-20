@@ -1,1 +1,1 @@
-structure load mbb:plumwood_tree_large ~-8 ~0 ~-8
+structure load mbb:plumwood_tree_large ~-6 ~0 ~-6

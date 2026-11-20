@@ -265,25 +265,22 @@ def voxelise(tree, sk, rmax, twig_r=0.3, fence_chance=0.45):
     return w, ch, radius
 
 
-def smooth_steps(tree, chance=0.85):
-    """Fill the corner of every diagonal step in the woodwork with a stair,
-    so branches and roots read as smooth slopes instead of blocky zig-zags."""
+def smooth_steps(tree, chance=0.6):
+    """Put a stair on top of each diagonal step in the woodwork (one per
+    step, so limbs stay slim) so branches read as smooth slopes."""
     rng = tree.rng
     wood_set = set(p for p, (b, prio) in tree.g.b.items() if prio == 3)
-    wood = sorted(wood_set)
-    for (x, y, z) in wood:
+    for (x, y, z) in sorted(wood_set):
         for d, (dx, dz) in DIRS.items():
             if (x + dx, y + 1, z + dz) not in wood_set:
                 continue
             above, beside = (x, y + 1, z), (x + dx, y, z + dz)
-            if above in wood_set and beside in wood_set:
+            if above in wood_set or beside not in wood_set and above not in wood_set and False:
                 continue
             if rng.random() > chance:
                 continue
             if above not in wood_set and not tree.g.has(above):
-                tree.stairs(above, d)                 # ramp up towards the next block
-            if beside not in wood_set and not tree.g.has(beside):
-                tree.stairs(beside, OPP[d], top=True)  # bracket underneath it
+                tree.stairs(above, d)
 
 
 def leaves_at_tips(tree, sk, w, ch, radius, leaf_r=1.8, along=0.35, max_w=3, density=0.9,

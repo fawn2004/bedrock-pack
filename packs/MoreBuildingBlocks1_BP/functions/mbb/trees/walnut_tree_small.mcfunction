@@ -1,1 +1,1 @@
-structure load mbb:walnut_tree_small ~-6 ~0 ~-7
+structure load mbb:walnut_tree_small ~-7 ~0 ~-6
