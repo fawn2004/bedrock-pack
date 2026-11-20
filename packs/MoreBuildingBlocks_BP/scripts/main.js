@@ -26,22 +26,28 @@ function offset(block, dir) {
 }
 
 // ---------------------------------------------------------------- doors
+// Each door is two blocks: the bottom half (mbb:upper = false) and the top
+// half (mbb:upper = true). The script keeps both halves in sync.
 
-/** Both halves of a door (uses the multi-block API, with a manual fallback). */
-function doorParts(block) {
-  if (typeof block.getParts === "function") {
-    const parts = block.getParts();
-    if (parts && parts.length) return parts;
-  }
-  const part = block.permutation.getState("minecraft:multi_block_part");
-  const other = part === 0 ? block.above() : block.below();
-  return other && other.typeId === block.typeId ? [block, other] : [block];
+const UPPER = `${NS}:upper`;
+const OPEN = `${NS}:open`;
+const HINGE = `${NS}:hinge_right`;
+
+/** The other half of a door, if it is still there. */
+function otherHalf(block, permutation = block.permutation) {
+  try {
+    const other = permutation.getState(UPPER) ? block.below() : block.above();
+    if (other && other.typeId === permutation.type.id && other.permutation.getState(UPPER) !== permutation.getState(UPPER)) {
+      return other;
+    }
+  } catch { /* unloaded */ }
+  return undefined;
 }
 
 function setDoorState(block, state, value) {
-  for (const p of doorParts(block)) {
-    p.setPermutation(p.permutation.withState(state, value));
-  }
+  const other = otherHalf(block);
+  block.setPermutation(block.permutation.withState(state, value));
+  if (other) other.setPermutation(other.permutation.withState(state, value));
 }
 
 function playDoorSound(block, open) {
@@ -52,40 +58,62 @@ function playDoorSound(block, open) {
   });
 }
 
+function dropDoor(player, id, location, dimension) {
+  if (player && isCreative(player)) return;
+  dimension.spawnItem(new ItemStack(id, 1), { x: location.x + 0.5, y: location.y + 0.5, z: location.z + 0.5 });
+}
+
 const DoorComponent = {
   onPlayerInteract({ block }) {
-    const open = !block.permutation.getState(`${NS}:open`);
-    setDoorState(block, `${NS}:open`, open);
+    const open = !block.permutation.getState(OPEN);
+    setDoorState(block, OPEN, open);
     playDoorSound(block, open);
   },
 
   beforeOnPlayerPlace(event) {
+    const above = event.block.above();
+    // Like vanilla: needs a free block above for the top half.
+    if (!above || !(above.isAir || above.isLiquid)) {
+      event.cancel = true;
+      return;
+    }
     const perm = event.permutationToPlace;
     const facing = perm.getState("minecraft:cardinal_direction");
-    // Like vanilla: placing next to another door that is hinged on the left
-    // puts this door's hinge on the right, making a double door.
+    // Placing next to a door hinged on the left makes a double door.
     const neighbour = offset(event.block, LEFT_OF[facing]);
     let hingeRight = false;
     if (neighbour && neighbour.typeId in DOORS) {
       const n = neighbour.permutation;
-      hingeRight =
-        n.getState("minecraft:cardinal_direction") === facing && !n.getState(`${NS}:hinge_right`);
+      hingeRight = n.getState("minecraft:cardinal_direction") === facing && !n.getState(HINGE);
     }
-    event.permutationToPlace = perm.withState(`${NS}:hinge_right`, hingeRight);
-    const placed = event.block;
+    const bottom = perm.withState(HINGE, hingeRight).withState(UPPER, false);
+    event.permutationToPlace = bottom;
     system.run(() => {
       try {
-        if (placed.typeId in DOORS) setDoorState(placed, `${NS}:hinge_right`, hingeRight);
-      } catch { /* block gone */ }
+        if (above.isAir || above.isLiquid) above.setPermutation(bottom.withState(UPPER, true));
+      } catch { /* unloaded */ }
     });
+  },
+
+  // Breaking either half removes the other half and drops one door.
+  onPlayerBreak({ block, brokenBlockPermutation, player, dimension }) {
+    const other = otherHalf(block, brokenBlockPermutation);
+    if (other) other.setType("minecraft:air");
+    dropDoor(player, brokenBlockPermutation.type.id, block.location, dimension);
   },
 };
 
-// A broken door always gives back exactly one door item (survival only).
-world.afterEvents.playerBreakBlock.subscribe(({ player, block, brokenBlockPermutation }) => {
-  const id = brokenBlockPermutation.type.id;
-  if (!(id in DOORS) || isCreative(player)) return;
-  block.dimension.spawnItem(new ItemStack(id, 1), block.center());
+// Like vanilla, a door pops off if the block under it is broken.
+world.afterEvents.playerBreakBlock.subscribe(({ player, block }) => {
+  try {
+    const above = block.above();
+    if (!above || !(above.typeId in DOORS) || above.permutation.getState(UPPER)) return;
+    const id = above.typeId;
+    const top = above.above();
+    if (top && top.typeId === id) top.setType("minecraft:air");
+    above.setType("minecraft:air");
+    dropDoor(player, id, above.location, above.dimension);
+  } catch { /* unloaded */ }
 });
 
 // ---------------------------------------------------------------- slabs

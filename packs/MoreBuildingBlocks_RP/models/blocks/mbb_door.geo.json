@@ -16,7 +16,7 @@
       },
       "bones": [
         {
-          "name": "door",
+          "name": "lower",
           "pivot": [
             0,
             0,
@@ -43,7 +43,8 @@
                   "uv_size": [
                     16,
                     16
-                  ]
+                  ],
+                  "material_instance": "door_bottom"
                 },
                 "south": {
                   "uv": [
@@ -53,7 +54,8 @@
                   "uv_size": [
                     -16,
                     16
-                  ]
+                  ],
+                  "material_instance": "door_bottom"
                 },
                 "east": {
                   "uv": [
@@ -63,7 +65,8 @@
                   "uv_size": [
                     3,
                     16
-                  ]
+                  ],
+                  "material_instance": "door_bottom"
                 },
                 "west": {
                   "uv": [
@@ -73,7 +76,8 @@
                   "uv_size": [
                     3,
                     16
-                  ]
+                  ],
+                  "material_instance": "door_bottom"
                 },
                 "up": {
                   "uv": [
@@ -83,7 +87,8 @@
                   "uv_size": [
                     16,
                     3
-                  ]
+                  ],
+                  "material_instance": "door_bottom"
                 },
                 "down": {
                   "uv": [
@@ -93,7 +98,98 @@
                   "uv_size": [
                     16,
                     3
-                  ]
+                  ],
+                  "material_instance": "door_bottom"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "upper",
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -8,
+                0,
+                -8
+              ],
+              "size": [
+                16,
+                16,
+                3
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    16,
+                    16
+                  ],
+                  "material_instance": "door_top"
+                },
+                "south": {
+                  "uv": [
+                    16,
+                    0
+                  ],
+                  "uv_size": [
+                    -16,
+                    16
+                  ],
+                  "material_instance": "door_top"
+                },
+                "east": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    3,
+                    16
+                  ],
+                  "material_instance": "door_top"
+                },
+                "west": {
+                  "uv": [
+                    13,
+                    0
+                  ],
+                  "uv_size": [
+                    3,
+                    16
+                  ],
+                  "material_instance": "door_top"
+                },
+                "up": {
+                  "uv": [
+                    0,
+                    0
+                  ],
+                  "uv_size": [
+                    16,
+                    3
+                  ],
+                  "material_instance": "door_top"
+                },
+                "down": {
+                  "uv": [
+                    0,
+                    13
+                  ],
+                  "uv_size": [
+                    16,
+                    3
+                  ],
+                  "material_instance": "door_top"
                 }
               }
             }

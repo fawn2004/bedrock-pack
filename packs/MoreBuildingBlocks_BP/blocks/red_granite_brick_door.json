@@ -1,5 +1,5 @@
 {
-  "format_version": "1.26.50",
+  "format_version": "1.26.20",
   "minecraft:block": {
     "description": {
       "identifier": "mbb:red_granite_brick_door",
@@ -14,16 +14,13 @@
         "mbb:hinge_right": [
           false,
           true
+        ],
+        "mbb:upper": [
+          false,
+          true
         ]
       },
       "traits": {
-        "minecraft:multi_block": {
-          "enabled_states": [
-            "minecraft:multi_block_part"
-          ],
-          "direction": "up",
-          "parts": 2
-        },
         "minecraft:placement_direction": {
           "enabled_states": [
             "minecraft:cardinal_direction"
@@ -47,10 +44,24 @@
         "explosion_resistance": 6
       },
       "minecraft:light_dampening": 0,
-      "minecraft:geometry": "geometry.mbb_door",
+      "minecraft:geometry": {
+        "identifier": "geometry.mbb_door",
+        "bone_visibility": {
+          "lower": "!q.block_state('mbb:upper')",
+          "upper": "q.block_state('mbb:upper')"
+        }
+      },
       "minecraft:material_instances": {
         "*": {
           "texture": "mbb_red_granite_brick_door_bottom",
+          "render_method": "alpha_test"
+        },
+        "door_bottom": {
+          "texture": "mbb_red_granite_brick_door_bottom",
+          "render_method": "alpha_test"
+        },
+        "door_top": {
+          "texture": "mbb_red_granite_brick_door_top",
           "render_method": "alpha_test"
         }
       },
@@ -80,15 +91,12 @@
           3
         ]
       },
-      "minecraft:movable": {
-        "movement_type": "popped"
-      },
       "minecraft:loot": "loot_tables/empty.json",
       "mbb:door": {}
     },
     "permutations": [
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -96,17 +104,11 @@
               0,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -114,17 +116,11 @@
               0,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -132,17 +128,11 @@
               90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -150,17 +140,11 @@
               -90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -168,17 +152,11 @@
               180,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -186,17 +164,11 @@
               180,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -204,17 +176,11 @@
               -90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -222,17 +188,11 @@
               90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -240,17 +200,11 @@
               90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -258,17 +212,11 @@
               90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -276,17 +224,11 @@
               180,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -294,17 +236,11 @@
               0,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -312,17 +248,11 @@
               -90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -330,17 +260,11 @@
               -90,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -348,17 +272,11 @@
               0,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
           }
         }
       },
       {
-        "condition": "q.block_state('minecraft:multi_block_part') == 0 && q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
         "components": {
           "minecraft:transformation": {
             "rotation": [
@@ -366,300 +284,6 @@
               180,
               0
             ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_bottom",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              0,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'north' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              0,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'north' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              -90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              180,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'south' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              180,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              -90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'south' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'west' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              180,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'west' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              0,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              -90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'east' && !q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              -90,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && !q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              0,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
-          }
-        }
-      },
-      {
-        "condition": "q.block_state('minecraft:multi_block_part') == 1 && q.block_state('minecraft:cardinal_direction') == 'east' && q.block_state('mbb:open') && q.block_state('mbb:hinge_right')",
-        "components": {
-          "minecraft:transformation": {
-            "rotation": [
-              0,
-              180,
-              0
-            ]
-          },
-          "minecraft:material_instances": {
-            "*": {
-              "texture": "mbb_red_granite_brick_door_top",
-              "render_method": "alpha_test"
-            }
           }
         }
       }

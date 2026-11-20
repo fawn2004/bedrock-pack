@@ -21,10 +21,10 @@ from PIL import Image  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NS = "mbb"
 PACK = "MoreBuildingBlocks"
-VERSION = [1, 0, 1]
-BLOCK_FMT = "1.26.50"
+VERSION = [1, 0, 2]
+BLOCK_FMT = "1.26.20"
 ITEM_FMT = "1.21.60"
-MIN_ENGINE = [1, 26, 50]
+MIN_ENGINE = [1, 26, 20]
 SCRIPT_API = "2.7.0"
 
 BP = os.path.join(ROOT, "packs", PACK + "_BP")
@@ -166,8 +166,11 @@ def build_geometry():
         "up": {"uv": [0, 0], "uv_size": [16, 3]},
         "down": {"uv": [0, 13], "uv_size": [16, 3]},
     }
+    def with_mat(name):
+        return {f: dict(v, material_instance=name) for f, v in door_uv.items()}
     write_json(os.path.join(models, "mbb_door.geo.json"), geo("geometry.mbb_door", [
-        ("door", [cube([-8, 0, -8], [16, 16, 3], door_uv)]),
+        ("lower", [cube([-8, 0, -8], [16, 16, 3], with_mat("door_bottom"))]),
+        ("upper", [cube([-8, 0, -8], [16, 16, 3], with_mat("door_top"))]),
     ]))
 
 
@@ -342,40 +345,41 @@ def stairs_block(base, mat_kind, color, tex):
 def door_block(base, display, mat_kind, color, tex_top, tex_bottom, icon):
     ident = f"{NS}:{base}_door"
     comps = common_components("door", mat_kind, color)
+    upper = f"q.block_state('{NS}:upper')"
     comps.update({
-        "minecraft:geometry": "geometry.mbb_door",
-        "minecraft:material_instances": mat(tex_bottom, "alpha_test"),
+        # one block per door half; the script places/removes the top half
+        "minecraft:geometry": {
+            "identifier": "geometry.mbb_door",
+            "bone_visibility": {"lower": f"!{upper}", "upper": upper},
+        },
+        "minecraft:material_instances": {
+            "*": {"texture": tex_bottom, "render_method": "alpha_test"},
+            "door_bottom": {"texture": tex_bottom, "render_method": "alpha_test"},
+            "door_top": {"texture": tex_top, "render_method": "alpha_test"},
+        },
         "minecraft:collision_box": [box([-8, 0, -8], [16, 16, 3])],
         "minecraft:selection_box": box([-8, 0, -8], [16, 16, 3]),
-        "minecraft:movable": {"movement_type": "popped"},
         # drops are handled by the script so a door always drops exactly one item
         "minecraft:loot": "loot_tables/empty.json",
         f"{NS}:door": {},
     })
     perms = []
-    for part in (0, 1):
-        for d in DIRS:
-            for open_ in (False, True):
-                for hinge_right in (False, True):
-                    rot = DIR_ROT[d]
-                    if open_:
-                        rot += -90 if hinge_right else 90
-                    cond = (f"q.block_state('minecraft:multi_block_part') == {part} && "
-                            f"q.block_state('minecraft:cardinal_direction') == '{d}' && "
-                            f"{'' if open_ else '!'}q.block_state('{NS}:open') && "
-                            f"{'' if hinge_right else '!'}q.block_state('{NS}:hinge_right')")
-                    pc = {"minecraft:transformation": {"rotation": [0, norm(rot), 0]}}
-                    pc["minecraft:material_instances"] = mat(tex_top if part else tex_bottom, "alpha_test")
-                    perms.append({"condition": cond, "components": pc})
+    for d in DIRS:
+        for open_ in (False, True):
+            for hinge_right in (False, True):
+                rot = DIR_ROT[d]
+                if open_:
+                    rot += -90 if hinge_right else 90
+                cond = (f"q.block_state('minecraft:cardinal_direction') == '{d}' && "
+                        f"{'' if open_ else '!'}q.block_state('{NS}:open') && "
+                        f"{'' if hinge_right else '!'}q.block_state('{NS}:hinge_right')")
+                perms.append({"condition": cond, "components": {
+                    "minecraft:transformation": {"rotation": [0, norm(rot), 0]}}})
     block_file(ident, {
         "menu_category": {"category": "none"},
-        "states": {f"{NS}:open": [False, True], f"{NS}:hinge_right": [False, True]},
+        "states": {f"{NS}:open": [False, True], f"{NS}:hinge_right": [False, True],
+                   f"{NS}:upper": [False, True]},
         "traits": {
-            "minecraft:multi_block": {
-                "enabled_states": ["minecraft:multi_block_part"],
-                "direction": "up",
-                "parts": 2,
-            },
             "minecraft:placement_direction": {"enabled_states": ["minecraft:cardinal_direction"]},
         },
     }, comps, perms)
