@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "More Building Blocks 2",
+    "name": "More Building Blocks 3",
     "description": "12 woods + 12 stones with logs, leaves, slabs, stairs, doors, plus ready-made trees, bushes and rocks.",
     "uuid": "579effbc-7213-5166-ab81-4e5ed2667001",
     "version": [
       1,
       7,
-      0
+      1
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         1,
         7,
-        0
+        1
       ]
     },
     {
@@ -33,7 +33,7 @@
       "version": [
         1,
         7,
-        0
+        1
       ]
     }
   ],
@@ -43,7 +43,7 @@
       "version": [
         1,
         7,
-        0
+        1
       ]
     },
     {
