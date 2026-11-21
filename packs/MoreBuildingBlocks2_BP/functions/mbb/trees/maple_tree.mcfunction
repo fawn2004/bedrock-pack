@@ -1,1 +1,1 @@
-place feature mbb:maple_tree ~ ~ ~
+scriptevent mbb:tree maple_tree

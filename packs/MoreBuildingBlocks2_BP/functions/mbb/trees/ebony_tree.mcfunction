@@ -1,1 +1,1 @@
-place feature mbb:ebony_tree ~ ~ ~
+scriptevent mbb:tree ebony_tree

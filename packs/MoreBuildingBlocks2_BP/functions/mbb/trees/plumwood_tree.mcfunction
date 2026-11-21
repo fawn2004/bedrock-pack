@@ -1,1 +1,1 @@
-place feature mbb:plumwood_tree ~ ~ ~
+scriptevent mbb:tree plumwood_tree

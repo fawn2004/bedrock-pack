@@ -1,1 +1,1 @@
-place feature mbb:ironwood_tree ~ ~ ~
+scriptevent mbb:tree ironwood_tree

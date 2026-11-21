@@ -1,1 +1,1 @@
-place feature mbb:palm_tree ~ ~ ~
+scriptevent mbb:tree palm_tree

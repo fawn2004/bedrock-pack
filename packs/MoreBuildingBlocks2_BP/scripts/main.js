@@ -8,6 +8,7 @@ const DOORS = {"mbb:maple_door": "wood", "mbb:redwood_door": "wood", "mbb:ebony_
 const STAIRS = new Set(["mbb:maple_stairs", "mbb:maple_bark_stairs", "mbb:redwood_stairs", "mbb:redwood_bark_stairs", "mbb:ebony_stairs", "mbb:ebony_bark_stairs", "mbb:willow_stairs", "mbb:willow_bark_stairs", "mbb:ash_stairs", "mbb:ash_bark_stairs", "mbb:azure_stairs", "mbb:azure_bark_stairs", "mbb:walnut_stairs", "mbb:walnut_bark_stairs", "mbb:rosewood_stairs", "mbb:rosewood_bark_stairs", "mbb:palm_stairs", "mbb:palm_bark_stairs", "mbb:ironwood_stairs", "mbb:ironwood_bark_stairs", "mbb:ghostwood_stairs", "mbb:ghostwood_bark_stairs", "mbb:plumwood_stairs", "mbb:plumwood_bark_stairs", "mbb:marble_stairs", "mbb:slate_tile_stairs", "mbb:limestone_brick_stairs", "mbb:red_granite_brick_stairs", "mbb:jade_brick_stairs", "mbb:polished_onyx_stairs", "mbb:travertine_stairs", "mbb:gabbro_brick_stairs", "mbb:rose_quartz_brick_stairs", "mbb:chalk_tile_stairs", "mbb:shale_brick_stairs", "mbb:marble_brick_stairs"]);
 const LOGS = {"mbb:maple_log": "mbb:stripped_maple_log", "mbb:redwood_log": "mbb:stripped_redwood_log", "mbb:ebony_log": "mbb:stripped_ebony_log", "mbb:willow_log": "mbb:stripped_willow_log", "mbb:ash_log": "mbb:stripped_ash_log", "mbb:azure_log": "mbb:stripped_azure_log", "mbb:walnut_log": "mbb:stripped_walnut_log", "mbb:rosewood_log": "mbb:stripped_rosewood_log", "mbb:palm_log": "mbb:stripped_palm_log", "mbb:ironwood_log": "mbb:stripped_ironwood_log", "mbb:ghostwood_log": "mbb:stripped_ghostwood_log", "mbb:plumwood_log": "mbb:stripped_plumwood_log"}; // log id -> stripped log id
 const WOOD_SLABS = new Set(["mbb:maple_bark_slab", "mbb:maple_slab", "mbb:redwood_bark_slab", "mbb:redwood_slab", "mbb:ebony_bark_slab", "mbb:ebony_slab", "mbb:willow_bark_slab", "mbb:willow_slab", "mbb:ash_bark_slab", "mbb:ash_slab", "mbb:azure_bark_slab", "mbb:azure_slab", "mbb:walnut_bark_slab", "mbb:walnut_slab", "mbb:rosewood_bark_slab", "mbb:rosewood_slab", "mbb:palm_bark_slab", "mbb:palm_slab", "mbb:ironwood_bark_slab", "mbb:ironwood_slab", "mbb:ghostwood_bark_slab", "mbb:ghostwood_slab", "mbb:plumwood_bark_slab", "mbb:plumwood_slab"]);
+const TREES = {"maple_tree": ["minecraft:fancy_oak_tree_feature", ["minecraft:oak_log"], "maple"], "maple_tree_small": ["minecraft:oak_tree_feature", ["minecraft:oak_log"], "maple"], "walnut_tree": ["minecraft:roofed_tree_feature", ["minecraft:dark_oak_log"], "walnut"], "redwood_tree": ["minecraft:mega_spruce_tree_feature", ["minecraft:spruce_log"], "redwood"], "redwood_tree_pine": ["minecraft:mega_pine_tree_feature", ["minecraft:spruce_log"], "redwood"], "ironwood_tree": ["minecraft:pine_tree_feature", ["minecraft:spruce_log"], "ironwood"], "ironwood_tree_mountain": ["minecraft:mountain_pine_tree_feature", ["minecraft:spruce_log"], "ironwood"], "azure_tree": ["minecraft:spruce_tree_feature", ["minecraft:spruce_log"], "azure"], "ash_tree": ["minecraft:super_birch_tree_feature", ["minecraft:birch_log"], "ash"], "ash_tree_small": ["minecraft:birch_tree_feature", ["minecraft:birch_log"], "ash"], "ghostwood_tree": ["minecraft:pale_oak_tree_feature", ["minecraft:pale_oak_log"], "ghostwood"], "ebony_tree": ["minecraft:savanna_tree_feature", ["minecraft:acacia_log"], "ebony"], "rosewood_tree": ["minecraft:cherry_tree_feature", ["minecraft:cherry_log"], "rosewood"], "willow_tree": ["minecraft:swamp_tree_feature", ["minecraft:oak_log"], "willow"], "willow_tree_mangrove": ["minecraft:mangrove_tree_feature", ["minecraft:mangrove_log"], "willow"], "palm_tree": ["minecraft:jungle_tree_feature", ["minecraft:jungle_log"], "palm"], "palm_tree_mega": ["minecraft:mega_jungle_tree_feature", ["minecraft:jungle_log"], "palm"], "plumwood_tree": ["minecraft:azalea_tree_feature", ["minecraft:oak_log"], "plumwood"]}; // name -> [vanilla feature, [vanilla log ids], our wood]
 
 const isCreative = (player) => String(player.getGameMode()).toLowerCase() === "creative";
 
@@ -267,6 +268,131 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
     block.dimension.playSound("use.wood", block.center());
     damageHeldItem(player);
   });
+});
+
+// ---------------------------------------------------------------- trees
+// "/scriptevent mbb:tree <name> [dx dz]" (what /function mbb/trees/<name>
+// runs) grows a real vanilla tree with Minecraft's own generator, then walks
+// that tree from its base and swaps its logs for our wood, keeping each
+// log's direction, and makes its leaves persistent so they never decay.
+
+const AXIS_TO_FACE = { y: "up", x: "east", z: "north" };
+
+function findGround(dimension, x, y, z) {
+  for (let yy = Math.floor(y) + 8; yy >= Math.floor(y) - 12; yy--) {
+    let b;
+    try { b = dimension.getBlock({ x, y: yy, z }); } catch { return undefined; }
+    if (!b) return undefined;
+    if (!b.isAir && !b.isLiquid && !b.typeId.endsWith("_leaves") && !b.typeId.includes("grass") &&
+        !b.typeId.includes("fern") && !b.typeId.includes("flower") && b.typeId !== "minecraft:snow_layer") {
+      return { x, y: yy + 1, z };
+    }
+  }
+  return undefined;
+}
+
+function convertTree(dimension, base, logIds, wood) {
+  const logs = new Set(logIds);
+  const ourLog = `${NS}:${wood}_log`;
+  const key = (p) => `${p.x},${p.y},${p.z}`;
+  const seen = new Set();
+  const queue = [];
+  // the trunk starts at (or right next to) the spot the tree was grown on
+  for (let dx = -2; dx <= 2; dx++)
+    for (let dz = -2; dz <= 2; dz++)
+      for (let dy = -1; dy <= 2; dy++) {
+        const p = { x: base.x + dx, y: base.y + dy, z: base.z + dz };
+        const b = dimension.getBlock(p);
+        if (b && logs.has(b.typeId)) { queue.push(p); seen.add(key(p)); }
+      }
+  const logCells = [];
+  while (queue.length && logCells.length < 4000) {
+    const p = queue.shift();
+    const b = dimension.getBlock(p);
+    if (!b || !logs.has(b.typeId)) continue;
+    logCells.push(p);
+    const axis = b.permutation.getState("pillar_axis") ?? "y";
+    b.setPermutation(BlockPermutation.resolve(ourLog, { "minecraft:block_face": AXIS_TO_FACE[axis] ?? "up" }));
+    for (let dx = -1; dx <= 1; dx++)
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dz = -1; dz <= 1; dz++) {
+          const q = { x: p.x + dx, y: p.y + dy, z: p.z + dz };
+          if (Math.abs(q.x - base.x) > 20 || Math.abs(q.z - base.z) > 20 || q.y < base.y - 2) continue;
+          const k = key(q);
+          if (seen.has(k)) continue;
+          seen.add(k);
+          const nb = dimension.getBlock(q);
+          if (nb && logs.has(nb.typeId)) queue.push(q);
+        }
+  }
+  // leaves round the tree: make them persistent so they never decay
+  const leafSeen = new Set();
+  const lq = logCells.map((p) => [p, 0]);
+  while (lq.length) {
+    const [p, d] = lq.shift();
+    if (d >= 7) continue;
+    for (const [dx, dy, dz] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) {
+      const q = { x: p.x + dx, y: p.y + dy, z: p.z + dz };
+      const k = key(q);
+      if (leafSeen.has(k)) continue;
+      leafSeen.add(k);
+      const lb = dimension.getBlock(q);
+      if (!lb || !lb.typeId.includes("leaves")) continue;
+      try {
+        if (lb.permutation.getState("persistent_bit") === false) {
+          lb.setPermutation(lb.permutation.withState("persistent_bit", true));
+        }
+      } catch { /* leaves without the state */ }
+      lq.push([q, d + 1]);
+    }
+  }
+  return logCells.length;
+}
+
+function growTree(name, origin, dimension, player) {
+  const def = TREES[name];
+  if (!def) {
+    player?.sendMessage(`§cUnknown tree "${name}". Try: ${Object.keys(TREES).join(", ")}`);
+    return;
+  }
+  const [feature, logIds, wood] = def;
+  const spot = findGround(dimension, Math.floor(origin.x), origin.y, Math.floor(origin.z));
+  if (!spot) {
+    player?.sendMessage("§cCouldn't find ground to grow the tree on here.");
+    return;
+  }
+  let ok = false;
+  try {
+    if (typeof dimension.placeFeature === "function") {
+      ok = dimension.placeFeature(feature, spot, false);
+    } else {
+      // older script API: use the /place command instead
+      const r = dimension.runCommand(`place feature ${feature} ${spot.x} ${spot.y} ${spot.z}`);
+      ok = (r?.successCount ?? 1) > 0;
+    }
+  } catch (e) {
+    player?.sendMessage(`§cMinecraft couldn't grow ${name}: ${e}`);
+    return;
+  }
+  if (!ok) {
+    player?.sendMessage(`§eNo room to grow ${name} here — try open grass or dirt with space above.`);
+    return;
+  }
+  convertTree(dimension, spot, logIds, wood);
+}
+
+system.afterEvents.scriptEventReceive.subscribe((event) => {
+  if (event.id !== `${NS}:tree`) return;
+  const source = event.sourceEntity ?? event.initiator;
+  const where = source ?? event.sourceBlock;
+  if (!where) return;
+  const parts = event.message.trim().split(/\s+/);
+  const name = parts[0];
+  const dx = Number(parts[1] ?? 0) || 0;
+  const dz = Number(parts[2] ?? 0) || 0;
+  const loc = where.location;
+  const player = source?.typeId === "minecraft:player" ? source : undefined;
+  system.run(() => growTree(name, { x: loc.x + dx, y: loc.y, z: loc.z + dz }, where.dimension, player));
 });
 
 // ---------------------------------------------------------------- register

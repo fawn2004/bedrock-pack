@@ -1267,8 +1267,7 @@ def build(bp):
     made = []
 
     # ---- trees: Minecraft's own tree generators (see build_tree_features)
-    shutil_rm(os.path.join(bp, "features"))
-    build_tree_features(bp, made)
+    build_tree_functions(bp, made)
 
     # ---- bushes (vanilla leaves only)
     V = leaf_v
@@ -1331,11 +1330,11 @@ def _showcase(bp, made):
     lines = ["say Placing every More Building Blocks tree, bush and rock... stand back!"]
     z = 8
     # trees: every wood three times so you can see the variety
-    trees = [m for m in made if m[0] == "feature"]
-    for row in range(3):
+    trees = [m for m in made if m[0] == "tree"]
+    for row in range(2):
         for i, (_, name, _, _, _) in enumerate(trees):
-            lines.append(f"place feature {NS}:{name} ~{i * 14} ~ ~{z}")
-        z += 16
+            lines.append(f"scriptevent {NS}:tree {name} {(i % 9) * 18} {z + (i // 9) * 20}")
+        z += 44
     for group in ("bushes", "rocks"):
         items = [m for m in made if m[0] == group]
         x, row_depth = 0, 0
@@ -1356,153 +1355,37 @@ def shutil_rm(path):
     shutil.rmtree(path, ignore_errors=True)
 
 
-# ======================================================================== vanilla-style tree features
-# Trees use Minecraft's own tree generators (minecraft:tree_feature) with
-# our bark "wood" blocks as trunks (bark on every side, so branches look
-# right at any angle) and vanilla leaves. Place with
-#   /place feature mbb:<wood>_tree   or   /function mbb/trees/<wood>_tree
-
-def _wood(w):
-    return {"name": f"{NS}:{w}_wood", "states": {"minecraft:block_face": "up"}}
-
-
-def _leaf(name):
-    return {"name": "minecraft:" + name, "states": {"persistent_bit": True}}
-
-
-GROW_ON = ["minecraft:grass_block", "minecraft:dirt", "minecraft:coarse_dirt", "minecraft:podzol",
-           "minecraft:dirt_with_roots", "minecraft:moss_block", "minecraft:mud", "minecraft:mycelium",
-           "minecraft:farmland", "minecraft:sand", "minecraft:red_sand", "minecraft:snow"]
-REPLACE = ["minecraft:air", "minecraft:short_grass", "minecraft:tall_grass", "minecraft:fern",
-           "minecraft:large_fern", "minecraft:snow_layer", "minecraft:moss_carpet", "minecraft:oak_leaves",
-           "minecraft:spruce_leaves", "minecraft:birch_leaves", "minecraft:jungle_leaves",
-           "minecraft:acacia_leaves", "minecraft:dark_oak_leaves", "minecraft:mangrove_leaves",
-           "minecraft:cherry_leaves", "minecraft:azalea_leaves", "minecraft:azalea_leaves_flowered",
-           "minecraft:pale_oak_leaves", "minecraft:vine"]
-
-
-def _fancy(w, leaves, base=14, variance=10, radius=3, density=0.35, slope=0.38):
-    return {
-        "fancy_trunk": {
-            "trunk_height": {"base": base, "variance": variance, "scale": 1.0},
-            "trunk_width": 1, "width_scale": 1.0, "foliage_altitude_factor": 0.3,
-            "trunk_block": _wood(w),
-            "branches": {"slope": slope, "density": density, "min_altitude_factor": 0.3},
-        },
-        "fancy_canopy": {"height": 4, "radius": radius, "leaf_block": _leaf(leaves)},
-    }
+# ======================================================================== trees from Minecraft's own generators
+# The script grows a real vanilla tree with Dimension.placeFeature, then
+# walks that tree from its base and swaps its logs for our wood (keeping each
+# log's direction) and makes its leaves persistent.
+# name -> (vanilla feature, vanilla log ids it uses, our wood)
+TREE_VARIANTS = {
+    "maple_tree": ("minecraft:fancy_oak_tree_feature", ["minecraft:oak_log"], "maple"),
+    "maple_tree_small": ("minecraft:oak_tree_feature", ["minecraft:oak_log"], "maple"),
+    "walnut_tree": ("minecraft:roofed_tree_feature", ["minecraft:dark_oak_log"], "walnut"),
+    "redwood_tree": ("minecraft:mega_spruce_tree_feature", ["minecraft:spruce_log"], "redwood"),
+    "redwood_tree_pine": ("minecraft:mega_pine_tree_feature", ["minecraft:spruce_log"], "redwood"),
+    "ironwood_tree": ("minecraft:pine_tree_feature", ["minecraft:spruce_log"], "ironwood"),
+    "ironwood_tree_mountain": ("minecraft:mountain_pine_tree_feature", ["minecraft:spruce_log"], "ironwood"),
+    "azure_tree": ("minecraft:spruce_tree_feature", ["minecraft:spruce_log"], "azure"),
+    "ash_tree": ("minecraft:super_birch_tree_feature", ["minecraft:birch_log"], "ash"),
+    "ash_tree_small": ("minecraft:birch_tree_feature", ["minecraft:birch_log"], "ash"),
+    "ghostwood_tree": ("minecraft:pale_oak_tree_feature", ["minecraft:pale_oak_log"], "ghostwood"),
+    "ebony_tree": ("minecraft:savanna_tree_feature", ["minecraft:acacia_log"], "ebony"),
+    "rosewood_tree": ("minecraft:cherry_tree_feature", ["minecraft:cherry_log"], "rosewood"),
+    "willow_tree": ("minecraft:swamp_tree_feature", ["minecraft:oak_log"], "willow"),
+    "willow_tree_mangrove": ("minecraft:mangrove_tree_feature", ["minecraft:mangrove_log"], "willow"),
+    "palm_tree": ("minecraft:jungle_tree_feature", ["minecraft:jungle_log"], "palm"),
+    "palm_tree_mega": ("minecraft:mega_jungle_tree_feature", ["minecraft:jungle_log"], "palm"),
+    "plumwood_tree": ("minecraft:azalea_tree_feature", ["minecraft:oak_log"], "plumwood"),
+}
 
 
-def tree_features():
-    f = {}
-    f["maple"] = _fancy("maple", "oak_leaves", base=15, variance=10, radius=3)
-    f["ash"] = _fancy("ash", "birch_leaves", base=18, variance=8, radius=2, density=0.3, slope=0.5)
-    f["ghostwood"] = _fancy("ghostwood", "pale_oak_leaves", base=14, variance=8, radius=2, density=0.5, slope=0.3)
-    f["walnut"] = {
-        "mega_trunk": {"trunk_width": 2, "trunk_height": {"base": 8, "intervals": [4, 3]},
-                       "trunk_block": _wood("walnut")},
-        "roofed_canopy": {"canopy_height": 4, "core_width": 2, "outer_radius": 4, "inner_radius": 3,
-                          "leaf_block": _leaf("dark_oak_leaves")},
-    }
-    f["redwood"] = {
-        "mega_trunk": {"trunk_width": 2, "trunk_height": {"base": 16, "intervals": [12, 6]},
-                       "trunk_block": _wood("redwood")},
-        "mega_pine_canopy": {"canopy_height": 16, "base_radius": 3, "radius_step_modifier": 0.6,
-                             "leaf_block": _leaf("spruce_leaves")},
-    }
-    f["ironwood"] = {
-        "trunk": {"trunk_height": {"range_min": 12, "range_max": 17}, "trunk_block": _wood("ironwood")},
-        "pine_canopy": {"canopy_height": 5, "base_radius": 2, "leaf_block": _leaf("spruce_leaves")},
-    }
-    f["azure"] = {
-        "trunk": {"trunk_height": {"range_min": 9, "range_max": 13}, "trunk_block": _wood("azure")},
-        "spruce_canopy": {"lower_offset": 2, "upper_offset": 2, "max_radius": 3,
-                          "leaf_block": _leaf("spruce_leaves")},
-    }
-    f["ebony"] = {
-        "acacia_trunk": {
-            "trunk_width": 1,
-            "trunk_height": {"base": 6, "intervals": [3, 3], "min_height_for_canopy": 3},
-            "trunk_lean": {"allow_diagonal_growth": True,
-                           "lean_height": {"range_min": 2, "range_max": 4},
-                           "lean_steps": {"range_min": 2, "range_max": 4},
-                           "lean_length": {"range_min": 1, "range_max": 3}},
-            "trunk_block": _wood("ebony"),
-        },
-        "acacia_canopy": {"canopy_size": 3, "leaf_block": _leaf("acacia_leaves")},
-    }
-    f["palm"] = {
-        "acacia_trunk": {
-            "trunk_width": 1,
-            "trunk_height": {"base": 8, "intervals": [3], "min_height_for_canopy": 5},
-            "trunk_lean": {"allow_diagonal_growth": False,
-                           "lean_height": {"range_min": 3, "range_max": 5},
-                           "lean_steps": {"range_min": 2, "range_max": 3},
-                           "lean_length": {"range_min": 1, "range_max": 2}},
-            "trunk_block": _wood("palm"),
-        },
-        "acacia_canopy": {"canopy_size": 2, "leaf_block": _leaf("jungle_leaves")},
-    }
-    cherry_canopy = {"cherry_canopy": {
-        "leaf_block": _leaf("cherry_leaves"), "height": 5, "radius": 4,
-        "wide_bottom_layer_hole_chance": 0.25, "corner_hole_chance": 0.25,
-        "hanging_leaves_chance": 0.16, "hanging_leaves_extension_chance": 0.33}}
-    f["rosewood"] = {
-        "cherry_trunk": {
-            "trunk_block": _wood("rosewood"),
-            "trunk_height": {"base": 7, "intervals": [1]},
-            "branches": {
-                "tree_type_weights": {"one_branch": 1, "two_branches": 1, "two_branches_and_trunk": 1},
-                "branch_horizontal_length": {"range_min": 2, "range_max": 4},
-                "branch_start_offset_from_top": {"range_min": -4, "range_max": -3},
-                "branch_end_offset_from_top": {"range_min": -1, "range_max": 0},
-                "branch_canopy": cherry_canopy,
-            },
-        },
-        **cherry_canopy,
-    }
-    f["willow"] = {
-        "trunk": {"trunk_height": {"range_min": 6, "range_max": 8}, "trunk_block": _wood("willow")},
-        "random_spread_canopy": {"canopy_height": 4, "canopy_radius": 4, "leaf_placement_attempts": 140,
-                                 "leaf_blocks": [[_leaf("mangrove_leaves"), 4], [_leaf("azalea_leaves"), 1]]},
-    }
-    f["plumwood"] = {
-        "acacia_trunk": {
-            "trunk_width": 1,
-            "trunk_height": {"base": 5, "intervals": [2], "min_height_for_canopy": 3},
-            "trunk_lean": {"allow_diagonal_growth": True,
-                           "lean_height": {"range_min": 2, "range_max": 3},
-                           "lean_steps": {"range_min": 2, "range_max": 3},
-                           "lean_length": {"range_min": 1, "range_max": 2}},
-            "trunk_block": _wood("plumwood"),
-        },
-        "random_spread_canopy": {"canopy_height": 3, "canopy_radius": 4, "leaf_placement_attempts": 90,
-                                 "leaf_blocks": [[_leaf("azalea_leaves_flowered"), 3],
-                                                 [_leaf("azalea_leaves"), 2]]},
-    }
-    return f
-
-
-def build_tree_features(bp, made):
-    import json
-    for wood, body in tree_features().items():
-        ident = f"{NS}:{wood}_tree"
-        data = {"format_version": "1.13.0", "minecraft:tree_feature": {
-            "description": {"identifier": ident},
-            **body,
-            "base_block": ["minecraft:dirt"],
-            "may_grow_on": GROW_ON,
-            "may_replace": REPLACE,
-            "may_grow_through": ["minecraft:short_grass", "minecraft:tall_grass", "minecraft:fern",
-                                 "minecraft:snow_layer", "minecraft:moss_carpet"],
-        }}
-        path = os.path.join(bp, "features", f"{wood}_tree.json")
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "w") as fh:
-            json.dump(data, fh, indent=2)
-            fh.write("\n")
-        fn = os.path.join(bp, "functions", NS, "trees", f"{wood}_tree.mcfunction")
+def build_tree_functions(bp, made):
+    for name in TREE_VARIANTS:
+        fn = os.path.join(bp, "functions", NS, "trees", f"{name}.mcfunction")
         os.makedirs(os.path.dirname(fn), exist_ok=True)
         with open(fn, "w") as fh:
-            fh.write(f"place feature {ident} ~ ~ ~\n")
-        made.append(("feature", f"{wood}_tree", (12, 0, 12), (0, 0, 0), 0))
+            fh.write(f"scriptevent {NS}:tree {name}\n")
+        made.append(("tree", name, (14, 0, 14), (0, 0, 0), 0))

@@ -1,6 +1,6 @@
 # More Building Blocks 2 (Minecraft Bedrock add-on)
 
-**12 new woods** and **12 new stones**: 180 blocks in total, plus **12 trees grown by Minecraft's own tree generators** and **32 ready-made bushes and rocks**.
+**12 new woods** and **12 new stones**: 180 blocks in total, plus **18 tree types grown by Minecraft's own tree generators** and **32 ready-made bushes and rocks**.
 Each wood has a log, stripped log, wood (bark) block, bark stairs and slab, two leaf colours, planks, slab, stairs and door.
 Each stone has a block, slab, stairs and door.
 Shapes and collision work like the vanilla blocks.
@@ -62,25 +62,27 @@ Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 
 ## Trees, bushes and rocks
 ### Trees (Minecraft's own tree generators)
-Each wood has a tree that uses Minecraft's built-in tree generation, with that wood's bark as the trunk and vanilla leaves.
-Every tree you place comes out different, just like natural trees.
+The pack's script grows a real vanilla tree using Minecraft's own generator. It then follows that tree from its base and swaps its logs for your wood, keeping each log's direction, and makes its leaves never decay.
+Every tree comes out different, just like natural ones. Stand on grass or dirt with space above, then run one of these:
 
-| Command | Generator |
+`/function mbb/trees/` + maple_tree, maple_tree_small, walnut_tree, redwood_tree, redwood_tree_pine, ironwood_tree, ironwood_tree_mountain, azure_tree, ash_tree, ash_tree_small, ghostwood_tree, ebony_tree, rosewood_tree, willow_tree, willow_tree_mangrove, palm_tree, palm_tree_mega, plumwood_tree
+
+| Wood | Vanilla tree |
 |---|---|
-| `/function mbb/trees/maple_tree` | Fancy (big) oak |
-| `/function mbb/trees/walnut_tree` | Dark oak, 2×2 trunk |
-| `/function mbb/trees/redwood_tree` | Mega spruce, 2×2 trunk |
-| `/function mbb/trees/ironwood_tree` | Tall pine |
-| `/function mbb/trees/azure_tree` | Spruce |
-| `/function mbb/trees/ash_tree` | Tall fancy tree, birch leaves |
-| `/function mbb/trees/ghostwood_tree` | Fancy tree, pale oak leaves |
-| `/function mbb/trees/ebony_tree` | Acacia |
-| `/function mbb/trees/palm_tree` | Leaning acacia trunk, jungle leaves |
-| `/function mbb/trees/rosewood_tree` | Cherry |
-| `/function mbb/trees/willow_tree` | Wide spreading crown, mangrove leaves |
-| `/function mbb/trees/plumwood_tree` | Flowering azalea |
+| Maple | Fancy oak (small variant: oak) |
+| Walnut | Dark oak |
+| Redwood | Mega spruce (variant: mega pine) |
+| Ironwood | Pine (variant: mountain pine) |
+| Azure | Spruce |
+| Ash | Tall birch (small variant: birch) |
+| Ghostwood | Pale oak |
+| Ebony | Acacia |
+| Rosewood | Cherry |
+| Willow | Swamp oak with vines (variant: mangrove) |
+| Palm | Jungle (variant: mega jungle) |
+| Plumwood | Flowering azalea |
 
-You can also use `/place feature mbb:maple_tree ~ ~ ~`. Stand on grass or dirt, because trees only grow on soil, like vanilla ones.
+You can also type `/scriptevent mbb:tree maple_tree` directly.
 
 ### Bushes and rocks (structures)
 - **Easiest:** `/function mbb/bushes/<name>` or `/function mbb/rocks/<name>` places one centred on you.

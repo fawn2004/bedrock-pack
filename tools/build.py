@@ -22,7 +22,7 @@ from PIL import Image  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NS = "mbb"
 PACK = "MoreBuildingBlocks2"
-VERSION = [1, 6, 1]
+VERSION = [1, 7, 0]
 BLOCK_FMT = "1.26.20"
 ITEM_FMT = "1.21.60"
 MIN_ENGINE = [1, 26, 20]
@@ -673,7 +673,8 @@ def main():
                   .replace("__DOORS__", json.dumps(mat_lookup))
                   .replace("__STAIRS__", json.dumps(stairs_ids))
                   .replace("__LOGS__", json.dumps(logs))
-                  .replace("__WOOD_SLABS__", json.dumps(wood_slabs)))
+                  .replace("__WOOD_SLABS__", json.dumps(wood_slabs))
+                  .replace("__TREES__", json.dumps({k: list(v) for k, v in nature.TREE_VARIANTS.items()})))
     os.makedirs(os.path.join(BP, "scripts"), exist_ok=True)
     with open(os.path.join(BP, "scripts", "main.js"), "w", encoding="utf-8") as f:
         f.write(script_src)

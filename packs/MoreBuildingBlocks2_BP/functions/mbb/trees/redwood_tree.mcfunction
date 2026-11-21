@@ -1,1 +1,1 @@
-place feature mbb:redwood_tree ~ ~ ~
+scriptevent mbb:tree redwood_tree

@@ -1,0 +1,1 @@
+scriptevent mbb:tree ironwood_tree_mountain

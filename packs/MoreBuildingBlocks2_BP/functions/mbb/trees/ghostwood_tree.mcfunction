@@ -1,1 +1,1 @@
-place feature mbb:ghostwood_tree ~ ~ ~
+scriptevent mbb:tree ghostwood_tree

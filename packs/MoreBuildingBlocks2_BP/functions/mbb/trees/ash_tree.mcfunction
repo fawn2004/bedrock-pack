@@ -1,1 +1,1 @@
-place feature mbb:ash_tree ~ ~ ~
+scriptevent mbb:tree ash_tree

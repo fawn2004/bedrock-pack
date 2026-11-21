@@ -8,6 +8,7 @@ const DOORS = __DOORS__; // door id -> "wood" | "stone"
 const STAIRS = new Set(__STAIRS__);
 const LOGS = __LOGS__; // log id -> stripped log id
 const WOOD_SLABS = new Set(__WOOD_SLABS__);
+const TREES = __TREES__; // name -> [vanilla feature, [vanilla log ids], our wood]
 
 const isCreative = (player) => String(player.getGameMode()).toLowerCase() === "creative";
 
@@ -267,6 +268,131 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
     block.dimension.playSound("use.wood", block.center());
     damageHeldItem(player);
   });
+});
+
+// ---------------------------------------------------------------- trees
+// "/scriptevent mbb:tree <name> [dx dz]" (what /function mbb/trees/<name>
+// runs) grows a real vanilla tree with Minecraft's own generator, then walks
+// that tree from its base and swaps its logs for our wood, keeping each
+// log's direction, and makes its leaves persistent so they never decay.
+
+const AXIS_TO_FACE = { y: "up", x: "east", z: "north" };
+
+function findGround(dimension, x, y, z) {
+  for (let yy = Math.floor(y) + 8; yy >= Math.floor(y) - 12; yy--) {
+    let b;
+    try { b = dimension.getBlock({ x, y: yy, z }); } catch { return undefined; }
+    if (!b) return undefined;
+    if (!b.isAir && !b.isLiquid && !b.typeId.endsWith("_leaves") && !b.typeId.includes("grass") &&
+        !b.typeId.includes("fern") && !b.typeId.includes("flower") && b.typeId !== "minecraft:snow_layer") {
+      return { x, y: yy + 1, z };
+    }
+  }
+  return undefined;
+}
+
+function convertTree(dimension, base, logIds, wood) {
+  const logs = new Set(logIds);
+  const ourLog = `${NS}:${wood}_log`;
+  const key = (p) => `${p.x},${p.y},${p.z}`;
+  const seen = new Set();
+  const queue = [];
+  // the trunk starts at (or right next to) the spot the tree was grown on
+  for (let dx = -2; dx <= 2; dx++)
+    for (let dz = -2; dz <= 2; dz++)
+      for (let dy = -1; dy <= 2; dy++) {
+        const p = { x: base.x + dx, y: base.y + dy, z: base.z + dz };
+        const b = dimension.getBlock(p);
+        if (b && logs.has(b.typeId)) { queue.push(p); seen.add(key(p)); }
+      }
+  const logCells = [];
+  while (queue.length && logCells.length < 4000) {
+    const p = queue.shift();
+    const b = dimension.getBlock(p);
+    if (!b || !logs.has(b.typeId)) continue;
+    logCells.push(p);
+    const axis = b.permutation.getState("pillar_axis") ?? "y";
+    b.setPermutation(BlockPermutation.resolve(ourLog, { "minecraft:block_face": AXIS_TO_FACE[axis] ?? "up" }));
+    for (let dx = -1; dx <= 1; dx++)
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dz = -1; dz <= 1; dz++) {
+          const q = { x: p.x + dx, y: p.y + dy, z: p.z + dz };
+          if (Math.abs(q.x - base.x) > 20 || Math.abs(q.z - base.z) > 20 || q.y < base.y - 2) continue;
+          const k = key(q);
+          if (seen.has(k)) continue;
+          seen.add(k);
+          const nb = dimension.getBlock(q);
+          if (nb && logs.has(nb.typeId)) queue.push(q);
+        }
+  }
+  // leaves round the tree: make them persistent so they never decay
+  const leafSeen = new Set();
+  const lq = logCells.map((p) => [p, 0]);
+  while (lq.length) {
+    const [p, d] = lq.shift();
+    if (d >= 7) continue;
+    for (const [dx, dy, dz] of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]]) {
+      const q = { x: p.x + dx, y: p.y + dy, z: p.z + dz };
+      const k = key(q);
+      if (leafSeen.has(k)) continue;
+      leafSeen.add(k);
+      const lb = dimension.getBlock(q);
+      if (!lb || !lb.typeId.includes("leaves")) continue;
+      try {
+        if (lb.permutation.getState("persistent_bit") === false) {
+          lb.setPermutation(lb.permutation.withState("persistent_bit", true));
+        }
+      } catch { /* leaves without the state */ }
+      lq.push([q, d + 1]);
+    }
+  }
+  return logCells.length;
+}
+
+function growTree(name, origin, dimension, player) {
+  const def = TREES[name];
+  if (!def) {
+    player?.sendMessage(`§cUnknown tree "${name}". Try: ${Object.keys(TREES).join(", ")}`);
+    return;
+  }
+  const [feature, logIds, wood] = def;
+  const spot = findGround(dimension, Math.floor(origin.x), origin.y, Math.floor(origin.z));
+  if (!spot) {
+    player?.sendMessage("§cCouldn't find ground to grow the tree on here.");
+    return;
+  }
+  let ok = false;
+  try {
+    if (typeof dimension.placeFeature === "function") {
+      ok = dimension.placeFeature(feature, spot, false);
+    } else {
+      // older script API: use the /place command instead
+      const r = dimension.runCommand(`place feature ${feature} ${spot.x} ${spot.y} ${spot.z}`);
+      ok = (r?.successCount ?? 1) > 0;
+    }
+  } catch (e) {
+    player?.sendMessage(`§cMinecraft couldn't grow ${name}: ${e}`);
+    return;
+  }
+  if (!ok) {
+    player?.sendMessage(`§eNo room to grow ${name} here — try open grass or dirt with space above.`);
+    return;
+  }
+  convertTree(dimension, spot, logIds, wood);
+}
+
+system.afterEvents.scriptEventReceive.subscribe((event) => {
+  if (event.id !== `${NS}:tree`) return;
+  const source = event.sourceEntity ?? event.initiator;
+  const where = source ?? event.sourceBlock;
+  if (!where) return;
+  const parts = event.message.trim().split(/\s+/);
+  const name = parts[0];
+  const dx = Number(parts[1] ?? 0) || 0;
+  const dz = Number(parts[2] ?? 0) || 0;
+  const loc = where.location;
+  const player = source?.typeId === "minecraft:player" ? source : undefined;
+  system.run(() => growTree(name, { x: loc.x + dx, y: loc.y, z: loc.z + dz }, where.dimension, player));
 });
 
 // ---------------------------------------------------------------- register

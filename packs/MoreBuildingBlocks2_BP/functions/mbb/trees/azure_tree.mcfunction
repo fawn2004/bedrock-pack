@@ -1,1 +1,1 @@
-place feature mbb:azure_tree ~ ~ ~
+scriptevent mbb:tree azure_tree

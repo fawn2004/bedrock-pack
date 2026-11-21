@@ -1,1 +1,1 @@
-place feature mbb:willow_tree ~ ~ ~
+scriptevent mbb:tree willow_tree

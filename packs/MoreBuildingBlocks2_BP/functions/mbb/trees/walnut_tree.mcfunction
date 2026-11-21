@@ -1,1 +1,1 @@
-place feature mbb:walnut_tree ~ ~ ~
+scriptevent mbb:tree walnut_tree
