@@ -151,7 +151,7 @@ def build_bp():
             "minecraft:movement.basic": {},
             "minecraft:jump.static": {},
             "minecraft:navigation.walk": {"can_walk": True, "avoid_water": True, "avoid_damage_blocks": True, "can_open_doors": False},
-            "minecraft:home": {"restriction_radius": 4},
+            "minecraft:home": {"restriction_radius": 4, "restriction_type": "random_movement"},
             "minecraft:behavior.move_towards_home_restriction": {"priority": 3, "speed_multiplier": 1.0},
             "minecraft:behavior.random_stroll": {"priority": 6, "speed_multiplier": 1.0, "xz_dist": 3, "y_dist": 1, "interval": 60},
             "minecraft:behavior.random_look_around": {"priority": 7},
@@ -347,21 +347,53 @@ def build_rp_entities():
         "render_controllers": ["controller.render.fc_hologram"],
     }}})
 
-    # Bosses: a copy of the vanilla client entity with our id and a tinted render controller.
-    VAN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vanilla")
+    # Bosses: vanilla models and textures (already in the game) with our own
+    # simple animations, so nothing depends on vanilla's internal Molang variables.
+    walk = "math.cos(q.modified_distance_moved * 38.17) * 40 * math.min(q.modified_move_speed * 4, 1)"
+    golem_walk = "math.cos(q.modified_distance_moved * 13.5) * 25 * math.min(q.modified_move_speed * 4, 1)"
+    look = {"rotation": ["q.target_x_rotation", "q.target_y_rotation", 0]}
+    write_json(os.path.join(RP, "animations", "boss.animation.json"), {"format_version": "1.8.0", "animations": {
+        "animation.fc_boss.humanoid": {"loop": True, "bones": {
+            "head": look,
+            "rightArm": {"rotation": ["-90 + math.sin(q.life_time * 180) * 4", 0, 0]},
+            "leftArm": {"rotation": ["-90 - math.sin(q.life_time * 180) * 4", 0, 0]},
+            "rightLeg": {"rotation": [walk, 0, 0]},
+            "leftLeg": {"rotation": [f"-({walk})", 0, 0]}}},
+        "animation.fc_boss.golem": {"loop": True, "bones": {
+            "head": look,
+            "arm0": {"rotation": [f"-({golem_walk})", 0, 0]},
+            "arm1": {"rotation": [golem_walk, 0, 0]},
+            "leg0": {"rotation": [golem_walk, 0, 0]},
+            "leg1": {"rotation": [f"-({golem_walk})", 0, 0]}}},
+        "animation.fc_boss.ravager": {"loop": True, "bones": {
+            "head": {"rotation": ["q.target_x_rotation * 0.5", "q.target_y_rotation * 0.5", 0]},
+            "leg0": {"rotation": [walk, 0, 0]},
+            "leg1": {"rotation": [f"-({walk})", 0, 0]},
+            "leg2": {"rotation": [f"-({walk})", 0, 0]},
+            "leg3": {"rotation": [walk, 0, 0]}}},
+    }})
+    MODELS = {
+        "zombie": ("zombie", "textures/entity/zombie/zombie", "geometry.zombie.v1.8", "animation.fc_boss.humanoid"),
+        "wither_skeleton": ("skeleton", "textures/entity/skeleton/wither_skeleton", "geometry.skeleton.v1.8", "animation.fc_boss.humanoid"),
+        "iron_golem": ("iron_golem", "textures/entity/iron_golem", "geometry.irongolem", "animation.fc_boss.golem"),
+        "ravager": ("ravager", "textures/entity/illager/ravager", "geometry.ravager", "animation.fc_boss.ravager"),
+    }
     controllers = {}
     for t, (ident, name, vanilla, *_rest, tint) in BOSSES.items():
-        with open(os.path.join(VAN, f"{vanilla}.entity.json"), encoding="utf-8") as f:
-            data = json.load(f)
-        desc = data["minecraft:client_entity"]["description"]
-        desc["identifier"] = ident
-        desc.pop("spawn_egg", None)
+        material, texture, geo, anim = MODELS[vanilla]
         rc = f"controller.render.fc_boss_{t}"
-        desc["render_controllers"] = [rc]
         r, g, b, a = tint
         controllers[rc] = {"geometry": "Geometry.default", "materials": [{"*": "Material.default"}], "textures": ["Texture.default"],
                            "overlay_color": {"r": r, "g": g, "b": b, "a": a}}
-        write_json(os.path.join(RP, "entity", f"boss_{t}.entity.json"), data)
+        write_json(os.path.join(RP, "entity", f"boss_{t}.entity.json"), {"format_version": "1.10.0", "minecraft:client_entity": {"description": {
+            "identifier": ident,
+            "materials": {"default": material},
+            "textures": {"default": texture},
+            "geometry": {"default": geo},
+            "animations": {"body": anim},
+            "scripts": {"animate": ["body"]},
+            "render_controllers": [rc],
+        }}})
     write_json(os.path.join(RP, "render_controllers", "boss.render_controllers.json"), {"format_version": "1.8.0", "render_controllers": controllers})
 
     blocks = {"format_version": "1.1.0"}

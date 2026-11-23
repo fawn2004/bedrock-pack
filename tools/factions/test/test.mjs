@@ -6,7 +6,12 @@ const origErr = console.error; console.error = (...a) => { errors.push(a.join(" 
 await import("./scripts/main.js");
 await import("./chat/main.js");
 const cmds = {};
-system.beforeEvents.startup.fire({ customCommandRegistry: { registerEnum() {}, registerCommand(d, cb) { cmds[d.name.split(":")[1]] = cb; } } });
+const tooMany = [];
+system.beforeEvents.startup.fire({ customCommandRegistry: { registerEnum() {}, registerCommand(d, cb) {
+  const n = (d.mandatoryParameters?.length ?? 0) + (d.optionalParameters?.length ?? 0);
+  if (n > 8) { tooMany.push(`${d.name} (${n})`); throw new Error("too many parameters"); } // like the real game
+  cmds[d.name.split(":")[1]] = cb;
+} } });
 world.afterEvents.worldLoad.fire({});
 let fails = 0;
 const ok = (c, what) => { console.log((c ? "PASS " : "FAIL ") + what); if (!c) fails++; };
@@ -22,6 +27,8 @@ const hold = (pl, it) => { pl.inv.setItem(pl.selectedSlotIndex, it); };
 const ow = world.getDimension("minecraft:overworld");
 const blk = (x, y, z) => ow.getBlock({ x, y, z });
 
+ok(tooMany.length === 0, "every command has 8 parameters or fewer" + (tooMany.length ? ": " + tooMany.join(", ") : ""));
+ok(["f", "fc", "fa", "fadmin", "menu", "shop", "kit", "mute", "hud"].every((c) => cmds[c]), "all commands registered");
 // ---------- join & starter kit
 const alice = await join("Alice", 8, 8), bob = await join("Bob", 8, 8), carol = await join("Carol", 300, 8);
 ok(alice.inv.slots.some((i) => i?.typeId === "fc:menu"), "new players get the menu item");

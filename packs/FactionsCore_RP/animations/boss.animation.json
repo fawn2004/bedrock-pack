@@ -1,0 +1,125 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.fc_boss.humanoid": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation",
+            "q.target_y_rotation",
+            0
+          ]
+        },
+        "rightArm": {
+          "rotation": [
+            "-90 + math.sin(q.life_time * 180) * 4",
+            0,
+            0
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "-90 - math.sin(q.life_time * 180) * 4",
+            0,
+            0
+          ]
+        },
+        "rightLeg": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 38.17) * 40 * math.min(q.modified_move_speed * 4, 1)",
+            0,
+            0
+          ]
+        },
+        "leftLeg": {
+          "rotation": [
+            "-(math.cos(q.modified_distance_moved * 38.17) * 40 * math.min(q.modified_move_speed * 4, 1))",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.fc_boss.golem": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation",
+            "q.target_y_rotation",
+            0
+          ]
+        },
+        "arm0": {
+          "rotation": [
+            "-(math.cos(q.modified_distance_moved * 13.5) * 25 * math.min(q.modified_move_speed * 4, 1))",
+            0,
+            0
+          ]
+        },
+        "arm1": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 13.5) * 25 * math.min(q.modified_move_speed * 4, 1)",
+            0,
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 13.5) * 25 * math.min(q.modified_move_speed * 4, 1)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-(math.cos(q.modified_distance_moved * 13.5) * 25 * math.min(q.modified_move_speed * 4, 1))",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.fc_boss.ravager": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.5",
+            "q.target_y_rotation * 0.5",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 38.17) * 40 * math.min(q.modified_move_speed * 4, 1)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-(math.cos(q.modified_distance_moved * 38.17) * 40 * math.min(q.modified_move_speed * 4, 1))",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-(math.cos(q.modified_distance_moved * 38.17) * 40 * math.min(q.modified_move_speed * 4, 1))",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 38.17) * 40 * math.min(q.modified_move_speed * 4, 1)",
+            0,
+            0
+          ]
+        }
+      }
+    }
+  }
+}

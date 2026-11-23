@@ -212,7 +212,17 @@ const words = (n, from = 1) => Array.from({ length: n }, (_, i) => ({ name: `wor
 const clean = (args) => args.filter((x) => x !== undefined && x !== null).map(String);
 
 export function setupCommands() {
-  system.beforeEvents.startup.subscribe(({ customCommandRegistry: reg }) => {
+  system.beforeEvents.startup.subscribe(({ customCommandRegistry: raw }) => {
+    // Minecraft allows at most 8 parameters per command. If one command
+    // fails to register, log it and carry on with the rest.
+    const reg = {
+      registerEnum: (n, v) => { try { raw.registerEnum(n, v); } catch (e) { console.error(`[Factions] enum ${n}: ${e}`); } },
+      registerCommand: (def, cb) => {
+        const count = (def.mandatoryParameters?.length ?? 0) + (def.optionalParameters?.length ?? 0);
+        if (count > 8) console.error(`[Factions] ${def.name} has ${count} parameters (max 8)`);
+        try { raw.registerCommand(def, cb); } catch (e) { console.error(`[Factions] command ${def.name}: ${e}`); }
+      },
+    };
     reg.registerEnum(`${NS}:action`, Object.keys(F_ACTIONS));
     reg.registerEnum(`${NS}:admin_action`, Object.keys(ADMIN_ACTIONS));
 
@@ -225,7 +235,7 @@ export function setupCommands() {
       name: `${NS}:f`,
       description: "Factions: /f opens your faction, /f help lists commands",
       permissionLevel: CommandPermissionLevel.Any,
-      optionalParameters: [{ name: `${NS}:action`, type: CustomCommandParamType.Enum }, ...words(8)],
+      optionalParameters: [{ name: `${NS}:action`, type: CustomCommandParamType.Enum }, ...words(7)],
     }, (origin, action, ...rest) => run(origin, (pl) => (action ? F_ACTIONS[action](pl, clean(rest)) : M.factionMenu(pl))));
 
     simple("menu", "Open the server menu", (pl) => M.openHub(pl));
@@ -273,7 +283,7 @@ export function setupCommands() {
         description: chat ? "Message your faction and its allies" : "Message your faction",
         permissionLevel: CommandPermissionLevel.Any,
         mandatoryParameters: words(1),
-        optionalParameters: words(19, 2),
+        optionalParameters: words(7, 2),
       }, (origin, ...rest) => run(origin, (pl) => A.chat(pl, clean(rest).join(" "), chat)));
     }
 

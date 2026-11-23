@@ -212,7 +212,7 @@ Ranks are player tags, so the vanilla `/tag` command gives and removes them:
 | `/f deposit`, `/f withdraw`, `/f upgrade <id>` | treasury and upgrades |
 | `/f ally`, `truce`, `neutral`, `enemy` `<faction>` | relations |
 | `/f info`, `list`, `who`, `power`, `top` | information |
-| `/fc <msg>`, `/fa <msg>` | faction chat, ally chat |
+| `/fc <msg>`, `/fa <msg>` | faction chat, ally chat (up to 8 words; put longer messages in quotes, or use `/f chat faction`) |
 | `/shop`, `/sell hand\|all`, `/pay <player> <amount>`, `/bal [player]` | money |
 | `/ah`, `/ah sell <price>` | auction house |
 | `/crates`, `/daily`, `/kit [name]`, `/bounty <player> <amount>` | rewards |
@@ -261,5 +261,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 116 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 118 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

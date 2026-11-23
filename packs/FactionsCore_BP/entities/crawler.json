@@ -66,7 +66,8 @@
         "can_open_doors": false
       },
       "minecraft:home": {
-        "restriction_radius": 4
+        "restriction_radius": 4,
+        "restriction_type": "random_movement"
       },
       "minecraft:behavior.move_towards_home_restriction": {
         "priority": 3,
