@@ -4,6 +4,7 @@ const { world, system, Player, Entity, ItemStack, players, flush, advance } = M;
 const errors = [];
 const origErr = console.error; console.error = (...a) => { errors.push(a.join(" ")); };
 await import("./scripts/main.js");
+await import("./chat/main.js");
 const cmds = {};
 system.beforeEvents.startup.fire({ customCommandRegistry: { registerEnum() {}, registerCommand(d, cb) { cmds[d.name.split(":")[1]] = cb; } } });
 world.afterEvents.worldLoad.fire({});
@@ -268,6 +269,39 @@ ok(["FACTION", "SERVER SHOP", "CRATES", "ENCHANTER", "F-TOP", "DAILY REWARDS", "
 await Mn.factionMenu(alice); await Mn.crawlerMenu(alice, ow.spawnEntity("fc:crawler", { x: 3, y: 64, z: 3 })); await Mn.spawnerMenu(alice, sb); await Mn.cratePreview(alice, "mythic");
 await flush();
 ok(shown.some((s) => strip(s.title).includes("MYTHIC CRATE") && s.body.includes("%")), "crate preview lists chances");
+
+// ---------- ranks via /tag + chat pack
+const Rk = await import("./scripts/ranks.js");
+alice.addTag("Owner");
+await advance(40);
+ok(strip(alice.nameTag).includes("[OWNER]") && strip(alice.nameTag).includes("[Wolves]"), "/tag add Owner shows on the nametag");
+ok(alice.msgs.some((m) => strip(m).includes("Your rank: OWNER")), "player is told about their new rank");
+ok(S.playerData(alice).fastTp === true && S.playerData(alice).rankHomes === 5, "Owner perks: instant teleports, +5 homes");
+Rk.createRank("Builder", "&d&lBUILDER", 2);
+bob.addTag("Builder"); carol.addTag("rank:&6Legend");
+await advance(40);
+ok(bob.getTags().some((t) => t.startsWith("fcprefix:") && t.includes("§d§lBUILDER")), "custom ranks made with /fadmin rank create work with /tag");
+ok(strip(carol.nameTag).includes("[Legend]"), "one-off rank:&6Legend tags work");
+const chat = async (pl, text) => { const e = { sender: pl, message: text, cancel: false }; world.beforeEvents.chatSend.fire(e); await flush(); return e; };
+M.log.length = 0;
+const ce = await chat(alice, "hello everyone");
+ok(ce.cancel && strip(M.log.at(-1) ?? "").includes("[OWNER] [Wolves] Alice » hello everyone"), "normal chat shows ranks and faction: " + strip(M.log.at(-1) ?? ""));
+await chat(alice, "spam"); M.log.length = 0; await chat(alice, "spam again");
+ok(M.log.length === 0 && strip(alice.last()).includes("Slow down"), "chat anti-spam");
+await advance(30);
+await f(bob, "chat", "faction");
+M.log.length = 0; const nC = carol.msgs.length;
+await chat(bob, "secret plan");
+ok(M.log.length === 0 && strip(alice.last()).includes("[Faction]") && strip(alice.last()).includes("secret plan") && carol.msgs.length === nC, "faction chat mode only reaches the faction");
+await f(bob, "chat", "public");
+ok((await run("mute", bob, "Carol", "5")).includes("Staff only"), "non-staff can't mute");
+await run("mute", alice, "Carol", "5");
+await advance(40);
+M.log.length = 0; await chat(carol, "let me talk");
+ok(M.log.length === 0 && strip(carol.last()).includes("muted"), "muted players can't chat");
+alice.removeTag("Owner");
+await advance(40);
+ok(!strip(alice.nameTag).includes("OWNER") && !alice.getTags().some((t) => t.includes("OWNER")), "/tag remove takes the rank away");
 
 // ---------- persistence
 const S2 = await import("./scripts/store.js?reload"); S2.ensureLoaded();

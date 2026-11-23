@@ -16,7 +16,7 @@ export function teleport(player, target, label) {
   if (isTagged(player)) E.fail(`You're in combat! Wait ${tagLeft(player)}s.`);
   const until = cooldown.get(player.id) ?? 0;
   if (until > Date.now() && !R.hasBypass(player)) E.fail(`Wait ${Math.ceil((until - Date.now()) / 1000)}s before teleporting again.`);
-  const left = R.hasBypass(player) ? 0 : CONFIG.homeWarmupSeconds;
+  const left = R.hasBypass(player) || S.playerData(player).fastTp ? 0 : CONFIG.homeWarmupSeconds;
   if (left <= 0) return arrive(player, target, label);
   pending.set(player.id, { target, start: { ...player.location }, left, label });
   R.tell(player, `Teleporting to §e${label}§r in §e${left}s§r. Don't move or get hurt.`);

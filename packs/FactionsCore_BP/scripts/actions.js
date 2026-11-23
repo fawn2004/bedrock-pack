@@ -7,6 +7,7 @@ import * as R from "./rules.js";
 import * as E from "./economy.js";
 import { Fail, fail } from "./economy.js";
 import { questEvent } from "./quests.js";
+import { rankPrefix } from "./ranks.js";
 
 export { Fail };
 
@@ -476,8 +477,8 @@ export function chat(player, text, toAllies) {
   text = String(text ?? "").trim();
   if (!text) fail(toAllies ? "Usage: /fa <message>" : "Usage: /fc <message>");
   const line = toAllies
-    ? `${COLOR.ally}[Ally] §7[${f.name}] §f${player.name}: ${COLOR.ally}${text}`
-    : `§a[Faction] §7${RANK_ICON[p.rank]}§f${player.name}: §a${text}`;
+    ? `${COLOR.ally}[Ally] §7[${f.name}] ${rankPrefix(player)}§f${player.name}: ${COLOR.ally}${text}`
+    : `§a[Faction] ${rankPrefix(player)}§7${RANK_ICON[p.rank]}§f${player.name}: §a${text}`;
   const targets = new Set([f.id]);
   if (toAllies) for (const a of R.alliesOf(f.id)) targets.add(a.id);
   for (const pl of world.getAllPlayers()) {
@@ -566,6 +567,7 @@ export const HELP = [
   ["/ah  /ah sell <price>", "auction house"],
   ["/crates  /daily  /bounty <player> <amount>", "rewards"],
   ["/home  /sethome  /delhome  /spawn  /wild  /warp", "teleports"],
+  ["/f chat [public|faction|ally]", "where your normal chat goes"],
   ["/hud", "show/hide the sidebar"],
 ];
 

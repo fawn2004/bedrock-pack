@@ -18,6 +18,7 @@ import { placeBounty } from "./combat.js";
 import { autoclaimers } from "./tasks.js";
 import { refreshHud } from "./hud.js";
 import { hasPerm } from "./perm.js";
+import * as Rk from "./ranks.js";
 
 const NS = "factions";
 const need = (v, usage) => {
@@ -66,6 +67,7 @@ const F_ACTIONS = {
   shield: (pl, a) => A.setShield(pl, a[0]),
   top: (pl) => M.ftopMenu(pl),
   quests: (pl) => M.questsMenu(pl),
+  chat: (pl, a) => R.tell(pl, `Chat mode: §e${Rk.setChatMode(pl, a[0])}§r. Normal chat now goes to ${({ public: "everyone", faction: "your faction", ally: "your faction and allies" })[S.playerData(pl).chatMode]}.`),
 };
 
 const ADMIN_ACTIONS = {
@@ -81,6 +83,7 @@ const ADMIN_ACTIONS = {
     "§esetspawn§7, §esetwarp <name>§7, §edelwarp <name>",
     "§ekoth <set [radius]|start|stop>§7, §eenvoy§7 - events",
     "§ehologram <ftop|money|kills|level|streak|welcome|remove>",
+    "§erank [list|create <name> [look] [homes]|delete <name>]§7 - give ranks with §e/tag <player> add <rank>",
   ].join("\n")),
   bypass: (pl) => {
     const on = !R.hasBypass(pl);
@@ -175,6 +178,12 @@ const ADMIN_ACTIONS = {
     else throw new E.Fail("Usage: /fadmin koth <set [radius]|start|stop>");
   },
   envoy: (pl) => R.tell(pl, `Dropped ${Ev.startEnvoy()} supply crates.`),
+  rank: (pl, a) => {
+    const sub = (a[0] ?? "list").toLowerCase();
+    if (sub === "create") { const r = Rk.createRank(need(a[1], "/fadmin rank create <name> [look] [homes]"), a[2], a[3]); return R.tell(pl, `Created ${r.display}§r. Give it with §e/tag <player> add ${r.name}`); }
+    if (sub === "delete") { Rk.deleteRank(need(a[1], "/fadmin rank delete <name>")); return R.tell(pl, `Deleted rank ${a[1]}.`); }
+    R.tell(pl, `Ranks: ${[...Rk.BUILTIN_RANKS, ...Rk.customRanks()].map((r) => `${r.display}§r §7(${r.name})`).join("§7, ")}\n§7Give one with §e/tag <player> add <name>§7, or a one-off with §e/tag <player> add "rank:&d&lName"`);
+  },
   hologram: (pl, a) => {
     if (a[0] === "remove") return H.removeNearestHolo(pl);
     H.placeHolo(pl, need(a[0], "/fadmin hologram <type|remove>"));
@@ -236,6 +245,17 @@ export function setupCommands() {
     simple("sethome", "Set a home: /sethome [name]", (pl, a) => T.setHome(pl, a[0] ?? "home"), 1);
     simple("delhome", "Delete a home: /delhome [name]", (pl, a) => T.delHome(pl, a[0] ?? "home"), 1);
     simple("warp", "Teleport to a warp: /warp <name>", (pl, a) => (a[0] ? T.warp(pl, a[0]) : M.warpsMenu(pl)), 1);
+    const staffOnly = (pl) => { if (!hasPerm(pl) && !Rk.isStaff(pl)) throw new E.Fail("Staff only."); };
+    simple("mute", "Mute a player: /mute <player> [minutes]", (pl, a) => {
+      staffOnly(pl);
+      const { p, m } = Rk.mute(need(a[0], "/mute <player> [minutes]"), a[1]);
+      R.broadcast(`§e${p.name}§r was muted for ${m} minute(s) by §e${pl.name}§r.`);
+    }, 2);
+    simple("unmute", "Unmute a player: /unmute <player>", (pl, a) => {
+      staffOnly(pl);
+      const p = Rk.unmute(need(a[0], "/unmute <player>"));
+      R.tell(pl, `§e${p.name}§r can talk again.`);
+    }, 1);
     simple("hud", "Show or hide the sidebar", (pl) => {
       const p = S.playerData(pl);
       p.hud = !p.hud;

@@ -55,7 +55,7 @@ export function takeCrystals(p, n, what = "that") {
 // ------------------------------------------------------------ levels
 
 export const xpForLevel = (level) => Math.floor(40 + level * 22 + Math.pow(level, 1.6) * 6);
-export const maxHomes = (p) => Math.min(6, 1 + Math.floor(p.level / 10));
+export const maxHomes = (p) => Math.min(6, 1 + Math.floor(p.level / 10)) + (p.rankHomes ?? 0);
 
 /** Gives XP (with the faction Wisdom bonus) and handles level-ups. */
 export function addXp(player, p, amount) {

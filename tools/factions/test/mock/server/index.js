@@ -56,7 +56,7 @@ const dist = (a, b) => Math.hypot(a.x - b.x, (a.y ?? 0) - (b.y ?? 0), a.z - b.z)
 const dims = { "minecraft:overworld": new Dimension("minecraft:overworld"), "minecraft:nether": new Dimension("minecraft:nether"), "minecraft:the_end": new Dimension("minecraft:the_end") };
 export class Entity { constructor(id, typeId, dim, loc) { this.id = id; this.typeId = typeId; this.dimension = dims[dim]; this.location = loc; this.dp = new Map(); this.tags = new Set(); this.nameTag = ""; this.isValid = true; this.props = {}; this.hp = 20; this.maxHp = 20; this.effects = {}; }
   getDynamicProperty(k) { return this.dp.get(k); } setDynamicProperty(k, v) { v === undefined ? this.dp.delete(k) : this.dp.set(k, v); }
-  addTag(t) { this.tags.add(t); return true; } hasTag(t) { return this.tags.has(t); }
+  addTag(t) { this.tags.add(t); return true; } hasTag(t) { return this.tags.has(t); } removeTag(t) { return this.tags.delete(t); } getTags() { return [...this.tags]; }
   setProperty(k, v) { this.props[k] = v; } getProperty(k) { return this.props[k]; }
   remove() { this.isValid = false; } kill() { this.isValid = false; return true; }
   matches(q) { return (q.families ?? []).includes("monster") && this.typeId === "minecraft:zombie"; }
@@ -75,7 +75,7 @@ export class Player extends Entity {
   last() { return this.msgs[this.msgs.length - 1] ?? ""; }
 }
 export const world = {
-  beforeEvents: Object.fromEntries(["playerBreakBlock", "playerInteractWithBlock", "playerInteractWithEntity", "explosion", "entityHurt", "playerLeave", "itemUse"].map((k) => [k, sig()])),
+  beforeEvents: Object.fromEntries(["playerBreakBlock", "playerInteractWithBlock", "playerInteractWithEntity", "explosion", "entityHurt", "playerLeave", "itemUse", "chatSend"].map((k) => [k, sig()])),
   afterEvents: Object.fromEntries(["playerSpawn", "playerLeave", "entityDie", "entityHurt", "worldLoad", "playerBreakBlock", "playerPlaceBlock", "itemUse"].map((k) => [k, sig()])),
   getDynamicPropertyIds: () => [...props.keys()], getDynamicProperty: (k) => props.get(k),
   setDynamicProperty: (k, v) => { if (readOnly) throw new Error("read-only"); v === undefined ? props.delete(k) : props.set(k, v); },

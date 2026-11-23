@@ -24,6 +24,11 @@ VERSION = [2, 0, 0]
 MIN_ENGINE = [1, 26, 20]
 BP_UUID, BP_DATA, BP_SCRIPT = "e01294d7-65a4-4856-b137-a27734420e64", "7c286f51-a204-4948-abc2-3b1d04b1e28e", "e4e9690b-5e9d-4009-983a-8c39d4a3dc8d"
 RP_UUID, RP_RES = "d769002a-fc35-4aa5-a76f-c532c897e981", "8bcc7ff2-873a-4ac4-a141-a71353d3b7f6"
+CHAT = os.path.join(ROOT, "packs", "FactionsCoreChat_BP")
+CHAT_UUID, CHAT_DATA, CHAT_SCRIPT = "2331762e-ee4e-4e36-91a6-d998ec1b1c83", "f9a86162-020f-43f4-842a-c3fcafa13ea2", "1bb89d32-6a09-49b9-a639-856b477ad81c"
+# Beta API for chat. Each Minecraft version has its own beta number:
+# 1.26.20 -> 2.8.0-beta, 1.26.30 -> 2.9.0-beta, 1.26.40 -> 2.10.0-beta, 1.26.50 -> 2.11.0-beta, 1.26.60 -> 2.12.0-beta
+CHAT_BETA = "2.12.0-beta"
 
 RARITIES = ["common", "rare", "epic", "legendary", "mythic"]
 RARITY_NAME = {"common": "Common", "rare": "Rare", "epic": "Epic", "legendary": "Legendary", "mythic": "Mythic"}
@@ -162,6 +167,7 @@ def build_bp():
         "modules": [{"type": "data", "uuid": BP_DATA, "version": VERSION},
                     {"type": "script", "language": "javascript", "uuid": BP_SCRIPT, "entry": "scripts/main.js", "version": VERSION}],
         "dependencies": [{"uuid": RP_UUID, "version": VERSION},
+                         {"uuid": CHAT_UUID, "version": VERSION},
                          {"module_name": "@minecraft/server", "version": "2.7.0"},
                          {"module_name": "@minecraft/server-ui", "version": "2.0.0"}],
     })
@@ -169,6 +175,18 @@ def build_bp():
 
 
 # ================================================================ resource pack: art
+
+def build_chat():
+    write_json(os.path.join(CHAT, "manifest.json"), {
+        "format_version": 2,
+        "header": {"name": "Factions Core Chat", "description": "Ranks and factions in normal chat. Needs the Beta APIs experiment; turned on automatically with Factions Core.",
+                   "uuid": CHAT_UUID, "version": VERSION, "min_engine_version": MIN_ENGINE},
+        "modules": [{"type": "data", "uuid": CHAT_DATA, "version": VERSION},
+                    {"type": "script", "language": "javascript", "uuid": CHAT_SCRIPT, "entry": "scripts/main.js", "version": VERSION}],
+        "dependencies": [{"module_name": "@minecraft/server", "version": CHAT_BETA}],
+    })
+    save_png(icons.build_logo(256), CHAT, "pack_icon.png")
+
 
 def build_rp_art():
     shutil.rmtree(os.path.join(RP, "textures"), ignore_errors=True)
@@ -336,16 +354,18 @@ def package():
     old = os.path.join(DIST, "FactionsCore.mcpack")
     if os.path.exists(old):
         os.remove(old)
-    for folder, name in ((BP, "FactionsCore_BP"), (RP, "FactionsCore_RP")):
+    for folder, name in ((BP, "FactionsCore_BP"), (RP, "FactionsCore_RP"), (CHAT, "FactionsCoreChat_BP")):
         with zipfile.ZipFile(os.path.join(DIST, name + ".mcpack"), "w", zipfile.ZIP_DEFLATED) as z:
             zip_dir(z, folder, "")
     with zipfile.ZipFile(os.path.join(DIST, "FactionsCore.mcaddon"), "w", zipfile.ZIP_DEFLATED) as z:
         zip_dir(z, BP, "FactionsCore_BP")
         zip_dir(z, RP, "FactionsCore_RP")
+        zip_dir(z, CHAT, "FactionsCoreChat_BP")
 
 
 def main():
     build_bp()
+    build_chat()
     build_rp_art()
     build_rp_entities()
     build_rp_ui()

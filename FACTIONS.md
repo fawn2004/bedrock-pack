@@ -1,6 +1,9 @@
 # Factions Core 2.0 (Minecraft Bedrock add-on)
 
-The complete core for a factions server. It is a behavior pack plus a resource pack: the resource pack draws the styled menus, the sidebar, the items and the models.
+The complete core for a factions server. It comes as three packs in one `.mcaddon`:
+- **Factions Core:** all the gameplay.
+- **Factions Core RP:** draws the styled menus, the sidebar, the items and the models.
+- **Factions Core Chat:** shows ranks and factions in normal chat. It needs the **Beta APIs** experiment.
 
 ![Main menu](docs/factions/menu_hub.png)
 
@@ -12,10 +15,11 @@ The complete core for a factions server. It is a behavior pack plus a resource p
 
 ## Install
 1. Double-click `dist/FactionsCore.mcaddon` to import both packs.
-2. Turn on **Factions Core** in your world's behavior packs. The resource pack is turned on with it automatically.
-3. You need Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
+2. Turn on **Factions Core** in your world's behavior packs. The resource pack and the chat pack are turned on with it automatically.
+3. You need Minecraft Bedrock **1.26.60 or newer** for chat formatting, and the world needs **Beta APIs** turned on.
+   Everything else works on 1.26.20 or newer without experiments. Without Beta APIs, normal chat simply stays vanilla.
 
-**On a dedicated server**, copy both pack folders from the `.mcaddon` into `behavior_packs` and `resource_packs`. Then list them in the world's `world_behavior_packs.json` and `world_resource_packs.json`, and turn on "require resource packs" so players get the menus.
+**On a dedicated server**, copy the pack folders from the `.mcaddon` into `behavior_packs` and `resource_packs`. Then list them in the world's `world_behavior_packs.json` and `world_resource_packs.json`, and turn on "require resource packs" so players get the menus.
 
 New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can tap the item or type `/menu` to open everything.
 
@@ -108,6 +112,35 @@ New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can t
 - **King of the Hill:** hold the hill alone for 2 minutes.
   The winner gets $250k, 50 crystals and a Legendary key, and their faction treasury gets $100k.
 
+### Ranks and chat
+Ranks are player tags, so the vanilla `/tag` command gives and removes them:
+
+| Command | What it does |
+|---|---|
+| `/tag Steve add Owner` | built-in rank: **Owner**, **Admin**, **Mod**, **Helper**, **MVP** or **VIP** |
+| `/tag Steve remove Owner` | takes it away |
+| `/fadmin rank create Builder &d&lBUILDER 2` | makes your own rank (name, look with `&` colour codes, extra homes) |
+| `/tag Steve add Builder` | gives your own rank |
+| `/tag Steve add "rank:&6&lLegend"` | a one-off rank with no setup |
+| `/fadmin rank delete Builder`, `/fadmin rank list` | manage your ranks |
+
+- **Where ranks show:** in normal chat (`[OWNER] [Wolves] Steve » hi`), above heads, in the sidebar, in `/fc` and `/fa`, and in the players list. A player with several ranks shows all of them.
+- **Perks:**
+
+  | Ranks | Extra homes | Instant teleports | Can `/mute` |
+  |---|---|---|---|
+  | Owner, Admin | +5 | yes | yes |
+  | Mod | +3 | yes | yes |
+  | Helper | +2 | no | yes |
+  | MVP | +3 | yes | no |
+  | VIP | +1 | no | no |
+  | Custom ranks | as set when you create them | no | no |
+- **Chat modes:** `/f chat faction`, `/f chat ally` or `/f chat public` decides where your normal chat goes.
+- **Moderation:** staff can `/mute <player> [minutes]` and `/unmute <player>`. Chat also blocks spam and repeated messages.
+- The **Admin > Ranks** page in `/menu` can give ranks and create custom ones too.
+
+**After a Minecraft update:** the chat pack is tied to one Minecraft version's beta API. If chat goes back to vanilla after an update, change `CHAT_BETA` in `tools/factions/build.py` to the new version and rebuild. The list of versions is in the comment next to it. The rest of the add-on keeps working in the meantime.
+
 ### Interface
 - **Styled menus** for every screen, as in the previews above. Forms from other add-ons keep the normal vanilla look.
 - **Sidebar:** your balance, crystals, level, K/D, power, faction, F-Top rank, shield timer and live event info. Turn it on or off with `/hud`.
@@ -130,6 +163,8 @@ New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can t
 | `/ah`, `/ah sell <price>` | auction house |
 | `/crates`, `/daily`, `/bounty <player> <amount>` | rewards |
 | `/home [name]`, `/sethome [name]`, `/delhome [name]`, `/spawn`, `/wild`, `/warp [name]` | teleports |
+| `/f chat public\|faction\|ally` | where your normal chat goes |
+| `/mute <player> [minutes]`, `/unmute <player>` | staff: mute players |
 | `/hud` | show or hide the sidebar |
 
 If another add-on uses the same command name, add the prefix, for example `/factions:f` or `/factions:menu`.
@@ -149,6 +184,7 @@ The **Admin** page in `/menu` has buttons for most of this. `/fadmin help` lists
 | `/fadmin hologram <ftop\|money\|kills\|level\|streak\|welcome\|remove>` | floating leaderboards |
 | `/fadmin give <item> [amount]` | `key_<rarity>`, `book_<rarity>`, `spawner_<type>`, `crawler_<tier>`, `gear_<id>`, `crate_<rarity>`, `crystal`, `genbucket`, `buster`, `wand`, `xpshard`, `power`, `mystery` |
 | `/fadmin eco give\|take\|set <player> <amount>`, `/fadmin crystals <player> <amount>` | money and crystals |
+| `/fadmin rank create <name> [look] [homes]`, `/fadmin rank delete <name>`, `/fadmin rank list` | custom ranks (give them with `/tag`) |
 | `/fadmin disband <faction>`, `/fadmin setpower <player> <n>`, `/fadmin join <faction>` | faction tools |
 
 ### Suggested server setup
@@ -171,5 +207,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 76 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 87 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

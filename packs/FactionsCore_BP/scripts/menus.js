@@ -23,6 +23,7 @@ import { SPAWNERS, CRAWLERS, GEAR, countItems, takeItems, rewardLabel, KEY, give
 import { hasPerm } from "./perm.js";
 import { refreshHud } from "./hud.js";
 import { autoclaimers } from "./tasks.js";
+import * as Rk from "./ranks.js";
 
 const { attempt } = UI;
 const pct = (a, b) => (b ? Math.floor((a / b) * 100) : 0);
@@ -97,7 +98,7 @@ async function profileMenu(player) {
   const need = E.xpForLevel(p.level);
   const kd = p.deaths ? (p.kills / p.deaths).toFixed(2) : p.kills.toFixed(2);
   const body = [
-    `§b§l${player.name}`,
+    `${Rk.rankPrefix(player)}§b§l${player.name}`,
     `§7Level §f${p.level}  §8${E.bar(p.xp / need, 20, "§a")} §7${pct(p.xp, need)}%`,
     `§7Balance §a${E.money(p.money)}   §7Crystals §b${p.crystals}`,
     `§7Power §f${Math.round(p.power * 10) / 10}/${CONFIG.maxPower}`,
@@ -117,6 +118,7 @@ async function profileMenu(player) {
     body: body.join("\n"),
     buttons: [
       { text: p.hud ? "Hide Sidebar" : "Show Sidebar", sub: "Toggle the profile HUD", icon: "settings", action: () => { p.hud = !p.hud; S.savePlayer(p); refreshHud(player); R.tell(player, `Sidebar ${p.hud ? "§aon" : "§coff"}§r.`); } },
+      { text: `Chat: ${(p.chatMode ?? "public").toUpperCase()}`, sub: "Public, faction or ally chat", icon: "mail", action: () => attempt(player, () => R.tell(player, `Chat mode: §e${Rk.setChatMode(player)}§r.`)) },
       { text: "Bank", sub: "Pay players, bank notes", icon: "coin", action: () => bankMenu(player) },
       { text: "Get Menu Item", sub: "Lost your menu item?", icon: "menu", action: () => { if (!countItems(player, "fc:menu")) giveItem(player, menuItem()); } },
     ],
@@ -154,7 +156,7 @@ async function playersMenu(player) {
     buttons: list.map((pl) => {
       const q = S.playerData(pl);
       const f = S.getFaction(q.faction);
-      return { text: pl.name, sub: `${f ? R.colorName(f, mine) : "§7No faction"} §8| §7Lv.${q.level} §8| §7K ${q.kills}`, icon: "player", action: () => A.who(player, pl.name) };
+      return { text: `${Rk.rankPrefix(pl)}§f${pl.name}`, sub: `${f ? R.colorName(f, mine) : "§7No faction"} §8| §7Lv.${q.level} §8| §7K ${q.kills}`, icon: "player", action: () => A.who(player, pl.name) };
     }),
     back: back(player),
   });
@@ -775,6 +777,7 @@ async function adminMenu(player) {
     title: "ADMIN",
     body: `§7Bypass: ${R.hasBypass(player) ? "§aON" : "§cOFF"}\n§7Spawn: ${S.kv.get("spawn") ? "§aset" : "§cnot set (using world spawn)"}\n§7KOTH: ${Ev.kothZone() ? "§aset" : "§cnot set"}\n\n§7Commands: §e/fadmin help`,
     buttons: [
+      { text: "Ranks", sub: "Give ranks, make custom ranks", icon: "crown", action: () => ranksMenu(player) },
       { text: "Toggle Bypass", sub: "Build anywhere", icon: "admin", action: () => { player.setDynamicProperty("fc:bypass", R.hasBypass(player) ? undefined : true); R.tell(player, `Bypass ${R.hasBypass(player) ? "§aon" : "§coff"}`); } },
       { text: "Set Spawn Here", sub: "Server spawn", icon: "spawn", action: () => { const l = player.location; S.kv.set("spawn", { dim: player.dimension.id, x: l.x, y: l.y, z: l.z }); R.tell(player, "Spawn set."); } },
       { text: "Start Envoy", sub: "Drop supply crates now", icon: "event", action: () => R.tell(player, `Dropped ${Ev.startEnvoy()} crates.`) },
@@ -790,5 +793,47 @@ async function adminMenu(player) {
       { text: "Give: Crate Blocks", sub: "Place them at spawn", icon: "crate", action: () => RARITIES.forEach((r) => giveItem(player, new ItemStack(`fc:crate_${r}`, 1))) },
     ],
     back: back(player),
+  });
+}
+
+async function ranksMenu(player) {
+  const custom = Rk.customRanks();
+  const body = [
+    "§fRanks are player tags, so you can also use the vanilla command:",
+    "§e/tag <player> add Owner§7  -  §e/tag <player> remove Owner",
+    "§7One-off ranks: §e/tag <player> add \"rank:&d&lBuilder\"",
+    "",
+    "§b§lBUILT-IN",
+    ...Rk.BUILTIN_RANKS.map((r) => `${r.display}§r §7- +${r.homes} homes${r.fastTp ? ", instant teleports" : ""}${r.staff ? ", can mute" : ""}`),
+    "",
+    "§b§lCUSTOM",
+    ...(custom.length ? custom.map((r) => `${r.display}§r §7(${r.name}) +${r.homes} homes`) : ["§8None yet"]),
+  ];
+  await UI.menu(player, {
+    title: "RANKS",
+    body: body.join("\n"),
+    buttons: [
+      { text: "Give a Rank", sub: "Add a rank to a player", icon: "crown", action: async () => {
+        const names = world.getAllPlayers().map((x) => x.name);
+        const ranks = Rk.allRankNames();
+        const v = await UI.modal(player, "GIVE RANK", (f) => f.dropdown("Player", names).dropdown("Rank", ranks).toggle("Remove it instead", { defaultValue: false }), "Apply");
+        if (!v) return;
+        const target = world.getAllPlayers().find((x) => x.name === names[v[0]]);
+        if (!target) return;
+        if (v[2]) target.removeTag(ranks[v[1]]); else target.addTag(ranks[v[1]]);
+        R.tell(player, `${v[2] ? "Removed" : "Gave"} §e${ranks[v[1]]}§r ${v[2] ? "from" : "to"} §e${target.name}§r.`);
+      } },
+      { text: "Create Custom Rank", sub: "Name, look and extra homes", icon: "create", action: async () => {
+        const v = await UI.modal(player, "CREATE RANK", (f) => f
+          .textField("Rank name (what you type in /tag)", "Builder")
+          .textField("How it looks (& colour codes, e.g. &d&lBUILDER)", "&d&lBUILDER")
+          .slider("Extra homes", 0, 5, { valueStep: 1, defaultValue: 0 }), "Create");
+        if (v) attempt(player, () => { const r = Rk.createRank(v[0], v[1], v[2]); R.tell(player, `Created ${r.display}§r. Give it with §e/tag <player> add ${r.name}§r.`); });
+      } },
+      ...custom.map((r) => ({ text: `Delete ${r.name}`, sub: "Remove this custom rank", icon: "leave", action: async () => {
+        if (await UI.confirm(player, "DELETE RANK", `Delete ${r.display}§r? Players keep the tag but it stops showing.`, "Delete")) attempt(player, () => Rk.deleteRank(r.name));
+      } })),
+    ],
+    back: () => adminMenu(player),
   });
 }

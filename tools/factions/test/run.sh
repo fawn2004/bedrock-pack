@@ -12,6 +12,7 @@ echo '{"name":"@minecraft/server","type":"module","main":"index.js"}' > "$WORK/n
 echo '{"name":"@minecraft/server-ui","type":"module","main":"index.js"}' > "$WORK/node_modules/@minecraft/server-ui/package.json"
 echo '{"type":"module"}' > "$WORK/package.json"
 cp -r "$ROOT/packs/FactionsCore_BP/scripts" "$WORK/scripts"
+cp -r "$ROOT/packs/FactionsCoreChat_BP/scripts" "$WORK/chat"
 cp "$HERE/test.mjs" "$WORK/test.mjs"
 cd "$WORK" && node test.mjs
 rm -rf "$WORK"

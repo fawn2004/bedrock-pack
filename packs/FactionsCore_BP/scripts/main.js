@@ -18,6 +18,9 @@ import { setupAuction } from "./auction.js";
 import { setupFtop } from "./ftop.js";
 import { setupHud } from "./hud.js";
 import { setupHolograms } from "./holograms.js";
+import { setupRanks, setOnRanksChanged, ranksOf } from "./ranks.js";
+import { alliesOf, refreshNametag, tell } from "./rules.js";
+import { refreshHud } from "./hud.js";
 
 setRewardGiver(giveReward);
 setQuestRewardGiver(giveReward);
@@ -37,6 +40,15 @@ setupAuction();
 setupFtop();
 setupHud();
 setupHolograms();
+setupRanks(alliesOf);
+setOnRanksChanged((player, first) => {
+  refreshNametag(player);
+  refreshHud(player);
+  if (!first) {
+    const list = ranksOf(player);
+    tell(player, list.length ? `Your rank: ${list.map((r) => r.display).join("§r ")}` : "Your rank was removed.");
+  }
+});
 
 world.afterEvents.worldLoad.subscribe(() => {
   ensureLoaded();
