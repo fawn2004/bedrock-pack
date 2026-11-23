@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Factions Core 3 RP",
-    "description": "Menus, HUD, items, blocks and models for Factions Core 3.",
+    "name": "Factions Core 4 RP",
+    "description": "Menus, HUD, items, blocks and models for Factions Core 4.",
     "uuid": "d769002a-fc35-4aa5-a76f-c532c897e981",
     "version": [
-      3,
+      4,
       0,
-      29
+      30
     ],
     "min_engine_version": [
       1,
@@ -20,9 +20,9 @@
       "type": "resources",
       "uuid": "8bcc7ff2-873a-4ac4-a141-a71353d3b7f6",
       "version": [
-        3,
+        4,
         0,
-        29
+        30
       ]
     }
   ]

@@ -1,4 +1,4 @@
-"""Builds Factions Core (both packs + dist/FactionsCore3_v<version>.mcaddon).
+"""Builds Factions Core (both packs + dist/FactionsCore4_v<version>.mcaddon).
 
     python3 tools/build_factions.py
 

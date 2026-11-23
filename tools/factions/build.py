@@ -21,7 +21,7 @@ RP = os.path.join(ROOT, "packs", "FactionsCore_RP")
 DIST = os.path.join(ROOT, "dist")
 
 def _version():
-    """3.0.<n>: n grows with every commit, so each update is a new version.
+    """4.0.<n>: n grows with every commit, so each update is a new version.
 
     Minecraft ignores an imported pack whose ID and version are already
     installed, so the version must change every time the add-on changes.
@@ -32,7 +32,7 @@ def _version():
                                capture_output=True, text=True, check=True).stdout.strip())
     except Exception:
         n = 0
-    return [3, 0, n + 1]
+    return [4, 0, n + 1]
 
 
 VERSION = _version()
@@ -241,7 +241,7 @@ def build_bp():
 
     write_json(os.path.join(BP, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "Factions Core 3", "description": "The complete factions server core: factions, land, power, raids, economy, shop, auction house, crates, custom enchants, spawners, ore crawlers, KOTH, envoys and a styled UI. Type /menu.",
+        "header": {"name": "Factions Core 4", "description": "The complete factions server core: factions, land, power, raids, economy, shop, auction house, crates, custom enchants, spawners, ore crawlers, KOTH, envoys and a styled UI. Type /menu.",
                    "uuid": BP_UUID, "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [{"type": "data", "uuid": BP_DATA, "version": VERSION},
                     {"type": "script", "language": "javascript", "uuid": BP_SCRIPT, "entry": "scripts/main.js", "version": VERSION}],
@@ -258,7 +258,7 @@ def build_bp():
 def build_chat():
     write_json(os.path.join(CHAT, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "Factions Core 3 Chat", "description": "Ranks and factions in normal chat. Needs the Beta APIs experiment; turned on automatically with Factions Core 3.",
+        "header": {"name": "Factions Core 4 Chat", "description": "Ranks and factions in normal chat. Needs the Beta APIs experiment; turned on automatically with Factions Core 4.",
                    "uuid": CHAT_UUID, "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [{"type": "data", "uuid": CHAT_DATA, "version": VERSION},
                     {"type": "script", "language": "javascript", "uuid": CHAT_SCRIPT, "entry": "scripts/main.js", "version": VERSION}],
@@ -465,7 +465,7 @@ def build_rp_entities():
     blocks["fc:supply_drop"] = {"sound": "metal"}
     write_json(os.path.join(RP, "blocks.json"), blocks)
 
-    lang = ["pack.name=Factions Core 3 RP", "pack.description=Menus, HUD, items, blocks and models for Factions Core 3"]
+    lang = ["pack.name=Factions Core 4 RP", "pack.description=Menus, HUD, items, blocks and models for Factions Core 4"]
     for t, n in SPAWNERS.items():
         lang.append(f"tile.fc:spawner_{t}.name={n} Spawner")
     for r in RARITIES:
@@ -482,7 +482,7 @@ def build_rp_entities():
 
     write_json(os.path.join(RP, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "Factions Core 3 RP", "description": "Menus, HUD, items, blocks and models for Factions Core 3.",
+        "header": {"name": "Factions Core 4 RP", "description": "Menus, HUD, items, blocks and models for Factions Core 4.",
                    "uuid": RP_UUID, "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [{"type": "resources", "uuid": RP_RES, "version": VERSION}],
     })
@@ -519,7 +519,7 @@ def package():
     for old in os.listdir(DIST):
         if old.startswith("FactionsCore") and old.endswith(".mcaddon"):
             os.remove(os.path.join(DIST, old))
-    with zipfile.ZipFile(os.path.join(DIST, f"FactionsCore3_v{'.'.join(map(str, VERSION))}.mcaddon"), "w", zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(os.path.join(DIST, f"FactionsCore4_v{'.'.join(map(str, VERSION))}.mcaddon"), "w", zipfile.ZIP_DEFLATED) as z:
         zip_dir(z, BP, "FactionsCore_BP")
         zip_dir(z, RP, "FactionsCore_RP")
         zip_dir(z, CHAT, "FactionsCoreChat_BP")
@@ -532,7 +532,7 @@ def main():
     build_rp_entities()
     build_rp_ui()
     package()
-    print(f"built Factions Core 3 v{'.'.join(map(str, VERSION))}: packs/FactionsCore_BP, packs/FactionsCore_RP, packs/FactionsCoreChat_BP and dist/FactionsCore3_v{'.'.join(map(str, VERSION))}.mcaddon")
+    print(f"built Factions Core 4 v{'.'.join(map(str, VERSION))}: packs/FactionsCore_BP, packs/FactionsCore_RP, packs/FactionsCoreChat_BP and dist/FactionsCore4_v{'.'.join(map(str, VERSION))}.mcaddon")
 
 
 if __name__ == "__main__":
