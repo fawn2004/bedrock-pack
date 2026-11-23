@@ -98,7 +98,7 @@ async function profileMenu(player) {
   const need = E.xpForLevel(p.level);
   const kd = p.deaths ? (p.kills / p.deaths).toFixed(2) : p.kills.toFixed(2);
   const body = [
-    `${Rk.rankPrefix(player)}§b§l${player.name}`,
+    `§b§l${player.name}`,
     `§7Level §f${p.level}  §8${E.bar(p.xp / need, 20, "§a")} §7${pct(p.xp, need)}%`,
     `§7Balance §a${E.money(p.money)}   §7Crystals §b${p.crystals}`,
     `§7Power §f${Math.round(p.power * 10) / 10}/${CONFIG.maxPower}`,
@@ -156,7 +156,7 @@ async function playersMenu(player) {
     buttons: list.map((pl) => {
       const q = S.playerData(pl);
       const f = S.getFaction(q.faction);
-      return { text: `${Rk.rankPrefix(pl)}§f${pl.name}`, sub: `${f ? R.colorName(f, mine) : "§7No faction"} §8| §7Lv.${q.level} §8| §7K ${q.kills}`, icon: "player", action: () => A.who(player, pl.name) };
+      return { text: pl.name, sub: `${f ? R.colorName(f, mine) : "§7No faction"} §8| §7Lv.${q.level} §8| §7K ${q.kills}`, icon: "player", action: () => A.who(player, pl.name) };
     }),
     back: back(player),
   });
@@ -804,10 +804,12 @@ async function ranksMenu(player) {
     "§7One-off ranks: §e/tag <player> add \"rank:&d&lBuilder\"",
     "",
     "§b§lBUILT-IN",
-    ...Rk.BUILTIN_RANKS.map((r) => `${r.display}§r §7- +${r.homes} homes${r.fastTp ? ", instant teleports" : ""}${r.staff ? ", can mute" : ""}`),
+    ...Rk.BUILTIN_RANKS.map((r) => `${r.display}§r §7(${r.name})`),
     "",
     "§b§lCUSTOM",
-    ...(custom.length ? custom.map((r) => `${r.display}§r §7(${r.name}) +${r.homes} homes`) : ["§8None yet"]),
+    ...(custom.length ? custom.map((r) => `${r.display}§r §7(${r.name})`) : ["§8None yet"]),
+    "",
+    "§7Ranks only show in chat, and a player shows just one: the highest on this list (built-ins first, then custom ranks, then one-off tags).",
   ];
   await UI.menu(player, {
     title: "RANKS",
@@ -823,12 +825,11 @@ async function ranksMenu(player) {
         if (v[2]) target.removeTag(ranks[v[1]]); else target.addTag(ranks[v[1]]);
         R.tell(player, `${v[2] ? "Removed" : "Gave"} §e${ranks[v[1]]}§r ${v[2] ? "from" : "to"} §e${target.name}§r.`);
       } },
-      { text: "Create Custom Rank", sub: "Name, look and extra homes", icon: "create", action: async () => {
+      { text: "Create Custom Rank", sub: "Name and how it looks", icon: "create", action: async () => {
         const v = await UI.modal(player, "CREATE RANK", (f) => f
           .textField("Rank name (what you type in /tag)", "Builder")
-          .textField("How it looks (& colour codes, e.g. &d&lBUILDER)", "&d&lBUILDER")
-          .slider("Extra homes", 0, 5, { valueStep: 1, defaultValue: 0 }), "Create");
-        if (v) attempt(player, () => { const r = Rk.createRank(v[0], v[1], v[2]); R.tell(player, `Created ${r.display}§r. Give it with §e/tag <player> add ${r.name}§r.`); });
+          .textField("How it looks (& colour codes, e.g. &d&lBUILDER)", "&d&lBUILDER"), "Create");
+        if (v) attempt(player, () => { const r = Rk.createRank(v[0], v[1]); R.tell(player, `Created ${r.display}§r. Give it with §e/tag <player> add ${r.name}§r.`); });
       } },
       ...custom.map((r) => ({ text: `Delete ${r.name}`, sub: "Remove this custom rank", icon: "leave", action: async () => {
         if (await UI.confirm(player, "DELETE RANK", `Delete ${r.display}§r? Players keep the tag but it stops showing.`, "Delete")) attempt(player, () => Rk.deleteRank(r.name));

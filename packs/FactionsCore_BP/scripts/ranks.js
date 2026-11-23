@@ -6,21 +6,23 @@
 //   /tag Steve add "rank:&d&lBuilder"    a one-off rank, styled with & colour codes
 //   /tag Steve remove Owner              take it away again
 //
-// Every couple of seconds the ranks are read from tags and copied onto the
-// nametag, the sidebar and a few "fc..." tags that the Factions Core Chat
-// pack (beta APIs) uses to format normal chat.
+// Ranks are only a name in front of the player's name in chat - no perks.
+// A player shows one rank at a time: the highest one they have (built-ins in
+// the order below, then custom ranks in the order they were made, then
+// one-off "rank:" tags). Every couple of seconds it's copied into a few "fc..."
+// tags that the Factions Core Chat pack (beta APIs) uses to format chat.
 import { system, world } from "@minecraft/server";
 import * as S from "./store.js";
 import { Fail } from "./economy.js";
 
-/** Built-in ranks, highest first. `homes` = extra homes, `fastTp` = no teleport warmup, `staff` = can /mute. */
+/** Built-in ranks, highest first. */
 export const BUILTIN_RANKS = [
-  { name: "Owner", display: "§4§lOWNER", homes: 5, fastTp: true, staff: true },
-  { name: "Admin", display: "§c§lADMIN", homes: 5, fastTp: true, staff: true },
-  { name: "Mod", display: "§9§lMOD", homes: 3, fastTp: true, staff: true },
-  { name: "Helper", display: "§3§lHELPER", homes: 2, fastTp: false, staff: true },
-  { name: "MVP", display: "§b§lMVP§6+", homes: 3, fastTp: true, staff: false },
-  { name: "VIP", display: "§a§lVIP", homes: 1, fastTp: false, staff: false },
+  { name: "Owner", display: "§4§lOWNER" },
+  { name: "Admin", display: "§c§lADMIN" },
+  { name: "Mod", display: "§9§lMOD" },
+  { name: "Helper", display: "§3§lHELPER" },
+  { name: "MVP", display: "§b§lMVP§6+" },
+  { name: "VIP", display: "§a§lVIP" },
 ];
 
 /** "&c&lHi" -> "§c§lHi" */
@@ -32,14 +34,14 @@ export const customRanks = () => S.kv.get("ranks", []);
 export function rankFromTag(tag) {
   if (tag.toLowerCase().startsWith("rank:")) {
     const display = colorize(tag.slice(5)).trim();
-    return display ? { name: display.replace(/§./g, ""), display, homes: 0, fastTp: false, staff: false, order: 500 } : undefined;
+    return display ? { name: display.replace(/§./g, ""), display, order: 500 } : undefined;
   }
   const t = tag.toLowerCase();
   const b = BUILTIN_RANKS.findIndex((r) => r.name.toLowerCase() === t);
   if (b >= 0) return { ...BUILTIN_RANKS[b], order: b };
   const customs = customRanks();
   const c = customs.findIndex((r) => r.name.toLowerCase() === t);
-  if (c >= 0) return { homes: 0, fastTp: false, staff: false, ...customs[c], order: 100 + c };
+  if (c >= 0) return { name: customs[c].name, display: customs[c].display, order: 100 + c };
   return undefined;
 }
 
@@ -56,22 +58,23 @@ export function ranksOf(player) {
   return out.sort((a, b) => a.order - b.order);
 }
 
-/** "[OWNER] [BUILDER] " for chat and nametags ("" with no ranks). */
-export function rankPrefix(player) {
-  const list = ranksOf(player);
-  return list.length ? list.map((r) => `§8[${r.display}§r§8]`).join("") + " " : "";
-}
+/** The one rank a player shows: their highest, or undefined. */
+export const topRank = (player) => ranksOf(player)[0];
 
-export const isStaff = (player) => ranksOf(player).some((r) => r.staff);
+/** "[OWNER] " for chat ("" with no rank). Only ever one rank. */
+export function rankPrefix(player) {
+  const r = topRank(player);
+  return r ? `§8[${r.display}§r§8] ` : "";
+}
 
 // ------------------------------------------------------------ custom ranks (admin)
 
-export function createRank(name, displayText, homes) {
+export function createRank(name, displayText) {
   name = String(name ?? "").trim();
   if (!/^[A-Za-z0-9_+-]{1,16}$/.test(name)) throw new Fail("Rank names are 1-16 letters, numbers, _ + or -.");
   if (BUILTIN_RANKS.some((r) => r.name.toLowerCase() === name.toLowerCase())) throw new Fail(`${name} is a built-in rank.`);
   const list = customRanks().filter((r) => r.name.toLowerCase() !== name.toLowerCase());
-  list.push({ name, display: colorize(displayText || `&f${name}`), homes: Math.max(0, Math.min(10, Math.floor(Number(homes) || 0))) });
+  list.push({ name, display: colorize(displayText || `&f${name}`) });
   S.kv.set("ranks", list);
   return list[list.length - 1];
 }
@@ -155,13 +158,7 @@ export function syncPlayer(player, alliesOf) {
   for (const t of have) if (!want.includes(t)) player.removeTag(t);
   for (const t of want) if (!have.includes(t)) player.addTag(t);
 
-  // Keep perks on the saved record so they work everywhere (and offline).
-  const ranks = ranksOf(player);
-  const p = S.playerData(player);
-  const homes = ranks.reduce((m, r) => Math.max(m, r.homes ?? 0), 0);
-  const fastTp = ranks.some((r) => r.fastTp);
-  if (p.rankHomes !== homes || p.fastTp !== fastTp) { p.rankHomes = homes; p.fastTp = fastTp; S.savePlayer(p); }
-  const sig = ranks.map((r) => r.display).join("|");
+  const sig = topRank(player)?.display ?? "";
   if (lastSig.get(player.id) !== sig) {
     const first = !lastSig.has(player.id);
     lastSig.set(player.id, sig);

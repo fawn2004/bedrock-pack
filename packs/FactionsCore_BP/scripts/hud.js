@@ -9,7 +9,6 @@ import * as E from "./economy.js";
 import { ftopRank } from "./ftop.js";
 import { hudEventLines } from "./events.js";
 import { isTagged } from "./combat.js";
-import { ranksOf } from "./ranks.js";
 
 export const HUD_MARK = "fchud:";
 const lastSent = new Map();
@@ -34,7 +33,6 @@ export function hudText(player) {
     `§8${CONFIG.season}`,
     "",
     "§3§lPROFILE",
-    ...(ranksOf(player).length ? [`§7Rank ${ranksOf(player).map((r) => r.display).join("§r §7")}`] : []),
     `§7Balance §a${E.money(p.money)}`,
     `§7Crystals §b${E.fmt(p.crystals)}`,
     `§7Level §f${p.level} §8${Math.floor((p.xp / need) * 100)}%`,

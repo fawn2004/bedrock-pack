@@ -83,7 +83,7 @@ const ADMIN_ACTIONS = {
     "§esetspawn§7, §esetwarp <name>§7, §edelwarp <name>",
     "§ekoth <set [radius]|start|stop>§7, §eenvoy§7 - events",
     "§ehologram <ftop|money|kills|level|streak|welcome|remove>",
-    "§erank [list|create <name> [look] [homes]|delete <name>]§7 - give ranks with §e/tag <player> add <rank>",
+    "§erank [list|create <name> [look]|delete <name>]§7 - give ranks with §e/tag <player> add <rank>",
   ].join("\n")),
   bypass: (pl) => {
     const on = !R.hasBypass(pl);
@@ -180,7 +180,7 @@ const ADMIN_ACTIONS = {
   envoy: (pl) => R.tell(pl, `Dropped ${Ev.startEnvoy()} supply crates.`),
   rank: (pl, a) => {
     const sub = (a[0] ?? "list").toLowerCase();
-    if (sub === "create") { const r = Rk.createRank(need(a[1], "/fadmin rank create <name> [look] [homes]"), a[2], a[3]); return R.tell(pl, `Created ${r.display}§r. Give it with §e/tag <player> add ${r.name}`); }
+    if (sub === "create") { const r = Rk.createRank(need(a[1], "/fadmin rank create <name> [look]"), a[2]); return R.tell(pl, `Created ${r.display}§r. Give it with §e/tag <player> add ${r.name}`); }
     if (sub === "delete") { Rk.deleteRank(need(a[1], "/fadmin rank delete <name>")); return R.tell(pl, `Deleted rank ${a[1]}.`); }
     R.tell(pl, `Ranks: ${[...Rk.BUILTIN_RANKS, ...Rk.customRanks()].map((r) => `${r.display}§r §7(${r.name})`).join("§7, ")}\n§7Give one with §e/tag <player> add <name>§7, or a one-off with §e/tag <player> add "rank:&d&lName"`);
   },
@@ -245,7 +245,7 @@ export function setupCommands() {
     simple("sethome", "Set a home: /sethome [name]", (pl, a) => T.setHome(pl, a[0] ?? "home"), 1);
     simple("delhome", "Delete a home: /delhome [name]", (pl, a) => T.delHome(pl, a[0] ?? "home"), 1);
     simple("warp", "Teleport to a warp: /warp <name>", (pl, a) => (a[0] ? T.warp(pl, a[0]) : M.warpsMenu(pl)), 1);
-    const staffOnly = (pl) => { if (!hasPerm(pl) && !Rk.isStaff(pl)) throw new E.Fail("Staff only."); };
+    const staffOnly = (pl) => { if (!hasPerm(pl)) throw new E.Fail("Operators only."); };
     simple("mute", "Mute a player: /mute <player> [minutes]", (pl, a) => {
       staffOnly(pl);
       const { p, m } = Rk.mute(need(a[0], "/mute <player> [minutes]"), a[1]);

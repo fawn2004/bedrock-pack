@@ -2,7 +2,6 @@
 import { world } from "@minecraft/server";
 import { CONFIG, COLOR, RANK_LEVEL } from "./config.js";
 import * as S from "./store.js";
-import { rankPrefix } from "./ranks.js";
 
 // ------------------------------------------------------------ power & limits
 
@@ -152,7 +151,7 @@ export function refreshNametag(player) {
   const p = S.playerData(player);
   const f = S.getFaction(p.faction);
   try {
-    player.nameTag = `${rankPrefix(player)}${f ? `§7[§${f.color}${f.name}§7] ` : ""}§f${player.name}\n§b✦ §7Lv.§f${p.level}`;
+    player.nameTag = `${f ? `§7[§${f.color}${f.name}§7] ` : ""}§f${player.name}\n§b✦ §7Lv.§f${p.level}`;
   } catch { /* player left */ }
 }
 

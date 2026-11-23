@@ -272,16 +272,23 @@ ok(shown.some((s) => strip(s.title).includes("MYTHIC CRATE") && s.body.includes(
 
 // ---------- ranks via /tag + chat pack
 const Rk = await import("./scripts/ranks.js");
+const E2 = await import("./scripts/economy.js");
 alice.addTag("Owner");
 await advance(40);
-ok(strip(alice.nameTag).includes("[OWNER]") && strip(alice.nameTag).includes("[Wolves]"), "/tag add Owner shows on the nametag");
-ok(alice.msgs.some((m) => strip(m).includes("Your rank: OWNER")), "player is told about their new rank");
-ok(S.playerData(alice).fastTp === true && S.playerData(alice).rankHomes === 5, "Owner perks: instant teleports, +5 homes");
-Rk.createRank("Builder", "&d&lBUILDER", 2);
+const prefixOf = (pl) => strip(pl.getTags().find((t) => t.startsWith("fcprefix:")) ?? "");
+ok(prefixOf(alice).includes("[OWNER] [Wolves]"), "/tag add Owner puts the rank in the chat prefix");
+ok(alice.msgs.some((m) => strip(m).includes("chat rank is now OWNER")), "player is told about their new rank");
+ok(!strip(alice.nameTag).includes("OWNER") && !strip(H.hudText(alice)).includes("OWNER"), "ranks only show in chat (not nametag or sidebar)");
+ok(!S.playerData(alice).fastTp && !S.playerData(alice).rankHomes && E2.maxHomes(S.playerData(alice)) === Math.min(6, 1 + Math.floor(S.playerData(alice).level / 10)), "ranks give no perks");
+alice.addTag("VIP"); alice.addTag("rank:&6Legend");
+await advance(40);
+ok((prefixOf(alice).match(/\[/g) ?? []).length === 2 && prefixOf(alice).includes("[OWNER]") && !prefixOf(alice).includes("VIP") && !prefixOf(alice).includes("Legend"), "only one rank shows: the highest");
+alice.removeTag("VIP"); alice.removeTag("rank:&6Legend");
+Rk.createRank("Builder", "&d&lBUILDER");
 bob.addTag("Builder"); carol.addTag("rank:&6Legend");
 await advance(40);
 ok(bob.getTags().some((t) => t.startsWith("fcprefix:") && t.includes("§d§lBUILDER")), "custom ranks made with /fadmin rank create work with /tag");
-ok(strip(carol.nameTag).includes("[Legend]"), "one-off rank:&6Legend tags work");
+ok(prefixOf(carol).includes("[Legend]"), "one-off rank:&6Legend tags work");
 const chat = async (pl, text) => { const e = { sender: pl, message: text, cancel: false }; world.beforeEvents.chatSend.fire(e); await flush(); return e; };
 M.log.length = 0;
 const ce = await chat(alice, "hello everyone");
@@ -294,14 +301,15 @@ M.log.length = 0; const nC = carol.msgs.length;
 await chat(bob, "secret plan");
 ok(M.log.length === 0 && strip(alice.last()).includes("[Faction]") && strip(alice.last()).includes("secret plan") && carol.msgs.length === nC, "faction chat mode only reaches the faction");
 await f(bob, "chat", "public");
-ok((await run("mute", bob, "Carol", "5")).includes("Staff only"), "non-staff can't mute");
+ok((await run("mute", bob, "Carol", "5")).includes("Operators only"), "only operators can mute");
+alice.playerPermissionLevel = 2;
 await run("mute", alice, "Carol", "5");
 await advance(40);
 M.log.length = 0; await chat(carol, "let me talk");
 ok(M.log.length === 0 && strip(carol.last()).includes("muted"), "muted players can't chat");
 alice.removeTag("Owner");
 await advance(40);
-ok(!strip(alice.nameTag).includes("OWNER") && !alice.getTags().some((t) => t.includes("OWNER")), "/tag remove takes the rank away");
+ok(!alice.getTags().some((t) => t.includes("OWNER")), "/tag remove takes the rank away");
 
 // ---------- persistence
 const S2 = await import("./scripts/store.js?reload"); S2.ensureLoaded();

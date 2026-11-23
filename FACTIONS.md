@@ -119,24 +119,15 @@ Ranks are player tags, so the vanilla `/tag` command gives and removes them:
 |---|---|
 | `/tag Steve add Owner` | built-in rank: **Owner**, **Admin**, **Mod**, **Helper**, **MVP** or **VIP** |
 | `/tag Steve remove Owner` | takes it away |
-| `/fadmin rank create Builder &d&lBUILDER 2` | makes your own rank (name, look with `&` colour codes, extra homes) |
+| `/fadmin rank create Builder &d&lBUILDER` | makes your own rank (the name you type in `/tag`, then how it looks with `&` colour codes) |
 | `/tag Steve add Builder` | gives your own rank |
 | `/tag Steve add "rank:&6&lLegend"` | a one-off rank with no setup |
 | `/fadmin rank delete Builder`, `/fadmin rank list` | manage your ranks |
 
-- **Where ranks show:** in normal chat (`[OWNER] [Wolves] Steve » hi`), above heads, in the sidebar, in `/fc` and `/fa`, and in the players list. A player with several ranks shows all of them.
-- **Perks:**
-
-  | Ranks | Extra homes | Instant teleports | Can `/mute` |
-  |---|---|---|---|
-  | Owner, Admin | +5 | yes | yes |
-  | Mod | +3 | yes | yes |
-  | Helper | +2 | no | yes |
-  | MVP | +3 | yes | no |
-  | VIP | +1 | no | no |
-  | Custom ranks | as set when you create them | no | no |
+- Ranks are **only a name in front of the player's name in chat**, like `[OWNER] [Wolves] Steve » hi`. They give no perks.
+- A player shows **one rank at a time**. If they have several, the highest shows: Owner, Admin, Mod, Helper, MVP, VIP, then your custom ranks in the order you made them, then one-off `rank:` tags.
 - **Chat modes:** `/f chat faction`, `/f chat ally` or `/f chat public` decides where your normal chat goes.
-- **Moderation:** staff can `/mute <player> [minutes]` and `/unmute <player>`. Chat also blocks spam and repeated messages.
+- **Moderation:** operators can `/mute <player> [minutes]` and `/unmute <player>`. Chat also blocks spam and repeated messages.
 - The **Admin > Ranks** page in `/menu` can give ranks and create custom ones too.
 
 **After a Minecraft update:** the chat pack is tied to one Minecraft version's beta API. If chat goes back to vanilla after an update, change `CHAT_BETA` in `tools/factions/build.py` to the new version and rebuild. The list of versions is in the comment next to it. The rest of the add-on keeps working in the meantime.
@@ -164,7 +155,7 @@ Ranks are player tags, so the vanilla `/tag` command gives and removes them:
 | `/crates`, `/daily`, `/bounty <player> <amount>` | rewards |
 | `/home [name]`, `/sethome [name]`, `/delhome [name]`, `/spawn`, `/wild`, `/warp [name]` | teleports |
 | `/f chat public\|faction\|ally` | where your normal chat goes |
-| `/mute <player> [minutes]`, `/unmute <player>` | staff: mute players |
+| `/mute <player> [minutes]`, `/unmute <player>` | operators: mute players |
 | `/hud` | show or hide the sidebar |
 
 If another add-on uses the same command name, add the prefix, for example `/factions:f` or `/factions:menu`.
@@ -184,7 +175,7 @@ The **Admin** page in `/menu` has buttons for most of this. `/fadmin help` lists
 | `/fadmin hologram <ftop\|money\|kills\|level\|streak\|welcome\|remove>` | floating leaderboards |
 | `/fadmin give <item> [amount]` | `key_<rarity>`, `book_<rarity>`, `spawner_<type>`, `crawler_<tier>`, `gear_<id>`, `crate_<rarity>`, `crystal`, `genbucket`, `buster`, `wand`, `xpshard`, `power`, `mystery` |
 | `/fadmin eco give\|take\|set <player> <amount>`, `/fadmin crystals <player> <amount>` | money and crystals |
-| `/fadmin rank create <name> [look] [homes]`, `/fadmin rank delete <name>`, `/fadmin rank list` | custom ranks (give them with `/tag`) |
+| `/fadmin rank create <name> [look]`, `/fadmin rank delete <name>`, `/fadmin rank list` | custom ranks (give them with `/tag`) |
 | `/fadmin disband <faction>`, `/fadmin setpower <player> <n>`, `/fadmin join <faction>` | faction tools |
 
 ### Suggested server setup
@@ -207,5 +198,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 87 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 89 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.
