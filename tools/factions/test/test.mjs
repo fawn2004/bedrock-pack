@@ -268,6 +268,7 @@ const Mn = await import("./scripts/menus.js");
 shown.length = 0;
 await Mn.openHub(alice); await flush();
 const hub = shown[0];
+ok(hub.buttons.slice(0, 4).every((b) => b.t.startsWith("§c§r§d§r§0§r")) && hub.buttons.slice(4, 8).every((b) => b.t.startsWith("§c§r§d§r§9§r")), "stat cards are split into a top and bottom row");
 ok(hub && hub.title.startsWith("§h§u§b§r") && hub.buttons.slice(0, 8).every((b) => b.t.startsWith("§c§r§d§r")) && hub.buttons.length >= 21, "hub form: 8 cards + rail");
 // walk every rail page once
 for (let i = 8; i < hub.buttons.length; i++) { globalThis.formAnswers = [i]; await Mn.openHub(alice); await flush(); await flush(); }
@@ -459,6 +460,8 @@ const tileCount = (f) => f.buttons.filter((b) => b.t.startsWith("§t§i§l§r"))
 ok(qm.title.startsWith("§b§o§a§r") && tileCount(qm) === 10 && qm.buttons.some((b) => b.t.startsWith("§b§n§r§r")), "Quest Master: 4 line + 6 reward tiles and a banner");
 ok(["Lumberjack", "Miner", "Farmer", "Monster Hunter"].every((n, i) => strip(qm.buttons[i].t).startsWith(n)), "quest lines are the first tiles on the Quest Master");
 ok(tileCount(qline) === 10 && qline.buttons.some((b) => strip(b.t).includes("SELL NOW")), "Monster Hunter page: 10 item tiles and SELL NOW");
+const tilesQ = qline.buttons.filter((b) => b.t.startsWith("§t§i§l§r"));
+ok(tilesQ.every((b, i) => b.t.startsWith("§t§i§l§r" + (i % 2 ? "§9§r" : "§0§r"))), "tiles alternate left/right columns so all 10 show");
 ok(tileCount(reb) === 6 && reb.buttons.some((b) => b.t.startsWith("§a§c§l§r") && strip(b.t).includes("REBIRTH LOCKED")), "Rebirth Oracle: 6 reward tiles, locked button");
 ok(qm.buttons.findIndex((b) => b.t.startsWith("§t§i§l§r")) === 0 && qm.buttons.slice(0, 10).every((b) => b.t.startsWith("§t§i§l§r")), "tiles come first so the grid shows them");
 

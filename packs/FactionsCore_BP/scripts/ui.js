@@ -13,6 +13,8 @@ export const MARK = {
   hub: "§h§u§b§r", list: "§l§s§t§r", modal: "§m§d§l§r", card: "§c§r§d§r",
   // "board" layout (quests): banner + text + action buttons | grid of tiles
   board: "§b§o§a§r", tile: "§t§i§l§r", banner: "§b§n§r§r", action: "§a§c§t§r", locked: "§a§c§l§r",
+  // which column (tiles) / row (cards) a button goes in; follows the tile/card marker
+  first: "§0§r", second: "§9§r",
 };
 /** Our icon by name ("coin"), or any full texture path ("textures/items/diamond"). */
 export const ICON = (name) => (name.includes("/") ? name : `textures/fc/ui/icons/${name}`);
@@ -54,7 +56,7 @@ const label = (b) => (b.sub ? `§l${b.text}§r\n§7${b.sub}` : `§l${b.text}`);
 export async function hub(player, { title, body, cards, rail }) {
   const form = new ActionFormData().title(MARK.hub + title).body(body);
   const all = [...cards, ...rail];
-  for (const c of cards) form.button(`${MARK.card}§l${c.text}§r\n${c.sub}`, ICON(c.icon));
+  cards.forEach((c, i) => form.button(`${MARK.card}${i < 4 ? MARK.first : MARK.second}§l${c.text}§r\n${c.sub}`, ICON(c.icon)));
   for (const b of rail) form.button(label(b), b.icon ? ICON(b.icon) : undefined);
   const res = await show(player, form);
   if (res.canceled || res.selection === undefined) return;
@@ -87,7 +89,8 @@ export async function menu(player, { title, body = "", buttons, back = undefined
 export async function board(player, { title, body, tiles, banner, actions }) {
   const form = new ActionFormData().title(MARK.board + title).body(body);
   const all = [];
-  for (const t of tiles) { form.button(MARK.tile + t.text, ICON(t.icon)); all.push(t.action); }
+  // Tiles alternate between the left and right column.
+  tiles.forEach((t, i) => { form.button(MARK.tile + (i % 2 ? MARK.second : MARK.first) + t.text, ICON(t.icon)); all.push(t.action); });
   form.button(MARK.banner, ICON(banner));
   all.push(undefined);
   for (const a of actions) { form.button((a.locked ? MARK.locked : MARK.action) + a.text); all.push(a.action); }

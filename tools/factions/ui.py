@@ -9,7 +9,7 @@ every other form (vanilla or other add-ons) is left exactly as it was.
 
 The HUD gets a sidebar that shows the last title starting with "fchud:".
 """
-from markers import HUB, LIST, MODAL, CARD, HUD, BOARD, TILE, BANNER, ACTION, LOCKED
+from markers import HUB, LIST, MODAL, CARD, HUD, BOARD, TILE, BANNER, ACTION, LOCKED, FIRST, SECOND
 
 T = "textures/fc/ui/"
 TEXT = [0.9, 0.96, 1.0]
@@ -86,6 +86,25 @@ def form_button(height, tex, hover, press, icon, visible, chevron=True, scale=1.
             {"binding_type": "view", "source_property_name": visible, "target_property_name": "#visible"},
         ],
     }
+
+
+def button_row(item, height):
+    """Like button_list, but side by side."""
+    return {
+        "type": "stack_panel", "orientation": "horizontal", "size": ["100%", height],
+        "anchor_from": "top_left", "anchor_to": "top_left",
+        "factory": {"name": "buttons", "control_ids": {
+            "button": item, "label": "@server_form.dynamic_label", "header": "@server_form.dynamic_header",
+            "divider": "@settings_common.option_group_section_divider"}},
+        "collection_name": "form_buttons",
+        "bindings": [{"binding_name": "#form_button_contents", "binding_name_override": "#collection_length"}],
+    }
+
+
+def only(marker, inner, size):
+    """A wrapper that exists only for buttons whose text contains `marker` (so stack panels skip the rest)."""
+    return {"type": "panel", "size": size, "controls": inner,
+            "bindings": [coll("#form_button_text"), {"binding_type": "view", "source_property_name": has(marker, "#form_button_text"), "target_property_name": "#visible"}]}
 
 
 def button_list(item):
@@ -214,13 +233,17 @@ def board_pieces():
                 {"binding_type": "view", "source_property_name": has(TILE, "#form_button_text"), "target_property_name": "#visible"},
             ],
         },
-        "tile_cell": {"type": "panel", "size": ["50%", 44], "controls": [{"tile@fc_ui.tile_button": {}}]},
-        "tiles_grid": {"type": "grid", "size": ["100%", 308], "grid_dimensions": [2, 7], "grid_item_template": "fc_ui.tile_cell",
-                       "grid_fill_direction": "horizontal", "collection_name": "form_buttons", "anchor_from": "top_left", "anchor_to": "top_left"},
+        # Tiles in two columns. Each column lists every button but only shows its own tiles.
+        "tile_left": only(TILE + FIRST, [{"tile@fc_ui.tile_button": {}}], ["100%", 44]),
+        "tile_right": only(TILE + SECOND, [{"tile@fc_ui.tile_button": {}}], ["100%", 44]),
+        "tiles_left": button_list("@fc_ui.tile_left"),
+        "tiles_right": button_list("@fc_ui.tile_right"),
         "tiles_padded": {"type": "stack_panel", "orientation": "vertical", "size": ["100%", "100%c"], "anchor_from": "top_left", "anchor_to": "top_left", "controls": [
             {"top": pad("100%", 3)},
             {"row": {"type": "stack_panel", "orientation": "horizontal", "size": ["100%", "100%c"], "controls": [
-                {"l": pad(3, 1)}, {"grid@fc_ui.tiles_grid": {"size": ["fill", 308]}}]}}]},
+                {"l": pad(3, 1)},
+                {"left@fc_ui.tiles_left": {"size": ["50% - 2px", "100%c"]}},
+                {"right@fc_ui.tiles_right": {"size": ["50% - 2px", "100%c"]}}]}}]},
         "board_form": {
             "type": "panel", "size": ["100%", "100%"],
             "bindings": [{"binding_name": "#title_text"}, {"binding_type": "view", "source_property_name": has(BOARD), "target_property_name": "#visible"}],
@@ -256,10 +279,12 @@ def files():
         "list_button@common.button": form_button(30, "btn", "btn_hover", "btn_press", 24, rail_vis, True, 1.0),
         "rail_list": button_list("@fc_ui.rail_button"),
         "button_list": button_list("@fc_ui.list_button"),
-        "card_cell": {"type": "panel", "size": ["25%", "50%"], "controls": [
-            {"card@common.button": form_button("100% - 3px", "card", "card_hover", "btn_press", 16, card_vis, False, 0.75, "100% - 3px")}]},
-        "cards_grid": {"type": "grid", "size": ["100%", 64], "grid_dimensions": [4, 2], "grid_item_template": "fc_ui.card_cell",
-                       "grid_fill_direction": "horizontal", "collection_name": "form_buttons", "anchor_from": "top_left", "anchor_to": "top_left"},
+        # Stat cards: first four on the top row, next four on the bottom row.
+        "card_top": only(CARD + FIRST, [{"card@common.button": form_button("100% - 3px", "card", "card_hover", "btn_press", 16, card_vis, False, 0.75, "100% - 3px")}], ["25%", "100%"]),
+        "card_bottom": only(CARD + SECOND, [{"card@common.button": form_button("100% - 3px", "card", "card_hover", "btn_press", 16, card_vis, False, 0.75, "100% - 3px")}], ["25%", "100%"]),
+        "cards_top": button_row("@fc_ui.card_top", 32),
+        "cards_bottom": button_row("@fc_ui.card_bottom", 32),
+        "cards_grid": {"type": "stack_panel", "orientation": "vertical", "size": ["100%", 64], "controls": [{"top@fc_ui.cards_top": {}}, {"bottom@fc_ui.cards_bottom": {}}]},
 
         # ---------------- layouts
         "hub_form": {
