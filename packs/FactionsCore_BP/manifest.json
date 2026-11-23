@@ -1,0 +1,28 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Factions Core",
+    "description": "Factions for your server: create a faction, claim land, build power, make allies and enemies, raid. Type /f to start.",
+    "uuid": "e01294d7-65a4-4856-b137-a27734420e64",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 20]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "7c286f51-a204-4948-abc2-3b1d04b1e28e",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "e4e9690b-5e9d-4009-983a-8c39d4a3dc8d",
+      "entry": "scripts/main.js",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    { "module_name": "@minecraft/server", "version": "2.7.0" },
+    { "module_name": "@minecraft/server-ui", "version": "2.0.0" }
+  ]
+}
