@@ -53,5 +53,5 @@ setOnRanksChanged((player, first) => {
 
 world.afterEvents.worldLoad.subscribe(() => {
   ensureLoaded();
-  console.log(`[Factions] Factions Core 2 v${VERSION} loaded.`);
+  console.log(`[Factions] Factions Core 3 v${VERSION} loaded.`);
 });

@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Factions Core 2 Chat",
-    "description": "Ranks and factions in normal chat. Needs the Beta APIs experiment; turned on automatically with Factions Core 2.",
+    "name": "Factions Core 3 Chat",
+    "description": "Ranks and factions in normal chat. Needs the Beta APIs experiment; turned on automatically with Factions Core 3.",
     "uuid": "2331762e-ee4e-4e36-91a6-d998ec1b1c83",
     "version": [
-      2,
-      1,
-      27
+      3,
+      0,
+      28
     ],
     "min_engine_version": [
       1,
@@ -20,9 +20,9 @@
       "type": "data",
       "uuid": "f9a86162-020f-43f4-842a-c3fcafa13ea2",
       "version": [
-        2,
-        1,
-        27
+        3,
+        0,
+        28
       ]
     },
     {
@@ -31,9 +31,9 @@
       "uuid": "1bb89d32-6a09-49b9-a639-856b477ad81c",
       "entry": "scripts/main.js",
       "version": [
-        2,
-        1,
-        27
+        3,
+        0,
+        28
       ]
     }
   ],

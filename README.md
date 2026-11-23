@@ -1,6 +1,6 @@
 # More Building Blocks 3 (Minecraft Bedrock add-on)
 
-> This repo also has **Factions Core 2**, a factions add-on for servers. See [FACTIONS.md](FACTIONS.md).
+> This repo also has **Factions Core 3**, a factions add-on for servers. See [FACTIONS.md](FACTIONS.md).
 
 **12 new woods** and **12 new stones**: 180 blocks in total, plus **18 tree types grown by Minecraft's own tree generators** and **32 ready-made bushes and rocks**.
 Each wood has a log, stripped log, wood (bark) block, bark stairs and slab, two leaf colours, planks, slab, stairs and door.

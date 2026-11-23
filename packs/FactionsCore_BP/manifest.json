@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Factions Core 2",
+    "name": "Factions Core 3",
     "description": "The complete factions server core: factions, land, power, raids, economy, shop, auction house, crates, custom enchants, spawners, ore crawlers, KOTH, envoys and a styled UI. Type /menu.",
     "uuid": "e01294d7-65a4-4856-b137-a27734420e64",
     "version": [
-      2,
-      1,
-      27
+      3,
+      0,
+      28
     ],
     "min_engine_version": [
       1,
@@ -20,9 +20,9 @@
       "type": "data",
       "uuid": "7c286f51-a204-4948-abc2-3b1d04b1e28e",
       "version": [
-        2,
-        1,
-        27
+        3,
+        0,
+        28
       ]
     },
     {
@@ -31,9 +31,9 @@
       "uuid": "e4e9690b-5e9d-4009-983a-8c39d4a3dc8d",
       "entry": "scripts/main.js",
       "version": [
-        2,
-        1,
-        27
+        3,
+        0,
+        28
       ]
     }
   ],
@@ -41,17 +41,17 @@
     {
       "uuid": "d769002a-fc35-4aa5-a76f-c532c897e981",
       "version": [
-        2,
-        1,
-        27
+        3,
+        0,
+        28
       ]
     },
     {
       "uuid": "2331762e-ee4e-4e36-91a6-d998ec1b1c83",
       "version": [
-        2,
-        1,
-        27
+        3,
+        0,
+        28
       ]
     },
     {
