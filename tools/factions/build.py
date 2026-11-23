@@ -224,7 +224,7 @@ def build_bp():
 
     write_json(os.path.join(BP, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "Factions Core", "description": "The complete factions server core: factions, land, power, raids, economy, shop, auction house, crates, custom enchants, spawners, ore crawlers, KOTH, envoys and a styled UI. Type /menu.",
+        "header": {"name": "Factions Core 2", "description": "The complete factions server core: factions, land, power, raids, economy, shop, auction house, crates, custom enchants, spawners, ore crawlers, KOTH, envoys and a styled UI. Type /menu.",
                    "uuid": BP_UUID, "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [{"type": "data", "uuid": BP_DATA, "version": VERSION},
                     {"type": "script", "language": "javascript", "uuid": BP_SCRIPT, "entry": "scripts/main.js", "version": VERSION}],
@@ -241,7 +241,7 @@ def build_bp():
 def build_chat():
     write_json(os.path.join(CHAT, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "Factions Core Chat", "description": "Ranks and factions in normal chat. Needs the Beta APIs experiment; turned on automatically with Factions Core.",
+        "header": {"name": "Factions Core 2 Chat", "description": "Ranks and factions in normal chat. Needs the Beta APIs experiment; turned on automatically with Factions Core 2.",
                    "uuid": CHAT_UUID, "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [{"type": "data", "uuid": CHAT_DATA, "version": VERSION},
                     {"type": "script", "language": "javascript", "uuid": CHAT_SCRIPT, "entry": "scripts/main.js", "version": VERSION}],
@@ -421,7 +421,7 @@ def build_rp_entities():
     blocks["fc:supply_drop"] = {"sound": "metal"}
     write_json(os.path.join(RP, "blocks.json"), blocks)
 
-    lang = ["pack.name=Factions Core RP", "pack.description=Menus, HUD, items, blocks and models for Factions Core"]
+    lang = ["pack.name=Factions Core 2 RP", "pack.description=Menus, HUD, items, blocks and models for Factions Core 2"]
     for t, n in SPAWNERS.items():
         lang.append(f"tile.fc:spawner_{t}.name={n} Spawner")
     for r in RARITIES:
@@ -437,7 +437,7 @@ def build_rp_entities():
 
     write_json(os.path.join(RP, "manifest.json"), {
         "format_version": 2,
-        "header": {"name": "Factions Core RP", "description": "Menus, HUD, items, blocks and models for Factions Core.",
+        "header": {"name": "Factions Core 2 RP", "description": "Menus, HUD, items, blocks and models for Factions Core 2.",
                    "uuid": RP_UUID, "version": VERSION, "min_engine_version": MIN_ENGINE},
         "modules": [{"type": "resources", "uuid": RP_RES, "version": VERSION}],
     })
@@ -474,7 +474,7 @@ def package():
     for old in os.listdir(DIST):
         if old.startswith("FactionsCore") and old.endswith(".mcaddon"):
             os.remove(os.path.join(DIST, old))
-    with zipfile.ZipFile(os.path.join(DIST, f"FactionsCore_v{'.'.join(map(str, VERSION))}.mcaddon"), "w", zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(os.path.join(DIST, f"FactionsCore2_v{'.'.join(map(str, VERSION))}.mcaddon"), "w", zipfile.ZIP_DEFLATED) as z:
         zip_dir(z, BP, "FactionsCore_BP")
         zip_dir(z, RP, "FactionsCore_RP")
         zip_dir(z, CHAT, "FactionsCoreChat_BP")
@@ -487,7 +487,7 @@ def main():
     build_rp_entities()
     build_rp_ui()
     package()
-    print(f"built Factions Core {'.'.join(map(str, VERSION))}: packs/FactionsCore_BP, packs/FactionsCore_RP, packs/FactionsCoreChat_BP and dist/FactionsCore_v{'.'.join(map(str, VERSION))}.mcaddon")
+    print(f"built Factions Core 2 v{'.'.join(map(str, VERSION))}: packs/FactionsCore_BP, packs/FactionsCore_RP, packs/FactionsCoreChat_BP and dist/FactionsCore2_v{'.'.join(map(str, VERSION))}.mcaddon")
 
 
 if __name__ == "__main__":

@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Factions Core RP",
-    "description": "Menus, HUD, items, blocks and models for Factions Core.",
+    "name": "Factions Core 2 RP",
+    "description": "Menus, HUD, items, blocks and models for Factions Core 2.",
     "uuid": "d769002a-fc35-4aa5-a76f-c532c897e981",
     "version": [
       2,
       1,
-      24
+      25
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         2,
         1,
-        24
+        25
       ]
     }
   ]

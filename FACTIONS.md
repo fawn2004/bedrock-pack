@@ -1,9 +1,9 @@
-# Factions Core 2.0 (Minecraft Bedrock add-on)
+# Factions Core 2 (Minecraft Bedrock add-on)
 
 The complete core for a factions server. It comes as three packs in one `.mcaddon`:
-- **Factions Core:** all the gameplay.
-- **Factions Core RP:** draws the styled menus, the sidebar, the items and the models.
-- **Factions Core Chat:** shows ranks and factions in normal chat. It needs the **Beta APIs** experiment.
+- **Factions Core 2:** all the gameplay.
+- **Factions Core 2 RP:** draws the styled menus, the sidebar, the items and the models.
+- **Factions Core 2 Chat:** shows ranks and factions in normal chat. It needs the **Beta APIs** experiment.
 
 ![Main menu](docs/factions/menu_hub.png)
 
@@ -14,13 +14,13 @@ The complete core for a factions server. It comes as three packs in one `.mcaddo
 *Previews are drawn from the real textures and layout; in game the text uses the Minecraft font.*
 
 ## Install
-1. Double-click `dist/FactionsCore_v<version>.mcaddon` to import all three packs.
+1. Double-click `dist/FactionsCore2_v<version>.mcaddon` to import all three packs.
    The number in the file name is the version. A higher number is a newer download.
-2. Turn on **Factions Core** in your world's behavior packs. The resource pack and the chat pack are turned on with it automatically.
+2. Turn on **Factions Core 2** in your world's behavior packs. The resource pack and the chat pack are turned on with it automatically.
 3. You need Minecraft Bedrock **1.26.60 or newer** for chat formatting, and the world needs **Beta APIs** turned on.
    Everything else works on 1.26.20 or newer without experiments. Without Beta APIs, normal chat simply stays vanilla.
 
-**Updating:** just import the newer file. Every build has a new version number, so Minecraft replaces the old copy. To check which version a world is running, look at the Admin page in `/menu`, or for `Factions Core 2.1.x loaded` in the content log.
+**Updating:** just import the newer file. Every build has a new version number, so Minecraft replaces the old copy. To check which version a world is running, look at the Admin page in `/menu`, or for `Factions Core 2 v2.1.x loaded` in the content log.
 
 **On a dedicated server**, copy the pack folders from the `.mcaddon` into `behavior_packs` and `resource_packs`. Then list them in the world's `world_behavior_packs.json` and `world_resource_packs.json`, and turn on "require resource packs" so players get the menus.
 
@@ -255,7 +255,7 @@ The **Admin** page in `/menu` has buttons for most of this. `/fadmin help` lists
 - Gameplay numbers are at the top of `packs/FactionsCore_BP/scripts/config.js`. This includes the server name on the menus and sidebar, power, claim and explosion rules, shield hours, kill rewards, auction tax, spawner speed and event timers.
 - Shop prices are in `scripts/shop.js`, crate loot in `scripts/crates.js`, and enchants in `scripts/enchants.js`.
 
-After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to rebuild both packs and `dist/FactionsCore_v<version>.mcaddon`.
+After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to rebuild both packs and `dist/FactionsCore2_v<version>.mcaddon`.
 
 ## For developers
 - `packs/FactionsCore_BP/scripts/` holds the hand-written game logic, on `@minecraft/server` 2.7.0 and `@minecraft/server-ui` 2.0.0.
