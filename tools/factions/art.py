@@ -220,6 +220,104 @@ def crawler_texture(tier):
     return img
 
 
+# ---------------------------------------------------------------- NPC skins (standard 64x64 player layout)
+
+# name: (skin, hair, shirt, shirt2 (pattern / trim), pants, shoes, hat or None, extra)
+NPC_SKINS = [
+    ("questmaster", (225, 180, 140), (235, 235, 240), (90, 50, 160), (230, 180, 50), (70, 40, 130), (60, 40, 30), (90, 50, 160), "beard"),
+    ("lumberjack", (225, 170, 130), (110, 60, 30), (190, 40, 40), (40, 20, 20), (50, 70, 120), (70, 45, 25), None, "beard"),
+    ("miner", (220, 170, 130), (60, 40, 25), (80, 80, 90), (60, 60, 70), (110, 80, 50), (50, 40, 30), (240, 200, 40), "lamp"),
+    ("farmer", (230, 180, 140), (150, 100, 50), (240, 240, 230), (240, 240, 230), (60, 100, 190), (90, 60, 30), (230, 200, 110), "straps"),
+    ("monster", (200, 160, 130), (30, 30, 30), (40, 40, 45), (150, 30, 30), (35, 35, 40), (25, 25, 25), (40, 40, 45), "hood"),
+    ("rebirth", (235, 190, 150), (240, 120, 30), (110, 40, 160), (250, 190, 60), (80, 30, 120), (60, 30, 60), None, "trim"),
+    ("merchant", (220, 170, 130), (90, 60, 40), (40, 140, 70), (240, 200, 60), (40, 90, 60), (60, 40, 30), None, "trim"),
+    ("crates", (225, 175, 135), (40, 40, 40), (40, 130, 200), (200, 230, 255), (40, 60, 110), (40, 40, 50), None, "trim"),
+    ("guide", (225, 175, 135), (80, 55, 35), (25, 50, 100), (90, 200, 255), (30, 40, 70), (30, 30, 40), None, "trim"),
+]
+
+
+def npc_skin(spec):
+    _name, skin, hair, shirt, shirt2, pants, shoes, hat, extra = spec
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    rnd = random.Random(_name)
+
+    def fill(rect, color, var=6):
+        x, y, w, h = rect
+        for yy in range(y, y + h):
+            for xx in range(x, x + w):
+                d = rnd.randint(-var, var)
+                img.putpixel((xx, yy), tuple(max(0, min(255, c + d)) for c in color) + (255,))
+
+    def box(u, v, w, h, d, color, var=6):
+        for rect in faces(u, v, w, h, d).values():
+            fill(rect, color, var)
+
+    # head
+    box(0, 0, 8, 8, 8, skin, 4)
+    head = faces(0, 0, 8, 8, 8)
+    fill(head["top"], hair)
+    for side in ("east", "west", "south"):
+        x, y, w, h = head[side]
+        fill((x, y, w, 3 if side != "south" else 8), hair)
+    fx, fy, _, _ = head["north"]
+    fill((fx, fy, 8, 2), hair)
+    for ex in (fx + 1, fx + 5):
+        img.putpixel((ex, fy + 4), (255, 255, 255, 255))
+        img.putpixel((ex + 1, fy + 4), (40, 60, 120, 255))
+    fill((fx + 3, fy + 6, 2, 1), (160, 90, 80), 0)
+    if extra == "beard":
+        fill((fx + 1, fy + 5, 6, 3), hair, 8)
+        fill((fx + 3, fy + 6, 2, 1), (120, 60, 50), 0)
+    if hat:
+        fill(head["top"], hat)
+        for side in ("north", "east", "west", "south"):
+            x, y, w, h = head[side]
+            fill((x, y, w, 2), hat)
+        if extra == "hood":
+            for side in ("east", "west", "south"):
+                x, y, w, h = head[side]
+                fill((x, y, w, h), hat)
+            fill((fx, fy, 8, 3), hat)
+        if extra == "lamp":
+            fill((fx + 3, fy, 2, 2), (255, 255, 200), 0)
+    # body, arms, legs
+    box(16, 16, 8, 12, 4, shirt)
+    box(40, 16, 4, 12, 4, shirt)
+    box(32, 48, 4, 12, 4, shirt)
+    for (u, v) in ((40, 16), (32, 48)):  # hands
+        for rect in faces(u, v, 4, 12, 4).values():
+            x, y, w, h = rect
+            if h == 12:
+                fill((x, y + 9, w, 3), skin, 4)
+        fill(faces(u, v, 4, 12, 4)["bottom"], skin, 4)
+    body = faces(16, 16, 8, 12, 4)
+    x, y, w, h = body["north"]
+    if extra in ("trim",):
+        fill((x + 3, y, 2, h), shirt2)
+    elif extra == "straps":
+        fill((x + 1, y, 2, h), pants)
+        fill((x + 5, y, 2, h), pants)
+        fill((x, y + 6, w, 6), pants)
+    elif _name == "lumberjack":
+        for yy in range(y, y + h):
+            for xx in range(x, x + w):
+                if (xx // 2 + yy // 2) % 2:
+                    img.putpixel((xx, yy), shirt2 + (255,))
+    for side in body.values():
+        sx, sy, sw, sh = side
+        if sh == 12:
+            fill((sx, sy + 10, sw, 1), (50, 35, 25), 3)  # belt
+    box(0, 16, 4, 12, 4, pants)
+    box(16, 48, 4, 12, 4, pants)
+    for (u, v) in ((0, 16), (16, 48)):
+        for rect in faces(u, v, 4, 12, 4).values():
+            x, y, w, h = rect
+            if h == 12:
+                fill((x, y + 10, w, 2), shoes)
+        fill(faces(u, v, 4, 12, 4)["bottom"], shoes)
+    return img
+
+
 def blank(size=16):
     return Image.new("RGBA", (size, size), (0, 0, 0, 0))
 

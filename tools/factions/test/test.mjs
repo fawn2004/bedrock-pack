@@ -456,10 +456,33 @@ shown.length = 0; globalThis.formAnswers = [];
 await MnQ.questMasterMenu(quester); await MnQ.questLineMenu(quester, "monster"); await MnQ.rebirthMenu(quester); await flush();
 const [qm, qline, reb] = shown;
 const tileCount = (f) => f.buttons.filter((b) => b.t.startsWith("§t§i§l§r")).length;
-ok(qm.title.startsWith("§b§o§a§r") && tileCount(qm) === 10 && qm.buttons.some((b) => b.t.startsWith("§b§n§r§r")), "Quest Master: 6 reward + 4 line tiles and a banner");
+ok(qm.title.startsWith("§b§o§a§r") && tileCount(qm) === 10 && qm.buttons.some((b) => b.t.startsWith("§b§n§r§r")), "Quest Master: 4 line + 6 reward tiles and a banner");
+ok(["Lumberjack", "Miner", "Farmer", "Monster Hunter"].every((n, i) => strip(qm.buttons[i].t).startsWith(n)), "quest lines are the first tiles on the Quest Master");
 ok(tileCount(qline) === 10 && qline.buttons.some((b) => strip(b.t).includes("SELL NOW")), "Monster Hunter page: 10 item tiles and SELL NOW");
 ok(tileCount(reb) === 6 && reb.buttons.some((b) => b.t.startsWith("§a§c§l§r") && strip(b.t).includes("REBIRTH LOCKED")), "Rebirth Oracle: 6 reward tiles, locked button");
 ok(qm.buttons.findIndex((b) => b.t.startsWith("§t§i§l§r")) === 0 && qm.buttons.slice(0, 10).every((b) => b.t.startsWith("§t§i§l§r")), "tiles come first so the grid shows them");
+
+// ---------- menu NPCs
+const npcAdmin = await join("NpcAdmin", 15000, 15000); npcAdmin.playerPermissionLevel = 2;
+await run("fadmin", npcAdmin, "npc", "quests");
+const npcs = ow.getEntities({ type: "fc:npc" });
+ok(npcs.length === 6 && npcs.every((n) => strip(n.nameTag).includes("Interact to open")), "/fadmin npc quests places 6 labelled NPCs");
+ok(new Set(npcs.map((n) => n.getDynamicProperty("fc:npc"))).size === 6 && npcs.every((n) => typeof n.props["fc:skin"] === "number"), "each quest NPC has its own type and skin");
+shown.length = 0; globalThis.formAnswers = [];
+const farmerNpc = npcs.find((n) => n.getDynamicProperty("fc:npc") === "farmer");
+await before_("playerInteractWithEntity", { player: npcAdmin, target: farmerNpc, cancel: false });
+await flush();
+ok(shown.some((s) => strip(s.title).startsWith("Farmer")), "tapping the Farmer NPC opens the Farmer quest page");
+shown.length = 0;
+const qmNpc = npcs.find((n) => n.getDynamicProperty("fc:npc") === "questmaster");
+await advance(20);
+world.afterEvents.entityHitEntity.fire({ damagingEntity: npcAdmin, hitEntity: qmNpc });
+await flush();
+ok(shown.some((s) => strip(s.title).startsWith("QUEST MASTER")), "hitting the Quest Master NPC opens it too");
+await run("fadmin", npcAdmin, "npc", "shop");
+ok(ow.getEntities({ type: "fc:npc" }).some((n) => n.getDynamicProperty("fc:npc") === "shop"), "single NPCs can be placed (shop)");
+await run("fadmin", npcAdmin, "npc", "remove");
+ok(ow.getEntities({ type: "fc:npc" }).filter((n) => n.isValid).length === 6, "/fadmin npc remove removes the nearest");
 
 // ---------- persistence
 const S2 = await import("./scripts/store.js?reload"); S2.ensureLoaded();

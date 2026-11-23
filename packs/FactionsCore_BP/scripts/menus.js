@@ -27,6 +27,7 @@ import * as Rk from "./ranks.js";
 import { VERSION } from "./version.js";
 import * as Kt from "./kits.js";
 import * as QL from "./questlines.js";
+import * as Npc from "./npcs.js";
 import { bossInfo } from "./bosses.js";
 
 const { attempt } = UI;
@@ -784,6 +785,13 @@ async function adminMenu(player) {
     title: "ADMIN",
     body: `§7Version: §f${VERSION}\n§7Bypass: ${R.hasBypass(player) ? "§aON" : "§cOFF"}\n§7Spawn: ${S.kv.get("spawn") ? "§aset" : "§cnot set (using world spawn)"}\n§7KOTH: ${Ev.kothZone() ? "§aset" : "§cnot set"}\n\n§7Commands: §e/fadmin help`,
     buttons: [
+      { text: "Place Quest NPCs", sub: "All 6 quest NPCs around you", icon: "quests", action: () => attempt(player, () => Npc.placeQuestNpcs(player)) },
+      { text: "Place an NPC", sub: "Shop, crates, kits, menu...", icon: "players", action: async () => {
+        const types = Object.keys(Npc.NPC_TYPES);
+        const v = await UI.modal(player, "PLACE NPC", (f) => f.dropdown("NPC", types), "Place");
+        if (v) attempt(player, () => Npc.placeNpc(player, types[v[0]]));
+      } },
+      { text: "Remove NPC", sub: "The nearest one", icon: "leave", action: () => attempt(player, () => Npc.removeNearestNpc(player)) },
       { text: "Ranks", sub: "Give ranks, make custom ranks", icon: "crown", action: () => ranksMenu(player) },
       { text: "Toggle Bypass", sub: "Build anywhere", icon: "admin", action: () => { player.setDynamicProperty("fc:bypass", R.hasBypass(player) ? undefined : true); R.tell(player, `Bypass ${R.hasBypass(player) ? "§aon" : "§coff"}`); } },
       { text: "Set Spawn Here", sub: "Server spawn", icon: "spawn", action: () => { const l = player.location; S.kv.set("spawn", { dim: player.dimension.id, x: l.x, y: l.y, z: l.z }); R.tell(player, "Spawn set."); } },
@@ -873,7 +881,7 @@ async function kitPage(player, id) {
   });
 }
 
-async function bossesMenu(player) {
+export async function bossesMenu(player) {
   await UI.menu(player, {
     title: "BOSSES",
     body: ["§fBoss Eggs only come from §cMythic Crates§f. Use one on the ground to summon its boss - each tier is tougher and drops loot you can't get anywhere else.", "§7Bosses get enraged below half health. Loot drops on the ground, so watch out for thieves!", "", ...bossInfo()].join("\n"),
@@ -910,13 +918,14 @@ export async function questMasterMenu(player) {
     "§8Sell items to the server to level up your quest lines. Every tier is worth 1 Quest Level.",
   ];
   const tiles = [];
+  // Quest lines first so they're always on screen; the reward track follows.
+  for (const line of QL.LINES) {
+    const t = QL.lineTiers(p, line);
+    tiles.push({ text: `§l${line.name}§r  §7${t} of ${QL.totalTiers(line)}\n${E.bar(t / QL.totalTiers(line), 24, "§a", "§8")}\n§eTap to open`, icon: line.icon, action: () => questLineMenu(player, line.id) });
+  }
   for (let L2 = q.claimed + 1; L2 <= Math.min(QL.MAX_LEVEL, q.claimed + 6); L2++) {
     const ready = L2 <= L;
     tiles.push({ text: `§lLevel ${L2}§r  ${ready ? "§a[CLAIM]" : "§8[LOCKED]"}\n§7${QL.levelRewardText(L2)}`, icon: KEY_ICON(L2), action: () => (ready ? attempt(player, () => QL.claimLevels(player)) : questMasterMenu(player)) });
-  }
-  for (const line of QL.LINES) {
-    const t = QL.lineTiers(p, line);
-    tiles.push({ text: `§l${line.name}§r  §7${t} of ${QL.totalTiers(line)}\n${E.bar(t / QL.totalTiers(line), 24, "§a", "§8")}`, icon: line.icon, action: () => questLineMenu(player, line.id) });
   }
   await UI.board(player, {
     title: `QUEST MASTER §8| ${rebirthBadge(p)}`,

@@ -173,6 +173,23 @@ def build_bp():
             "minecraft:behavior.random_stroll": {"priority": 6, "speed_multiplier": 1.0, "xz_dist": 3, "y_dist": 1, "interval": 60},
             "minecraft:behavior.random_look_around": {"priority": 7},
         }}})
+    write_json(os.path.join(BP, "entities", "npc.json"), {"format_version": "1.21.60", "minecraft:entity": {
+        "description": {"identifier": "fc:npc", "is_spawnable": False, "is_summonable": True,
+                        "properties": {"fc:skin": {"type": "int", "range": [0, len(art.NPC_SKINS) - 1], "default": 0, "client_sync": True}}},
+        "components": {
+            "minecraft:type_family": {"family": ["fc_npc", "inanimate"]},
+            "minecraft:health": {"value": 20, "max": 20},
+            "minecraft:damage_sensor": invulnerable,
+            "minecraft:collision_box": {"width": 0.6, "height": 1.8},
+            "minecraft:physics": {},
+            "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
+            "minecraft:persistent": {},
+            "minecraft:nameable": {"always_show": True, "allow_name_tag_renaming": False},
+            "minecraft:knockback_resistance": {"value": 1.0},
+            "minecraft:fire_immune": {},
+            "minecraft:movement": {"value": 0},
+            "minecraft:behavior.look_at_player": {"priority": 1, "look_distance": 8, "probability": 1.0},
+        }}})
     write_json(os.path.join(BP, "entities", "hologram.json"), {"format_version": "1.21.60", "minecraft:entity": {
         "description": {"identifier": "fc:hologram", "is_spawnable": False, "is_summonable": True},
         "components": {
@@ -291,6 +308,8 @@ def build_rp_art():
     for t in CRAWLERS:
         save_png(art.crawler_texture(t), RP, "textures", "fc", "entity", f"crawler_{t}.png")
     save_png(art.blank(16), RP, "textures", "fc", "entity", "hologram.png")
+    for spec in art.NPC_SKINS:
+        save_png(art.npc_skin(spec), RP, "textures", "fc", "entity", "npc", f"{spec[0]}.png")
     return ic
 
 
@@ -357,6 +376,29 @@ def build_rp_entities():
         "scripts": {"animate": ["idle", {"walk": "q.modified_move_speed > 0.05"}]},
         "render_controllers": ["controller.render.fc_crawler"],
         "spawn_egg": {"base_color": "#3a3f4f", "overlay_color": "#46c3ff"},
+    }}})
+    skins = [s[0] for s in art.NPC_SKINS]
+    write_json(os.path.join(RP, "animations", "npc.animation.json"), {"format_version": "1.8.0", "animations": {
+        "animation.fc_npc.idle": {"loop": True, "bones": {
+            "head": {"rotation": ["q.target_x_rotation", "q.target_y_rotation", 0]},
+            "rightArm": {"rotation": ["math.sin(q.life_time * 60) * 3", 0, "2 + math.cos(q.life_time * 50) * 2"]},
+            "leftArm": {"rotation": ["-math.sin(q.life_time * 60) * 3", 0, "-2 - math.cos(q.life_time * 50) * 2"]}}},
+    }})
+    write_json(os.path.join(RP, "render_controllers", "npc.render_controllers.json"), {"format_version": "1.10.0", "render_controllers": {
+        "controller.render.fc_npc": {
+            "arrays": {"textures": {"Array.skins": [f"Texture.{s}" for s in skins]}},
+            "geometry": "Geometry.default",
+            "materials": [{"*": "Material.default"}],
+            "textures": [f"Array.skins[math.clamp(q.property('fc:skin'), 0, {len(skins) - 1})]"],
+        }}})
+    write_json(os.path.join(RP, "entity", "npc.entity.json"), {"format_version": "1.10.0", "minecraft:client_entity": {"description": {
+        "identifier": "fc:npc",
+        "materials": {"default": "entity_alphatest"},
+        "textures": {s: f"textures/fc/entity/npc/{s}" for s in skins},
+        "geometry": {"default": "geometry.humanoid.custom"},
+        "animations": {"idle": "animation.fc_npc.idle"},
+        "scripts": {"animate": ["idle"]},
+        "render_controllers": ["controller.render.fc_npc"],
     }}})
     write_json(os.path.join(RP, "entity", "hologram.entity.json"), {"format_version": "1.10.0", "minecraft:client_entity": {"description": {
         "identifier": "fc:hologram",
@@ -430,6 +472,7 @@ def build_rp_entities():
         lang.append(f"tile.fc:crate_{r}.name={RARITY_NAME[r]} Crate")
     for t, (ident, name, *_rest) in BOSSES.items():
         lang.append(f"entity.{ident}.name={name}")
+    lang += ["entity.fc:npc.name=NPC"]
     lang += ["tile.fc:supply_drop.name=Supply Drop", "entity.fc:crawler.name=Ore Crawler", "entity.fc:hologram.name=Hologram",
              "item.spawn_egg.entity.fc:crawler.name=Spawn Ore Crawler"]
     os.makedirs(os.path.join(RP, "texts"), exist_ok=True)

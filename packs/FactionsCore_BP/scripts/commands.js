@@ -20,6 +20,7 @@ import { refreshHud } from "./hud.js";
 import { hasPerm } from "./perm.js";
 import * as Rk from "./ranks.js";
 import * as Kt from "./kits.js";
+import * as Npc from "./npcs.js";
 
 const NS = "factions";
 const need = (v, usage) => {
@@ -85,6 +86,7 @@ const ADMIN_ACTIONS = {
     "§esetspawn§7, §esetwarp <name>§7, §edelwarp <name>",
     "§ekoth <set [radius]|start|stop>§7, §eenvoy§7 - events",
     "§ehologram <ftop|money|kills|level|streak|welcome|remove>",
+    "§enpc <quests|questmaster|lumberjack|miner|farmer|monster|rebirth|shop|crates|kits|auction|bosses|menu|remove>§7 - menu NPCs",
     "§erank [list|create <name> [look]|delete <name>]§7 - give ranks with §e/tag <player> add <rank>",
   ].join("\n")),
   bypass: (pl) => {
@@ -181,6 +183,13 @@ const ADMIN_ACTIONS = {
     else throw new E.Fail("Usage: /fadmin koth <set [radius]|start|stop>");
   },
   envoy: (pl) => R.tell(pl, `Dropped ${Ev.startEnvoy()} supply crates.`),
+  npc: (pl, a) => {
+    const what = need(a[0], "/fadmin npc <type|quests|remove>").toLowerCase();
+    if (what === "quests") { Npc.placeQuestNpcs(pl); return R.tell(pl, "Placed the 6 quest NPCs. Tap one to try it."); }
+    if (what === "remove") { Npc.removeNearestNpc(pl); return R.tell(pl, "NPC removed."); }
+    Npc.placeNpc(pl, what);
+    R.tell(pl, `Placed the §e${what}§r NPC.`);
+  },
   rank: (pl, a) => {
     const sub = (a[0] ?? "list").toLowerCase();
     if (sub === "create") { const r = Rk.createRank(need(a[1], "/fadmin rank create <name> [look]"), a[2]); return R.tell(pl, `Created ${r.display}§r. Give it with §e/tag <player> add ${r.name}`); }

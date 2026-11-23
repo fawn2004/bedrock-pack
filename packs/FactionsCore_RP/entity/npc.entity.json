@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "fc:npc",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "questmaster": "textures/fc/entity/npc/questmaster",
+        "lumberjack": "textures/fc/entity/npc/lumberjack",
+        "miner": "textures/fc/entity/npc/miner",
+        "farmer": "textures/fc/entity/npc/farmer",
+        "monster": "textures/fc/entity/npc/monster",
+        "rebirth": "textures/fc/entity/npc/rebirth",
+        "merchant": "textures/fc/entity/npc/merchant",
+        "crates": "textures/fc/entity/npc/crates",
+        "guide": "textures/fc/entity/npc/guide"
+      },
+      "geometry": {
+        "default": "geometry.humanoid.custom"
+      },
+      "animations": {
+        "idle": "animation.fc_npc.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.fc_npc"
+      ]
+    }
+  }
+}

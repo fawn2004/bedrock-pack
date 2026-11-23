@@ -21,6 +21,7 @@ import { setupHud } from "./hud.js";
 import { setupHolograms } from "./holograms.js";
 import { setupBosses } from "./bosses.js";
 import { setupGrind } from "./grind.js";
+import { setupNpcs } from "./npcs.js";
 import { setupRanks, setOnRanksChanged, topRank } from "./ranks.js";
 import { alliesOf, tell } from "./rules.js";
 
@@ -44,6 +45,7 @@ setupHud();
 setupHolograms();
 setupBosses();
 setupGrind();
+setupNpcs();
 setupRanks(alliesOf);
 setOnRanksChanged((player, first) => {
   if (first) return;

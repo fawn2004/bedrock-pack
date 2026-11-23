@@ -1,0 +1,31 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.fc_npc": {
+      "arrays": {
+        "textures": {
+          "Array.skins": [
+            "Texture.questmaster",
+            "Texture.lumberjack",
+            "Texture.miner",
+            "Texture.farmer",
+            "Texture.monster",
+            "Texture.rebirth",
+            "Texture.merchant",
+            "Texture.crates",
+            "Texture.guide"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.skins[math.clamp(q.property('fc:skin'), 0, 8)]"
+      ]
+    }
+  }
+}

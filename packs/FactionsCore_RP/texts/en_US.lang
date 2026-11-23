@@ -19,6 +19,7 @@ entity.fc:boss_warlord.name=Undead Warlord
 entity.fc:boss_tyrant.name=Bone Tyrant
 entity.fc:boss_golem.name=Infernal Golem
 entity.fc:boss_ravager.name=Void Ravager
+entity.fc:npc.name=NPC
 tile.fc:supply_drop.name=Supply Drop
 entity.fc:crawler.name=Ore Crawler
 entity.fc:hologram.name=Hologram

@@ -125,6 +125,13 @@ Open **Quests** in `/menu`, or type `/quests`.
   - **What you keep:** money, keys and items.
   - **What you get:** $25M, 16 spawners, 8 Mythic keys, 16 Epic keys, a permanent **sell bonus** (x2 after the first rebirth, x3 after the second, up to x6), and an `[R1]`, `[R2]`... badge in chat.
 
+**Quest NPCs:** stand at spawn and run `/fadmin npc quests` to place all six quest NPCs around you:
+- Lumberjack, Miner, Farmer and Monster Hunter
+- Quest Master
+- Rebirth Oracle
+
+Players tap (or hit) an NPC to open its menu. Other NPCs can be placed one at a time with `/fadmin npc <type>`: `shop`, `crates`, `kits`, `auction`, `bosses` or `menu`. Remove the nearest one with `/fadmin npc remove`. The Admin page in `/menu` has buttons for all of this too.
+
 Each quest page shows a picture banner, line progress, the item closest to its next tier and a **SELL NOW** button. Next to that is a card for every item, with its tier and progress bar.
 The old daily quests are still there, under **Daily Quests** on the Quest Master page.
 
@@ -263,6 +270,7 @@ The **Admin** page in `/menu` has buttons for most of this. `/fadmin help` lists
 | `/fadmin setspawn`, `/fadmin setwarp <name>`, `/fadmin delwarp <name>` | spawn and warps (for example `nether` and `end`) |
 | `/fadmin koth set [radius]`, `/fadmin koth start\|stop` | King of the Hill |
 | `/fadmin envoy` | drop supply crates now |
+| `/fadmin npc <quests\|questmaster\|lumberjack\|miner\|farmer\|monster\|rebirth\|shop\|crates\|kits\|auction\|bosses\|menu\|remove>` | menu NPCs players tap to open |
 | `/fadmin hologram <ftop\|money\|kills\|level\|streak\|welcome\|remove>` | floating leaderboards |
 | `/fadmin give <item> [amount]` | `key_<rarity>`, `book_<rarity>`, `spawner_<type>`, `crawler_<tier>`, `gear_<id>`, `crate_<rarity>`, `bossegg_<1-4>`, `crystal`, `genbucket`, `buster`, `wand`, `xpshard`, `power`, `mystery` |
 | `/fadmin eco give\|take\|set <player> <amount>`, `/fadmin crystals <player> <amount>` | money and crystals |
@@ -289,5 +297,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 134 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 141 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

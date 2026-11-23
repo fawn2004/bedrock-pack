@@ -1,0 +1,31 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.fc_npc.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation",
+            "q.target_y_rotation",
+            0
+          ]
+        },
+        "rightArm": {
+          "rotation": [
+            "math.sin(q.life_time * 60) * 3",
+            0,
+            "2 + math.cos(q.life_time * 50) * 2"
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "-math.sin(q.life_time * 60) * 3",
+            0,
+            "-2 - math.cos(q.life_time * 50) * 2"
+          ]
+        }
+      }
+    }
+  }
+}

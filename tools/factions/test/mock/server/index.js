@@ -76,7 +76,7 @@ export class Player extends Entity {
 }
 export const world = {
   beforeEvents: Object.fromEntries(["playerBreakBlock", "playerInteractWithBlock", "playerInteractWithEntity", "explosion", "entityHurt", "playerLeave", "itemUse", "chatSend"].map((k) => [k, sig()])),
-  afterEvents: Object.fromEntries(["playerSpawn", "playerLeave", "entityDie", "entityHurt", "worldLoad", "playerBreakBlock", "playerPlaceBlock", "itemUse", "entitySpawn"].map((k) => [k, sig()])),
+  afterEvents: Object.fromEntries(["playerSpawn", "playerLeave", "entityDie", "entityHurt", "worldLoad", "playerBreakBlock", "playerPlaceBlock", "itemUse", "entitySpawn", "entityHitEntity"].map((k) => [k, sig()])),
   getDynamicPropertyIds: () => [...props.keys()], getDynamicProperty: (k) => props.get(k),
   setDynamicProperty: (k, v) => { if (readOnly) throw new Error("read-only"); v === undefined ? props.delete(k) : props.set(k, v); },
   getAllPlayers: () => players, getEntity: (id) => players.find((p) => p.id === id) ?? entities.find((e) => e.id === id),
