@@ -10,7 +10,8 @@ import * as R from "./rules.js";
 import { Fail } from "./economy.js";
 
 export const MARK = { hub: "§h§u§b§r", list: "§l§s§t§r", modal: "§m§d§l§r", card: "§c§r§d§r" };
-export const ICON = (name) => `textures/fc/ui/icons/${name}`;
+/** Our icon by name ("coin"), or any full texture path ("textures/items/diamond"). */
+export const ICON = (name) => (name.includes("/") ? name : `textures/fc/ui/icons/${name}`);
 
 /** Show a form, waiting until the player has closed chat or another screen. */
 export async function show(player, form, tries = 60) {

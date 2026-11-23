@@ -269,6 +269,20 @@ ok(["FACTION", "SERVER SHOP", "CRATES", "ENCHANTER", "F-TOP", "DAILY REWARDS", "
 await Mn.factionMenu(alice); await Mn.crawlerMenu(alice, ow.spawnEntity("fc:crawler", { x: 3, y: 64, z: 3 })); await Mn.spawnerMenu(alice, sb); await Mn.cratePreview(alice, "mythic");
 await flush();
 ok(shown.some((s) => strip(s.title).includes("MYTHIC CRATE") && s.body.includes("%")), "crate preview lists chances");
+// shop pages: every item has its own icon (the two golden apples share one, as in vanilla)
+const ShopM = await import("./scripts/shop.js");
+const MnS = await import("./scripts/menus.js");
+let distinct = true;
+for (const [k, cat] of Object.keys(ShopM.CATEGORIES).entries()) {
+  shown.length = 0;
+  globalThis.formAnswers = [2 + k]; // shop page: 2 sell buttons, then the categories
+  await MnS.shopMenu(alice); await flush();
+  const page = shown[1];
+  const icons = page.buttons.slice(0, -1).map((b) => b.i.replace("apple_golden", `apple_golden_${b.t}`));
+  if (page.buttons.length - 1 !== ShopM.CATEGORIES[cat].items.length || new Set(icons).size !== icons.length || icons.some((i) => !i.startsWith("textures/"))) distinct = false;
+}
+ok(distinct, "every shop item has its own icon in every category");
+ok(ShopM.SPECIALS.every((x, i, a) => a.findIndex((y) => y.icon === x.icon) === i), "spawners and crawlers each have their own icon");
 
 // ---------- ranks via /tag + chat pack
 const Rk = await import("./scripts/ranks.js");

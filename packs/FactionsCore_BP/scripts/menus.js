@@ -392,7 +392,7 @@ async function categoryMenu(player, id) {
     buttons: c.items.map(([item, buy, sell]) => ({
       text: item.replace(/_/g, " ").replace(/\b\w/g, (m) => m.toUpperCase()),
       sub: `${buy ? `§aBuy ${E.money(buy)}` : "§8Can't buy"} §8| ${sell ? `§eSell ${E.money(sell)}` : "§8Can't sell"}`,
-      icon: c.icon,
+      icon: Shop.ITEM_ICONS[item] ?? c.icon,
       action: async () => {
         if (!buy) return R.tell(player, "That item can only be sold.");
         const v = await UI.modal(player, `BUY ${item.replace(/_/g, " ").toUpperCase()}`, (f) => f.slider(`Amount (${E.money(buy)} each)`, 1, 64, { valueStep: 1, defaultValue: 16 }), "Buy");
@@ -411,7 +411,7 @@ async function specialMenu(player, kind) {
     body: kind === "spawner"
       ? "§fSpawners spawn stacked mobs near players. Stack more of the same type on one block to multiply them. Each spawner adds its value to your §bF-Top§f."
       : "§fCrawlers wander your base digging ores into their storage. Upgrade them, turn on auto-sell, and evolve them into better crawlers. Enemies can steal them if they take your land!",
-    buttons: list.map((s) => ({ text: s.name, sub: `§a${E.money(s.price)}`, icon: kind, action: async () => {
+    buttons: list.map((s) => ({ text: s.name, sub: `§a${E.money(s.price)}`, icon: s.icon, action: async () => {
       const v = s.single ? [1] : await UI.modal(player, s.name.toUpperCase(), (f) => f.slider(`Amount (${E.money(s.price)} each)`, 1, 16, { valueStep: 1, defaultValue: 1 }), "Buy");
       if (v) attempt(player, () => Shop.buySpecial(player, s, v[0], false));
     } })),
