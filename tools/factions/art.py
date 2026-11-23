@@ -57,7 +57,7 @@ def noise_fill(img, box, base, var=10, seed=1):
 def spawner_texture(mob):
     s = BLOCK
     img = Image.new("RGBA", (s, s))
-    noise_fill(img, (0, 0, s, s), (18, 20, 30), 4, hash(mob) & 0xFFFF)
+    noise_fill(img, (0, 0, s, s), (18, 20, 30), 4, sum(map(ord, mob)))
     glow = SPAWNER_COLORS[mob]
     # glowing core
     g = Image.new("RGBA", (s, s), (0, 0, 0, 0))
