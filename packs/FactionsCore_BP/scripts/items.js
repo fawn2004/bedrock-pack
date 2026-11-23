@@ -148,6 +148,12 @@ export const busterItem = (n = 1) => makeItem("fc:chunk_buster", { amount: n, lo
 export const xpShardItem = (n = 1) => makeItem("fc:xp_shard", { amount: n, lore: ["§r§7Right-click for §b+250 level XP§7."] });
 export const powerShardItem = (n = 1) => makeItem("fc:power_shard", { amount: n, lore: ["§r§7Right-click for §c+2 power§7", "§r§7(up to your max)."] });
 export const mysteryItem = (n = 1) => makeItem("fc:mystery_spawner", { amount: n, lore: ["§r§7Right-click to reveal a", "§r§7random spawner!"] });
+export const BOSS_NAMES = { 1: "§2Undead Warlord", 2: "§8Bone Tyrant", 3: "§6Infernal Golem", 4: "§5Void Ravager" };
+export const bossEggItem = (tier, n = 1) => makeItem(`fc:boss_egg_${tier}`, {
+  amount: n,
+  name: `§4§lBoss Egg §r§7- ${BOSS_NAMES[tier]} §7(Tier ${tier})`,
+  lore: ["§r§7Use it on the ground to summon", `§r§7the ${BOSS_NAMES[tier]}§7. Bring friends!`, "§r§4Drops loot you can't get anywhere else.", "§r§8Not in the SafeZone."],
+});
 export const menuItem = () => makeItem("fc:menu", { lore: ["§r§7Right-click to open the", "§r§7server menu."], keep: true, lock: true });
 
 // ------------------------------------------------------------ legendary gear
@@ -174,6 +180,16 @@ export const GEAR = {
   titan_boots: { item: "minecraft:netherite_boots", name: "§3§lTitan Boots", rarity: "legendary", vanilla: [["protection", 4], ["feather_falling", 4]], custom: { speed: 2, jump: 1 } },
   scout_boots: { item: "minecraft:diamond_boots", name: "§9§lScout Boots", rarity: "rare", vanilla: [["protection", 3]], custom: { speed: 1 } },
   miner_helm: { item: "minecraft:iron_helmet", name: "§9§lMiner's Lamp", rarity: "rare", vanilla: [["protection", 2]], custom: { nightvision: 1, aquatic: 1 } },
+  // ---- boss drops only
+  warlord_cleaver: { item: "minecraft:netherite_axe", name: "§2§lWarlord's Cleaver", rarity: "boss", vanilla: [["sharpness", 5], ["unbreaking", 3]], custom: { executioner: 3, rage: 2, lifesteal: 2 } },
+  warlord_helm: { item: "minecraft:netherite_helmet", name: "§2§lWarlord's Crown", rarity: "boss", vanilla: [["protection", 4], ["unbreaking", 3]], custom: { nightvision: 1, berserk: 2, aquatic: 1 } },
+  tyrant_blade: { item: "minecraft:netherite_sword", name: "§8§lTyrant's Edge", rarity: "boss", vanilla: [["sharpness", 5], ["unbreaking", 3], ["looting", 3]], custom: { wither: 2, venom: 3, swiftness: 2, plunder: 3 } },
+  tyrant_greaves: { item: "minecraft:netherite_leggings", name: "§8§lBonewoven Greaves", rarity: "boss", vanilla: [["protection", 4], ["unbreaking", 3]], custom: { dodge: 3, armored: 3, reflect: 3 } },
+  molten_core: { item: "minecraft:netherite_chestplate", name: "§6§lMolten Core", rarity: "boss", vanilla: [["protection", 4], ["unbreaking", 3], ["thorns", 3]], custom: { overload: 3, regen: 2, fireshield: 1 } },
+  magma_drill: { item: "minecraft:netherite_pickaxe", name: "§6§lMagma Drill", rarity: "boss", vanilla: [["efficiency", 5], ["unbreaking", 3], ["fortune", 3]], custom: { explosive: 3, autosmelt: 1, telepathy: 1, treasure: 3, haste: 3 } },
+  void_reaver: { item: "minecraft:netherite_sword", name: "§5§lVoid Reaver", rarity: "boss", vanilla: [["sharpness", 5], ["unbreaking", 3], ["fire_aspect", 2], ["looting", 3]], custom: { obliterate: 1, thunder: 3, lifesteal: 3, rage: 2, soulbound: 1 } },
+  void_striders: { item: "minecraft:netherite_boots", name: "§5§lVoid Striders", rarity: "boss", vanilla: [["protection", 4], ["feather_falling", 4], ["unbreaking", 3]], custom: { speed: 2, jump: 2, soulbound: 1 } },
+  void_wings: { item: "minecraft:elytra", name: "§5§lVoid Wings", rarity: "boss", vanilla: [["unbreaking", 3], ["mending", 1]], custom: { soulbound: 1 } },
 };
 
 export function gearItem(id) {
@@ -207,6 +223,7 @@ export function rewardLabel(spec) {
     case "wand": return `§6Sell Wand (${a} uses)`;
     case "note": return `§aBank Note ${E.money(+a)}`;
     case "mystery": return `§dMystery Spawner x${a}`;
+    case "bossegg": return `§4Boss Egg: ${BOSS_NAMES[a]}`;
     default: return spec;
   }
 }
@@ -232,6 +249,7 @@ export function giveReward(player, spec) {
     case "wand": giveItem(player, wandItem(+a)); break;
     case "note": giveItem(player, noteItem(+a)); break;
     case "mystery": giveItem(player, mysteryItem(+a)); break;
+    case "bossegg": giveItem(player, bossEggItem(+a)); break;
   }
   return rewardLabel(spec);
 }
@@ -244,6 +262,7 @@ export function rewardRarity(spec) {
   if (kind === "crawler") return CRAWLERS[a].rarity;
   if (kind === "gear") return GEAR[a].rarity;
   if (kind === "buster" || kind === "mystery") return "epic";
+  if (kind === "bossegg") return "boss";
   return "common";
 }
 

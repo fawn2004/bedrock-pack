@@ -39,6 +39,8 @@ export const LOOT = {
     [6, "crawler:emerald"], [2, "crawler:netherite"], [3, "gear:reaper"], [6, "gear:excavator"], [6, "gear:frostbite_blade"],
     [4, "gear:titan_helmet"], [4, "gear:titan_chest"], [4, "gear:titan_legs"], [4, "gear:titan_boots"],
     [4, "item:elytra:1"], [6, "key:legendary:3"],
+    // Boss eggs only come from Mythic crates.
+    [6, "bossegg:1"], [4, "bossegg:2"], [3, "bossegg:3"], [1, "bossegg:4"],
   ],
 };
 

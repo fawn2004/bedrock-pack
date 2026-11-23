@@ -1,0 +1,73 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.fc_boss_1": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "overlay_color": {
+        "r": 0.25,
+        "g": 0.95,
+        "b": 0.3,
+        "a": 0.35
+      }
+    },
+    "controller.render.fc_boss_2": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "overlay_color": {
+        "r": 0.85,
+        "g": 0.1,
+        "b": 0.1,
+        "a": 0.3
+      }
+    },
+    "controller.render.fc_boss_3": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "overlay_color": {
+        "r": 1.0,
+        "g": 0.45,
+        "b": 0.05,
+        "a": 0.45
+      }
+    },
+    "controller.render.fc_boss_4": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "overlay_color": {
+        "r": 0.55,
+        "g": 0.15,
+        "b": 0.9,
+        "a": 0.45
+      }
+    }
+  }
+}

@@ -24,6 +24,8 @@ import { hasPerm } from "./perm.js";
 import { refreshHud } from "./hud.js";
 import { autoclaimers } from "./tasks.js";
 import * as Rk from "./ranks.js";
+import * as Kt from "./kits.js";
+import { bossInfo } from "./bosses.js";
 
 const { attempt } = UI;
 const pct = (a, b) => (b ? Math.floor((a / b) * 100) : 0);
@@ -72,7 +74,9 @@ async function hubScreen(player) {
   const rail = [
     { text: "FACTIONS", sub: "Dashboard & Stats", icon: "faction", action: () => factionMenu(player) },
     { text: "SERVER SHOP", sub: "Buy & Sell Items", icon: "shop", action: () => shopMenu(player) },
+    { text: "KITS", sub: "Gear Bundles", icon: "kit", action: () => kitsMenu(player) },
     { text: "CRATES", sub: "Open Rare Loot", icon: "crate", action: () => cratesMenu(player) },
+    { text: "BOSSES", sub: "Boss Eggs & Drops", icon: "boss", action: () => bossesMenu(player) },
     { text: "ENCHANTER", sub: "Custom Enchants", icon: "enchant", action: () => enchanterMenu(player) },
     { text: "F-TOP", sub: "Faction Rankings", icon: "ftop", action: () => ftopMenu(player) },
     { text: "DAILY REWARDS", sub: "Claim Rewards", icon: "daily", action: () => dailyMenu(player) },
@@ -836,5 +840,41 @@ async function ranksMenu(player) {
       } })),
     ],
     back: () => adminMenu(player),
+  });
+}
+
+// ============================================================ KITS & BOSSES
+
+export async function kitsMenu(player) {
+  const p = S.playerData(player);
+  await UI.menu(player, {
+    title: "KIT SHOP",
+    body: `§7Balance: §a${E.money(p.money)}§7  Crystals: §b${p.crystals}\n\n§fKits are bundles of gear. You pay each time you claim one, then wait for its cooldown.`,
+    buttons: Kt.KITS.map((k) => {
+      const wait = Kt.cooldownLeft(p, k);
+      return { text: k.name, sub: wait ? `§cReady in ${A.dur(wait)}` : `${Kt.priceText(k)} §8| §7every ${k.hours}h`, icon: k.icon, action: () => kitPage(player, k.id) };
+    }),
+    back: back(player),
+  });
+}
+
+async function kitPage(player, id) {
+  const k = Kt.kit(id);
+  const p = S.playerData(player);
+  const wait = Kt.cooldownLeft(p, k);
+  await UI.menu(player, {
+    title: `${k.name.toUpperCase()} KIT`,
+    body: [`§f${k.desc}`, "", `§7Price: ${Kt.priceText(k)}`, `§7Cooldown: §f${k.hours} hours`, wait ? `§cYou can claim it again in ${A.dur(wait)}.` : "§aReady to claim!", "", "§b§lINSIDE", ...Kt.contents(k)].join("\n"),
+    buttons: [{ text: wait ? "§8On Cooldown" : "Claim Kit", sub: wait ? A.dur(wait) : Kt.priceText(k), icon: k.icon, action: () => { attempt(player, () => Kt.claimKit(player, k.id)); } }],
+    back: () => kitsMenu(player),
+  });
+}
+
+async function bossesMenu(player) {
+  await UI.menu(player, {
+    title: "BOSSES",
+    body: ["§fBoss Eggs only come from §cMythic Crates§f. Use one on the ground to summon its boss - each tier is tougher and drops loot you can't get anywhere else.", "§7Bosses get enraged below half health. Loot drops on the ground, so watch out for thieves!", "", ...bossInfo()].join("\n"),
+    buttons: [{ text: "Mythic Crate", sub: "Where boss eggs come from", icon: "key_mythic", action: () => cratePreview(player, "mythic", () => bossesMenu(player)) }],
+    back: back(player),
   });
 }

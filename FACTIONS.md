@@ -95,6 +95,41 @@ New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can t
   - The **Sell Wand** sells everything in a chest.
 - **Shards and Mystery Spawners:** XP Shards, Power Shards, and Mystery Spawners (a random spawner, sometimes Iron Golem).
 
+### Kits
+Open **Kits** in `/menu` or type `/kit`. You pay each time you claim a kit, then wait for its cooldown.
+
+| Kit | Price | Cooldown | Highlights |
+|---|---|---|---|
+| Starter | Free | 24h | stone tools, leather armour, food |
+| Farmer | $10k | 12h | Efficiency hoe, seeds, crops, bone meal |
+| Miner | $15k | 12h | Efficiency III + Haste pickaxe, torches, XP shards |
+| Builder | $20k | 12h | stone bricks, glass, logs, a stack of cobble genbuckets |
+| Warrior | $40k | 12h | Protection II iron armour, Sharpness III diamond sword, bow, gapples |
+| Raider | $100k | 24h | 64 TNT, redstone, dispensers, obsidian and sand genbuckets |
+| Diamond | $250k | 48h | full enchanted diamond gear with Lifesteal, Autosmelt and Gears |
+| Legend | 500 crystals | 72h | full netherite gear with Frostbite, Rage, Explosive, Overload, and a Legendary key |
+
+Kits are defined at the top of `scripts/kits.js`, where you can change prices, cooldowns and contents.
+
+### Bosses
+**Boss Eggs only come from Mythic crates.** Use one on the ground to summon its boss:
+- You can summon on your own land, in the wilderness or in the WarZone, but never in the SafeZone.
+- Bosses have a health bar, special attacks, and get **enraged** below half health.
+- When a boss dies, its loot drops on the ground and the top damage dealers are announced.
+
+| Boss | Health | Attacks | Always drops | Exclusive loot (rolls) |
+|---|---|---|---|---|
+| Tier 1: Undead Warlord (giant zombie) | 500 | ground slam, summons zombies, rallies | 50 crystals, $250k note | Warlord's Cleaver, Warlord's Crown, Legendary key (1) |
+| Tier 2: Bone Tyrant (giant wither skeleton) | 900 | wither aura, summons skeletons, slam | 100 crystals, $500k note | Tyrant's Edge, Bonewoven Greaves, Mythic book, Enderman spawner (1) |
+| Tier 3: Infernal Golem (molten iron golem) | 1,500 | fire aura, slam, launches players | 200 crystals, $1m note | Molten Core, Magma Drill, Emerald Crawler, Iron Golem spawner (2) |
+| Tier 4: Void Ravager (void ravager) | 2,500 | void pull, lightning, roar, slam | 500 crystals, $3m note | Void Reaver, Void Striders, Void Wings, Netherite Crawler, 2 Mythic keys (2) |
+
+The boss gear can't be found anywhere else. It is the strongest in the game, for example:
+- **Void Reaver:** a netherite sword with Obliterate, Thunderstrike III, Lifesteal III, Rage II and Soulbound.
+- **Magma Drill:** a pickaxe with Explosive III, Autosmelt, Telepathy, Treasure Hunter III and Haste III.
+
+The **Bosses** page in `/menu` lists every drop and its chance. Admins can give eggs with `/fadmin give bossegg_<1-4>`.
+
 ### Spawners and Ore Crawlers
 - **10 spawners**, from Pig up to Iron Golem.
   - Stack them on one block by using more of the same spawner on it. Sneak to add the whole stack.
@@ -152,7 +187,7 @@ Ranks are player tags, so the vanilla `/tag` command gives and removes them:
 | `/fc <msg>`, `/fa <msg>` | faction chat, ally chat |
 | `/shop`, `/sell hand\|all`, `/pay <player> <amount>`, `/bal [player]` | money |
 | `/ah`, `/ah sell <price>` | auction house |
-| `/crates`, `/daily`, `/bounty <player> <amount>` | rewards |
+| `/crates`, `/daily`, `/kit [name]`, `/bounty <player> <amount>` | rewards |
 | `/home [name]`, `/sethome [name]`, `/delhome [name]`, `/spawn`, `/wild`, `/warp [name]` | teleports |
 | `/f chat public\|faction\|ally` | where your normal chat goes |
 | `/mute <player> [minutes]`, `/unmute <player>` | operators: mute players |
@@ -173,7 +208,7 @@ The **Admin** page in `/menu` has buttons for most of this. `/fadmin help` lists
 | `/fadmin koth set [radius]`, `/fadmin koth start\|stop` | King of the Hill |
 | `/fadmin envoy` | drop supply crates now |
 | `/fadmin hologram <ftop\|money\|kills\|level\|streak\|welcome\|remove>` | floating leaderboards |
-| `/fadmin give <item> [amount]` | `key_<rarity>`, `book_<rarity>`, `spawner_<type>`, `crawler_<tier>`, `gear_<id>`, `crate_<rarity>`, `crystal`, `genbucket`, `buster`, `wand`, `xpshard`, `power`, `mystery` |
+| `/fadmin give <item> [amount]` | `key_<rarity>`, `book_<rarity>`, `spawner_<type>`, `crawler_<tier>`, `gear_<id>`, `crate_<rarity>`, `bossegg_<1-4>`, `crystal`, `genbucket`, `buster`, `wand`, `xpshard`, `power`, `mystery` |
 | `/fadmin eco give\|take\|set <player> <amount>`, `/fadmin crystals <player> <amount>` | money and crystals |
 | `/fadmin rank create <name> [look]`, `/fadmin rank delete <name>`, `/fadmin rank list` | custom ranks (give them with `/tag`) |
 | `/fadmin disband <faction>`, `/fadmin setpower <player> <n>`, `/fadmin join <faction>` | faction tools |
@@ -198,5 +233,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 91 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 106 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

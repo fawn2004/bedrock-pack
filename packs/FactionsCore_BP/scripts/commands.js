@@ -19,6 +19,7 @@ import { autoclaimers } from "./tasks.js";
 import { refreshHud } from "./hud.js";
 import { hasPerm } from "./perm.js";
 import * as Rk from "./ranks.js";
+import * as Kt from "./kits.js";
 
 const NS = "factions";
 const need = (v, usage) => {
@@ -79,7 +80,7 @@ const ADMIN_ACTIONS = {
     "§edisband <faction>§7, §esetpower <player> <n>§7, §ejoin <faction>",
     "§eeco <give|take|set> <player> <amount>§7 - money",
     "§ecrystals <player> <amount>§7 - give crystals",
-    "§egive <item> [amount]§7 - key_<rarity>, book_<rarity>, spawner_<type>, crawler_<type>, gear_<id>, crystal, genbucket, buster, wand, xpshard, power, mystery, crate_<rarity>",
+    "§egive <item> [amount]§7 - key_<rarity>, book_<rarity>, spawner_<type>, crawler_<type>, gear_<id>, crystal, genbucket, buster, wand, xpshard, power, mystery, crate_<rarity>, bossegg_<1-4>",
     "§esetspawn§7, §esetwarp <name>§7, §edelwarp <name>",
     "§ekoth <set [radius]|start|stop>§7, §eenvoy§7 - events",
     "§ehologram <ftop|money|kills|level|streak|welcome|remove>",
@@ -161,6 +162,7 @@ const ADMIN_ACTIONS = {
     else if (what === "mystery") item = I.mysteryItem(n);
     else if (what === "menu") item = I.menuItem();
     else if (what === "supply_drop") item = I.makeItem("fc:supply_drop", { amount: n });
+    else if (kind === "bossegg" && I.BOSS_NAMES[arg]) item = I.bossEggItem(+arg, n);
     if (!item) throw new E.Fail("Unknown item. See §e/fadmin help§r.");
     I.giveItem(pl, item);
   },
@@ -237,6 +239,7 @@ export function setupCommands() {
     }, 1);
     simple("ah", "Auction house: /ah or /ah sell <price>", (pl, a) => (a[0] === "sell" ? AH.list(pl, need(a[1], "/ah sell <price>")) : M.auctionMenu(pl)), 2);
     simple("crates", "Open the crates menu", (pl) => M.cratesMenu(pl));
+    simple("kit", "Kit shop: /kit or /kit <name>", (pl, a) => (a[0] ? Kt.claimKit(pl, a[0]) : M.kitsMenu(pl)), 1);
     simple("daily", "Claim your daily reward", (pl) => claimDaily(pl));
     simple("bounty", "Place a bounty: /bounty <player> <amount>", (pl, a) => placeBounty(pl, need(a[0], "/bounty <player> <amount>"), need(a[1], "/bounty <player> <amount>")), 2);
     simple("spawn", "Teleport to spawn", (pl) => T.spawn(pl));

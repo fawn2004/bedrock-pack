@@ -97,6 +97,8 @@ export function colorName(f, viewerFid) {
 
 // ------------------------------------------------------------ permissions
 
+export const dist2 = (a, b) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;
+
 export const hasBypass = (player) => player.getDynamicProperty("fc:bypass") === true;
 export const rankAtLeast = (p, rank) => !!p?.faction && RANK_LEVEL[p.rank] >= RANK_LEVEL[rank];
 

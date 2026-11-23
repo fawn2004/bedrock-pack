@@ -63,7 +63,7 @@ export class Entity { constructor(id, typeId, dim, loc) { this.id = id; this.typ
   getComponent(id) { if (id === "minecraft:item") return this.item ? { itemStack: this.item } : undefined;
     if (id === "minecraft:health") { const s = this; return { get currentValue() { return s.hp; }, effectiveMax: s.maxHp, setCurrentValue(v) { s.hp = v; } }; } }
   addEffect(id, d, o) { this.effects[id] = { duration: d, amplifier: o?.amplifier ?? 0 }; } getEffect(id) { return this.effects[id]; } removeEffect(id) { delete this.effects[id]; }
-  setOnFire() {} applyDamage(n) { this.hp -= n; } playAnimation() {} teleport(loc, o) { this.location = { ...loc }; if (o?.dimension) this.dimension = dims[o.dimension.id]; }
+  setOnFire() {} applyDamage(n) { this.hp -= n; } applyKnockback(h, v) { this.knock = { h, v }; } playAnimation() {} teleport(loc, o) { this.location = { ...loc }; if (o?.dimension) this.dimension = dims[o.dimension.id]; }
   getRotation() { return { x: 0, y: 0 }; } getViewDirection() { return { x: 0, y: 0, z: 1 }; }
 }
 export class Player extends Entity {

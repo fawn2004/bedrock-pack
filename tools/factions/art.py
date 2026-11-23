@@ -38,6 +38,8 @@ def item_textures(ic):
     for r in RARITY_RGB:
         out[f"key_{r}"] = ic[f"key_{r}"]
         out[f"book_{r}"] = ic[f"book_{r}"]
+    for t in (1, 2, 3, 4):
+        out[f"boss_egg_{t}"] = ic[f"boss_egg_{t}"]
     for t, (a, b, eye) in CRAWLER_COLORS.items():
         out[f"crawler_{t}"] = I.robot((a, b), (tuple(min(255, c + 60) for c in eye), eye)).done()
     return {k: small(v) for k, v in out.items()}

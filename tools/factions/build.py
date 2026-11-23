@@ -35,6 +35,14 @@ RARITY_NAME = {"common": "Common", "rare": "Rare", "epic": "Epic", "legendary": 
 RARITY_CODE = {"common": "§f", "rare": "§9", "epic": "§5", "legendary": "§6", "mythic": "§c"}
 SPAWNERS = {"pig": "Pig", "chicken": "Chicken", "cow": "Cow", "zombie": "Zombie", "spider": "Spider", "skeleton": "Skeleton",
             "creeper": "Creeper", "blaze": "Blaze", "enderman": "Enderman", "iron_golem": "Iron Golem"}
+# Bosses reuse a vanilla mob's model and animations, scaled up and tinted.
+# tier: (identifier, name, vanilla client entity, hp, damage, speed, scale, (width, height), tint rgba)
+BOSSES = {
+    1: ("fc:boss_warlord", "Undead Warlord", "zombie", 500, 9, 0.28, 2.0, (1.2, 3.8), (0.25, 0.95, 0.3, 0.35)),
+    2: ("fc:boss_tyrant", "Bone Tyrant", "wither_skeleton", 900, 12, 0.3, 1.6, (1.1, 3.8), (0.85, 0.1, 0.1, 0.3)),
+    3: ("fc:boss_golem", "Infernal Golem", "iron_golem", 1500, 16, 0.26, 1.6, (2.2, 4.6), (1.0, 0.45, 0.05, 0.45)),
+    4: ("fc:boss_ravager", "Void Ravager", "ravager", 2500, 22, 0.3, 1.5, (2.9, 3.3), (0.55, 0.15, 0.9, 0.45)),
+}
 CRAWLERS = {"coal": ("Coal Crawler", "common"), "iron": ("Iron Crawler", "common"), "gold": ("Gold Crawler", "rare"),
             "diamond": ("Diamond Crawler", "epic"), "emerald": ("Emerald Crawler", "legendary"), "netherite": ("Netherite Crawler", "mythic")}
 
@@ -108,6 +116,8 @@ def build_bp():
     for r in RARITIES:
         items[f"key_{r}"] = item(f"fc:key_{r}", f"{RARITY_CODE[r]}{RARITY_NAME[r]} Crate Key", f"fc_key_{r}", 16, r in ("legendary", "mythic"))
         items[f"book_{r}"] = item(f"fc:book_{r}", f"{RARITY_CODE[r]}{RARITY_NAME[r]} Enchant Book", f"fc_book_{r}", 1, True)
+    for t, (_, name, *_rest) in BOSSES.items():
+        items[f"boss_egg_{t}"] = item(f"fc:boss_egg_{t}", f"§4Boss Egg - {name}", f"fc_boss_egg_{t}", 16, True)
     for t, (name, r) in CRAWLERS.items():
         items[f"crawler_{t}"] = item(f"fc:crawler_{t}", f"{RARITY_CODE[r]}{name}", f"fc_crawler_{t}", 1, r in ("legendary", "mythic"))
     for k, v in items.items():
@@ -159,6 +169,41 @@ def build_bp():
             "minecraft:knockback_resistance": {"value": 1.0},
             "minecraft:fire_immune": {},
         }}})
+
+    for t, (ident, name, _v, hp, dmg, speed, scale, (w, h), _tint) in BOSSES.items():
+        write_json(os.path.join(BP, "entities", f"boss_{t}.json"), {"format_version": "1.21.60", "minecraft:entity": {
+            "description": {"identifier": ident, "is_spawnable": False, "is_summonable": True},
+            "components": {
+                "minecraft:type_family": {"family": ["fc_boss", "monster", "mob"]},
+                "minecraft:health": {"value": hp, "max": hp},
+                "minecraft:attack": {"damage": dmg},
+                "minecraft:movement": {"value": speed},
+                "minecraft:movement.basic": {},
+                "minecraft:navigation.walk": {"can_path_over_water": True, "avoid_water": False, "can_open_doors": False},
+                "minecraft:jump.static": {},
+                "minecraft:can_climb": {},
+                "minecraft:physics": {},
+                "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
+                "minecraft:collision_box": {"width": w, "height": h},
+                "minecraft:scale": {"value": scale},
+                "minecraft:knockback_resistance": {"value": 1.0},
+                "minecraft:fire_immune": {},
+                "minecraft:persistent": {},
+                "minecraft:nameable": {"always_show": True, "allow_name_tag_renaming": False},
+                "minecraft:boss": {"name": name, "hud_range": 64, "should_darken_sky": t >= 3},
+                "minecraft:follow_range": {"value": 48, "max": 48},
+                "minecraft:experience_reward": {"on_death": str(100 * t)},
+                "minecraft:breathable": {"total_supply": 15, "suffocate_time": 0, "breathes_water": True},
+                "minecraft:damage_sensor": {"triggers": [{"cause": c, "deals_damage": "no"} for c in ("fall", "drowning", "suffocation", "lightning", "fire", "fire_tick", "lava")]},
+                "minecraft:behavior.float": {"priority": 0},
+                "minecraft:behavior.nearest_attackable_target": {"priority": 1, "must_see": False, "reselect_targets": True, "within_radius": 40,
+                                                                 "entity_types": [{"filters": {"test": "is_family", "subject": "other", "value": "player"}, "max_dist": 40}]},
+                "minecraft:behavior.hurt_by_target": {"priority": 1},
+                "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.2, "track_target": True},
+                "minecraft:behavior.random_stroll": {"priority": 6, "speed_multiplier": 0.8},
+                "minecraft:behavior.look_at_player": {"priority": 7, "look_distance": 12},
+                "minecraft:behavior.random_look_around": {"priority": 8},
+            }}})
 
     write_json(os.path.join(BP, "manifest.json"), {
         "format_version": 2,
@@ -302,6 +347,23 @@ def build_rp_entities():
         "render_controllers": ["controller.render.fc_hologram"],
     }}})
 
+    # Bosses: a copy of the vanilla client entity with our id and a tinted render controller.
+    VAN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vanilla")
+    controllers = {}
+    for t, (ident, name, vanilla, *_rest, tint) in BOSSES.items():
+        with open(os.path.join(VAN, f"{vanilla}.entity.json"), encoding="utf-8") as f:
+            data = json.load(f)
+        desc = data["minecraft:client_entity"]["description"]
+        desc["identifier"] = ident
+        desc.pop("spawn_egg", None)
+        rc = f"controller.render.fc_boss_{t}"
+        desc["render_controllers"] = [rc]
+        r, g, b, a = tint
+        controllers[rc] = {"geometry": "Geometry.default", "materials": [{"*": "Material.default"}], "textures": ["Texture.default"],
+                           "overlay_color": {"r": r, "g": g, "b": b, "a": a}}
+        write_json(os.path.join(RP, "entity", f"boss_{t}.entity.json"), data)
+    write_json(os.path.join(RP, "render_controllers", "boss.render_controllers.json"), {"format_version": "1.8.0", "render_controllers": controllers})
+
     blocks = {"format_version": "1.1.0"}
     for t in SPAWNERS:
         blocks[f"fc:spawner_{t}"] = {"sound": "metal"}
@@ -315,6 +377,8 @@ def build_rp_entities():
         lang.append(f"tile.fc:spawner_{t}.name={n} Spawner")
     for r in RARITIES:
         lang.append(f"tile.fc:crate_{r}.name={RARITY_NAME[r]} Crate")
+    for t, (ident, name, *_rest) in BOSSES.items():
+        lang.append(f"entity.{ident}.name={name}")
     lang += ["tile.fc:supply_drop.name=Supply Drop", "entity.fc:crawler.name=Ore Crawler", "entity.fc:hologram.name=Hologram",
              "item.spawn_egg.entity.fc:crawler.name=Spawn Ore Crawler"]
     os.makedirs(os.path.join(RP, "texts"), exist_ok=True)

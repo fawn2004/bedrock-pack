@@ -97,6 +97,7 @@ export const RARITY = {
   epic: { name: "Epic", color: "§5", order: 2 },
   legendary: { name: "Legendary", color: "§6", order: 3 },
   mythic: { name: "Mythic", color: "§c", order: 4 },
+  boss: { name: "Boss Drop", color: "§4", order: 5 },
 };
 export const RARITIES = ["common", "rare", "epic", "legendary", "mythic"];
 

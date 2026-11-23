@@ -18,6 +18,7 @@ import { setupAuction } from "./auction.js";
 import { setupFtop } from "./ftop.js";
 import { setupHud } from "./hud.js";
 import { setupHolograms } from "./holograms.js";
+import { setupBosses } from "./bosses.js";
 import { setupRanks, setOnRanksChanged, topRank } from "./ranks.js";
 import { alliesOf, tell } from "./rules.js";
 
@@ -39,6 +40,7 @@ setupAuction();
 setupFtop();
 setupHud();
 setupHolograms();
+setupBosses();
 setupRanks(alliesOf);
 setOnRanksChanged((player, first) => {
   if (first) return;

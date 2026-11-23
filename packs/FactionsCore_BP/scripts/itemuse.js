@@ -11,6 +11,7 @@ import * as Sp from "./spawners.js";
 import * as Cr from "./crawlers.js";
 import * as Ev from "./events.js";
 import * as M from "./menus.js";
+import { summon } from "./bosses.js";
 
 /** Runs fn next tick, reporting failures to the player. */
 function later(player, fn) {
@@ -81,7 +82,7 @@ function useItem(player, item) {
     return;
   }
   if (id === "fc:sell_wand") return R.tell(player, "Use the sell wand on a chest or barrel to sell what's inside.");
-  if (id.startsWith("fc:genbucket") || id === "fc:chunk_buster" || id.startsWith("fc:crawler_")) return R.tell(player, "Use this on a block.");
+  if (id.startsWith("fc:genbucket") || id === "fc:chunk_buster" || id.startsWith("fc:crawler_") || id.startsWith("fc:boss_egg_")) return R.tell(player, "Use this on a block.");
 }
 
 // ------------------------------------------------------------ genbucket & chunk buster
@@ -196,6 +197,7 @@ export function setupItemUse() {
     e.cancel = true;
     if (!e.isFirstEvent) return;
     if (it.startsWith("fc:crawler_")) return later(player, () => Cr.place(player, block, e.blockFace, item));
+    if (it.startsWith("fc:boss_egg_")) return later(player, () => summon(player, block, Number(it.slice(12))));
     if (it.startsWith("fc:genbucket")) return later(player, () => genbucket(player, block, e.blockFace, item));
     if (it === "fc:chunk_buster") return later(player, () => chunkBuster(player, block));
     if (it === "fc:sell_wand" && CONTAINERS.test(bt)) {

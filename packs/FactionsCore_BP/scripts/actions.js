@@ -565,7 +565,7 @@ export const HELP = [
   ["/fc <msg>  /fa <msg>", "faction / ally chat"],
   ["/shop  /sell hand|all  /pay  /bal", "money"],
   ["/ah  /ah sell <price>", "auction house"],
-  ["/crates  /daily  /bounty <player> <amount>", "rewards"],
+  ["/crates  /daily  /kit [name]  /bounty <player> <amount>", "rewards"],
   ["/home  /sethome  /delhome  /spawn  /wild  /warp", "teleports"],
   ["/f chat [public|faction|ally]", "where your normal chat goes"],
   ["/hud", "show/hide the sidebar"],

@@ -583,6 +583,41 @@ def boot():
     return i
 
 
+def chestplate(c=BLUE):
+    i = Icon()
+    i.shape(poly([(64, 26), (104, 26), (128, 52), (152, 26), (192, 26), (236, 70), (204, 112), (186, 100), (186, 230), (70, 230), (70, 100), (52, 112), (20, 70)]), c)
+    i.shape(poly(star_pts(128, 140, 34, 14)), GOLD, outline=5)
+    return i
+
+
+def horned_skull():
+    i = Icon()
+    i.shape(poly([(56, 90), (18, 20), (88, 62)]), WHITE)
+    i.shape(poly([(200, 90), (238, 20), (168, 62)]), WHITE)
+    i.shape(lambda d: (d.ellipse((46, 40, 210, 190), fill=255), d.rounded_rectangle((84, 160, 172, 232), 16, fill=255)), RED)
+    d = ImageDraw.Draw(i.img)
+    d.polygon([(78, 104), (120, 118), (112, 142), (80, 132)], fill=(255, 220, 60, 255))
+    d.polygon([(178, 104), (136, 118), (144, 142), (176, 132)], fill=(255, 220, 60, 255))
+    d.polygon([(128, 146), (116, 168), (140, 168)], fill=INK)
+    for x in (104, 128, 152):
+        d.line([(x, 190), (x, 226)], fill=INK, width=8)
+    return i
+
+
+def egg(c=GREEN, spot=WHITE):
+    i = Icon()
+    i.shape(lambda d: d.ellipse((46, 14, 210, 240), fill=255), c)
+    for (x, y, r) in [(96, 80, 18), (156, 110, 22), (110, 170, 20), (168, 182, 14), (82, 132, 12)]:
+        i.shape(ell((x - r, y - r, x + r, y + r)), spot, outline=3, gloss=False)
+    return i
+
+
+BOSS_EGGS = {1: (((120, 210, 90), (40, 110, 40)), ((60, 40, 30), (30, 20, 15))),
+             2: (((90, 90, 100), (25, 25, 32)), ((230, 225, 210), (170, 165, 150))),
+             3: (((255, 150, 50), (190, 50, 10)), ((255, 235, 120), (230, 160, 40))),
+             4: (((170, 90, 255), (60, 20, 120)), ((20, 10, 40), (5, 0, 15)))}
+
+
 def build_icons():
     """Returns {name: 64x64 RGBA image}."""
     icons = {
@@ -600,7 +635,10 @@ def build_icons():
         "genbucket_sand": bucket(((255, 235, 160), (220, 190, 100))), "chunk_buster": tnt(PURPLE, "CB"), "sell_wand": wand(),
         "xp_shard": shard(LIME), "power_shard": shard(RED), "haste": pickaxe(), "speed": boot(), "mail": envelope(),
         "spawn": beacon(), "wild": tree(), "nether": portal(), "end": eye(), "menu": star4(), "power": lightning(),
+        "kit": chestplate(), "boss": horned_skull(),
     }
+    for t, (c, s) in BOSS_EGGS.items():
+        icons[f"boss_egg_{t}"] = egg(c, s)
     for r, c in RARITY.items():
         icons[f"key_{r}"] = key(c)
         icons[f"book_{r}"] = book(c)

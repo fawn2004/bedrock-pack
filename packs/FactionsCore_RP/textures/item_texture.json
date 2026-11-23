@@ -65,6 +65,18 @@
     "fc_book_mythic": {
       "textures": "textures/fc/items/book_mythic"
     },
+    "fc_boss_egg_1": {
+      "textures": "textures/fc/items/boss_egg_1"
+    },
+    "fc_boss_egg_2": {
+      "textures": "textures/fc/items/boss_egg_2"
+    },
+    "fc_boss_egg_3": {
+      "textures": "textures/fc/items/boss_egg_3"
+    },
+    "fc_boss_egg_4": {
+      "textures": "textures/fc/items/boss_egg_4"
+    },
     "fc_crawler_coal": {
       "textures": "textures/fc/items/crawler_coal"
     },

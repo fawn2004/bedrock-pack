@@ -15,6 +15,7 @@ const run = async (name, pl, ...a) => { M.setReadOnly(true); cmds[name]({ source
 const f = (pl, ...a) => run("f", pl, ...a);
 const join = async (name, x, z) => { const p = new Player(name, { x, y: 64, z }); players.push(p); world.afterEvents.playerSpawn.fire({ player: p, initialSpawn: true }); await flush(); return p; };
 const before = async (k, e) => { M.setReadOnly(true); world.beforeEvents[k].fire(e); M.setReadOnly(false); await flush(); return e; };
+const before_ = (...a) => before(...a);
 const hurt = async (att, vic, dmg = 4) => (await before("entityHurt", { hurtEntity: vic, damageSource: { damagingEntity: att }, damage: dmg, cancel: false }));
 const P = (pl) => JSON.parse(world._props.get("fc:p:" + pl.id));
 const hold = (pl, it) => { pl.inv.setItem(pl.selectedSlotIndex, it); };
@@ -324,6 +325,47 @@ ok(M.log.length === 0 && strip(carol.last()).includes("muted"), "muted players c
 alice.removeTag("Owner");
 await advance(40);
 ok(!alice.getTags().some((t) => t.includes("OWNER")), "/tag remove takes the rank away");
+
+// ---------- kits
+const Kt = await import("./scripts/kits.js");
+const kitter = await join("Kitter", 7000, 7000);
+const kitCount0 = kitter.inv.slots.filter(Boolean).length;
+Kt.claimKit(kitter, "starter");
+ok(kitter.inv.slots.filter(Boolean).length > kitCount0 + 5, "free Starter kit gives items");
+try { Kt.claimKit(kitter, "starter"); ok(false, "kit cooldown"); } catch (e) { ok(strip(e.message).includes("again in"), "kits have a cooldown"); }
+try { Kt.claimKit(kitter, "raider"); ok(false, "kit price"); } catch (e) { ok(strip(e.message).includes("You need"), "paid kits need money"); }
+S.playerData(kitter).money = 1000000; S.playerData(kitter).crystals = 600;
+Kt.claimKit(kitter, "diamond"); Kt.claimKit(kitter, "legend");
+ok(S.playerData(kitter).money === 750000 && S.playerData(kitter).crystals === 100, "kits charge money or crystals");
+const sword2 = kitter.inv.slots.find((i) => i?.typeId === "minecraft:netherite_sword");
+ok(sword2 && En.readEnchants(sword2).frostbite === 2 && sword2.ench.length >= 2, "kit gear has vanilla and custom enchants");
+ok(Kt.KITS.every((k) => Kt.contents(k).length > 0), "every kit lists its contents");
+
+// ---------- bosses
+const Bs = await import("./scripts/bosses.js");
+const mythic = new Set(); for (let i = 0; i < 4000; i++) mythic.add(Cr.roll("mythic"));
+ok([1, 2, 3, 4].every((t) => mythic.has(`bossegg:${t}`)), "mythic crates can drop all 4 boss eggs");
+ok(["common", "rare", "epic", "legendary"].every((r) => !Cr.LOOT[r].some(([, s]) => s.startsWith("bossegg"))), "boss eggs only come from mythic crates");
+const hunter = await join("Hunter", 9000, 9000);
+hunter.inv.setItem(0, I.bossEggItem(3)); hunter.selectedSlotIndex = 0;
+await before_("playerInteractWithBlock", { player: hunter, block: blk(9000, 63, 9000), itemStack: hunter.inv.getItem(0), blockFace: "Up", isFirstEvent: true, cancel: false });
+const golem = ow.getEntities({ type: "fc:boss_golem" })[0];
+ok(golem && !hunter.inv.getItem(0) && M.log.some((m) => strip(m).includes("summoned the Infernal Golem")), "boss egg summons its boss and is used up");
+hunter.inv.setItem(0, I.bossEggItem(1));
+await before_("playerInteractWithBlock", { player: hunter, block: blk(5000, 63, 5000), itemStack: hunter.inv.getItem(0), blockFace: "Up", isFirstEvent: true, cancel: false });
+ok(!ow.getEntities({ type: "fc:boss_warlord" }).length && strip(hunter.last()).includes("SafeZone"), "bosses can't be summoned in the SafeZone");
+golem.hp = 100; golem.maxHp = 1500;
+hunter.location = { x: 9002, y: 64, z: 9000 };
+await advance(20 * 15);
+ok(hunter.knock || hunter.hp < 20 || Object.keys(hunter.effects).length, "boss uses its attacks on nearby players");
+ok(golem.effects.strength, "boss gets enraged below half health");
+world.afterEvents.entityHurt.fire({ hurtEntity: golem, damageSource: { damagingEntity: hunter }, damage: 100 });
+const itemsBefore = ow.getEntities({ type: "minecraft:item" }).length;
+world.afterEvents.entityDie.fire({ deadEntity: golem, damageSource: { damagingEntity: hunter } });
+const drops = ow.getEntities({ type: "minecraft:item" }).slice(itemsBefore).map((e) => e.item);
+ok(drops.some((d) => d.typeId === "fc:crystal" && d.amount === 200) && drops.some((d) => d.typeId === "fc:bank_note") && drops.length === 4, "Tier 3 boss drops crystals, a bank note and 2 exclusive items");
+ok(drops.slice(2).every((d) => /Molten|Magma|Crawler|Spawner/.test((d.nameTag ?? "") + d.getLore().join(" "))), "boss loot comes from its exclusive table: " + drops.slice(2).map((d) => strip(d.nameTag ?? d.typeId)).join(", "));
+ok(strip(M.log.at(-1)).includes("was slain") && strip(M.log.at(-1)).includes("Hunter"), "boss death is announced with top damage");
 
 // ---------- persistence
 const S2 = await import("./scripts/store.js?reload"); S2.ensureLoaded();
