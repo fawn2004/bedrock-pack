@@ -46,7 +46,7 @@ class Dimension { constructor(id) { this.id = id; this.heightRange = { min: -64,
   getPlayers(o = {}) { return players.filter((p) => p.dimension.id === this.id && (!o.location || dist(p.location, o.location) <= (o.maxDistance ?? 1e9))); }
   getEntities(o = {}) { let l = entities.filter((e) => e.isValid && e.dimension.id === this.id); if (o.type) l = l.filter((e) => e.typeId === o.type);
     if (o.location) l = l.filter((e) => dist(e.location, o.location) <= (o.maxDistance ?? 1e9)); if (o.tags) l = l.filter((e) => o.tags.every((t) => e.tags.has(t))); return l; }
-  spawnEntity(type, loc) { const e = new Entity("e" + nextId++, type, this.id, { ...loc }); entities.push(e); return e; }
+  spawnEntity(type, loc) { const e = new Entity("e" + nextId++, type, this.id, { ...loc }); entities.push(e); if (type === "minecraft:item") queueMicrotask(() => world.afterEvents.entitySpawn.fire({ entity: e })); return e; }
   spawnItem(it, loc) { const e = this.spawnEntity("minecraft:item", loc); e.item = it; return e; }
   spawnParticle() {} playSound() {} runCommand(c) { const m = c.match(/setblock (\S+) (\S+) (\S+) air destroy/); if (m) blocks.set(bk(this.id, { x: +m[1], y: +m[2], z: +m[3] }), "minecraft:air"); return { successCount: 1 }; }
   fillBlocks(vol, t, o) { let n = 0; for (let x = vol.a.x; x <= vol.b.x; x++) for (let z = vol.a.z; z <= vol.b.z; z++) { const k = bk(this.id, { x, y: vol.a.y, z }); const cur = blocks.get(k) ?? (vol.a.y < 64 ? "minecraft:stone" : "minecraft:air"); if (o?.blockFilter?.excludeTypes?.includes(cur)) continue; blocks.set(k, t); n++; } return { n }; }
@@ -76,7 +76,7 @@ export class Player extends Entity {
 }
 export const world = {
   beforeEvents: Object.fromEntries(["playerBreakBlock", "playerInteractWithBlock", "playerInteractWithEntity", "explosion", "entityHurt", "playerLeave", "itemUse", "chatSend"].map((k) => [k, sig()])),
-  afterEvents: Object.fromEntries(["playerSpawn", "playerLeave", "entityDie", "entityHurt", "worldLoad", "playerBreakBlock", "playerPlaceBlock", "itemUse"].map((k) => [k, sig()])),
+  afterEvents: Object.fromEntries(["playerSpawn", "playerLeave", "entityDie", "entityHurt", "worldLoad", "playerBreakBlock", "playerPlaceBlock", "itemUse", "entitySpawn"].map((k) => [k, sig()])),
   getDynamicPropertyIds: () => [...props.keys()], getDynamicProperty: (k) => props.get(k),
   setDynamicProperty: (k, v) => { if (readOnly) throw new Error("read-only"); v === undefined ? props.delete(k) : props.set(k, v); },
   getAllPlayers: () => players, getEntity: (id) => players.find((p) => p.id === id) ?? entities.find((e) => e.id === id),

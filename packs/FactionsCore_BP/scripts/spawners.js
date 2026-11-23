@@ -7,6 +7,7 @@ import * as S from "./store.js";
 import * as R from "./rules.js";
 import { SPAWNERS, spawnerItem, giveItem } from "./items.js";
 import { questEvent } from "./quests.js";
+import { freeze, extraStackKills, recordKills } from "./grind.js";
 
 export const MAX_SPAWNER_STACK = 100;
 export const spawnerTypeOf = (typeId) => (typeId?.startsWith("fc:spawner_") ? typeId.slice(11) : undefined);
@@ -80,6 +81,7 @@ function spawnFor(key, s) {
         const ent = dim.spawnEntity(def.mob, { x: l.x, y: l.y + dy, z: l.z });
         ent.addTag("fc_stack");
         setStack(ent, s.type, count);
+        freeze(ent);
         dim.spawnParticle("minecraft:basic_flame_particle", center);
         return;
       }
@@ -108,12 +110,17 @@ export function setupSpawners() {
       type = deadEntity.getDynamicProperty("fc:stype");
     } catch { return; }
     const killer = damageSource.damagingEntity;
-    if (killer?.typeId === "minecraft:player") questEvent(killer, "stack_kill");
-    if (n <= 1 || !SPAWNERS[type]) return;
+    // Mass Slayer takes extra mobs off the stack with one kill.
+    const extra = extraStackKills(killer, n - 1);
+    if (extra) recordKills(deadEntity.id, 1 + extra);
+    if (killer?.typeId === "minecraft:player") questEvent(killer, "stack_kill", 1 + extra);
+    const left = n - 1 - extra;
+    if (left <= 0 || !SPAWNERS[type]) return;
     try {
       const ent = deadEntity.dimension.spawnEntity(SPAWNERS[type].mob, deadEntity.location);
       ent.addTag("fc_stack");
-      setStack(ent, type, n - 1);
+      setStack(ent, type, left);
+      freeze(ent);
     } catch { /* unloaded */ }
   });
 

@@ -3,7 +3,7 @@ import { ItemStack } from "@minecraft/server";
 import * as S from "./store.js";
 import * as R from "./rules.js";
 import * as E from "./economy.js";
-import { giveItem, spawnerItem, crawlerItem, SPAWNERS, CRAWLERS, keyItem, bookItem, genbucketItem, busterItem, wandItem, xpShardItem, powerShardItem, mysteryItem } from "./items.js";
+import { giveItem, gearItem, spawnerItem, crawlerItem, SPAWNERS, CRAWLERS, keyItem, bookItem, genbucketItem, busterItem, wandItem, xpShardItem, powerShardItem, mysteryItem } from "./items.js";
 import { questEvent } from "./quests.js";
 
 // [item, buy price (0 = can't buy), sell price (0 = can't sell)]
@@ -155,6 +155,8 @@ export const CRYSTAL_SHOP = [
   { id: "wand", name: "Sell Wand (100 uses)", price: 60, icon: "sell_wand", give: () => wandItem(100), single: true },
   { id: "xpshard", name: "XP Shard", price: 8, icon: "xp_shard", give: (n) => xpShardItem(n) },
   { id: "power", name: "Power Shard", price: 25, icon: "power_shard", give: (n) => powerShardItem(n) },
+  { id: "grinder_blade", name: "Grinder's Blade (sword)", price: 80, icon: "sword", give: () => gearItem("grinder_blade"), single: true },
+  { id: "golden_harvester", name: "Golden Harvester (sword)", price: 350, icon: "sword", give: () => gearItem("golden_harvester"), single: true },
   { id: "mystery", name: "Mystery Spawner", price: 500, icon: "mystery_spawner", give: (n) => mysteryItem(n) },
 ];
 

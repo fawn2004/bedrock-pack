@@ -10,6 +10,7 @@ import { giveItem, menuItem, keyItem, countItems } from "./items.js";
 import { questEvent } from "./quests.js";
 import { onMine, plunderBonus } from "./enchants.js";
 import { refreshHud } from "./hud.js";
+import { onMobKill } from "./grind.js";
 
 export const autoclaimers = new Set();
 const lastLand = new Map(); // player id -> owner id ("" = wilderness)
@@ -96,15 +97,7 @@ export function setupTasks() {
   world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
     const killer = damageSource.damagingEntity;
     if (!(killer instanceof Player) || deadEntity instanceof Player) return;
-    const p = S.playerData(killer);
-    p.mobKills++;
-    E.addXp(killer, p, 3);
-    const plunder = plunderBonus(killer);
-    if (plunder && Math.random() < 0.02 * plunder * 4) {
-      E.addCrystals(p, 1);
-      killer.onScreenDisplay.setActionBar("§b+1 crystal §7(Plunder)");
-    }
-    questEvent(killer, "kill_mob");
+    onMobKill(killer, deadEntity);
   });
 
   system.runInterval(tickTerritory, 10);

@@ -180,6 +180,10 @@ export const GEAR = {
   titan_boots: { item: "minecraft:netherite_boots", name: "§3§lTitan Boots", rarity: "legendary", vanilla: [["protection", 4], ["feather_falling", 4]], custom: { speed: 2, jump: 1 } },
   scout_boots: { item: "minecraft:diamond_boots", name: "§9§lScout Boots", rarity: "rare", vanilla: [["protection", 3]], custom: { speed: 1 } },
   miner_helm: { item: "minecraft:iron_helmet", name: "§9§lMiner's Lamp", rarity: "rare", vanilla: [["protection", 2]], custom: { nightvision: 1, aquatic: 1 } },
+  // ---- grinding swords
+  grinder_blade: { item: "minecraft:iron_sword", name: "§9§lGrinder's Blade", rarity: "rare", vanilla: [["sharpness", 3], ["looting", 2], ["unbreaking", 2]], custom: { greed: 1, scholar: 1 } },
+  golden_harvester: { item: "minecraft:diamond_sword", name: "§5§lGolden Harvester", rarity: "epic", vanilla: [["sharpness", 4], ["looting", 3], ["unbreaking", 3]], custom: { greed: 2, looter: 2, crystal_seeker: 1, mass_slayer: 1 } },
+  soul_collector: { item: "minecraft:netherite_sword", name: "§6§lSoul Collector", rarity: "legendary", vanilla: [["sharpness", 5], ["looting", 3], ["unbreaking", 3]], custom: { greed: 3, scholar: 3, looter: 3, crystal_seeker: 2, mass_slayer: 3 } },
   // ---- boss drops only
   warlord_cleaver: { item: "minecraft:netherite_axe", name: "§2§lWarlord's Cleaver", rarity: "boss", vanilla: [["sharpness", 5], ["unbreaking", 3]], custom: { executioner: 3, rage: 2, lifesteal: 2 } },
   warlord_helm: { item: "minecraft:netherite_helmet", name: "§2§lWarlord's Crown", rarity: "boss", vanilla: [["protection", 4], ["unbreaking", 3]], custom: { nightvision: 1, berserk: 2, aquatic: 1 } },

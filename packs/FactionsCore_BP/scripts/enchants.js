@@ -26,6 +26,12 @@ export const ENCHANTS = {
   thunder: { name: "Thunderstrike", rarity: "legendary", max: 3, on: W, desc: "Chance to call down lightning" },
   obliterate: { name: "Obliterate", rarity: "mythic", max: 1, on: W, desc: "10% chance to deal double damage" },
   swiftness: { name: "Swiftness", rarity: "rare", max: 2, on: W, desc: "Speed while you hold it" },
+  // ---- grinding (mob kills)
+  greed: { name: "Greed", rarity: "rare", max: 3, on: W, desc: "Earn money for every mob you kill" },
+  scholar: { name: "Scholar", rarity: "rare", max: 3, on: W, desc: "Extra XP from every mob you kill" },
+  looter: { name: "Looter", rarity: "epic", max: 3, on: W, desc: "Chance to double a mob's drops" },
+  crystal_seeker: { name: "Crystal Seeker", rarity: "epic", max: 2, on: W, desc: "Chance to find crystals on mob kills" },
+  mass_slayer: { name: "Mass Slayer", rarity: "legendary", max: 3, on: W, desc: "Kill extra mobs from a stack with each kill" },
   rage: { name: "Rage", rarity: "epic", max: 2, on: W, desc: "Strength while you hold it" },
   // ---- tools
   telepathy: { name: "Telepathy", rarity: "common", max: 1, on: T, desc: "Drops go straight to your inventory" },
@@ -163,7 +169,14 @@ export function setupEnchants() {
       const arm = armorEnchants(victim);
       if (arm.dodge && chance(arm.dodge * 4)) {
         e.cancel = true;
-        system.run(() => { try { victim.onScreenDisplay.setActionBar("§b§lDODGED!"); R.sound(victim, "mob.bat.takeoff"); } catch { /* */ } });
+        system.run(() => {
+          try {
+            victim.onScreenDisplay.setActionBar("§b§lDODGED!");
+            R.sound(victim, "mob.bat.takeoff");
+            procChat(victim, "dodge", `§5Dodge §7let you dodge ${attacker ? `§f${nameOf(attacker)}'s§7 ` : "a "}hit.`);
+            if (attacker instanceof Player) procChat(attacker, "dodged", `§f${victim.name}§7 dodged your hit with §5Dodge§7.`);
+          } catch { /* */ }
+        });
         return;
       }
       if (arm.armored) e.damage *= 1 - 0.06 * arm.armored;
@@ -172,6 +185,8 @@ export function setupEnchants() {
         later.push(() => {
           attacker.applyDamage(dmg, { cause: EntityDamageCause.thorns, damagingEntity: victim });
           victim.onScreenDisplay.setActionBar("§5§lREFLECT!");
+          procChat(victim, "reflect", `§5Reflect §7sent §c${dmg.toFixed(1)}§7 damage back at §f${nameOf(attacker)}§7.`);
+          if (attacker instanceof Player) procChat(attacker, "reflected", `§f${victim.name}'s §5Reflect §7hit you back for §c${dmg.toFixed(1)}§7.`);
           R.sound(victim, "random.anvil_land", 1.8, 0.3);
         });
       }
@@ -202,6 +217,26 @@ const PROC_FX = {
 };
 
 const lastProcBar = new Map();
+const lastProcChat = new Map(); // "player|enchant" -> time
+
+// Chat wording: what the enchant did to the target.
+const PROC_TEXT = {
+  executioner: "dealt bonus damage to", obliterate: "dealt §c§lDOUBLE§r§7 damage to", lifesteal: "healed you as you hit",
+  frostbite: "slowed", venom: "poisoned", wither: "withered", blind: "blinded", blaze: "set fire to", thunder: "called lightning on",
+};
+const VICTIM_TEXT = { ...PROC_TEXT, lifesteal: "drained health from", obliterate: "dealt §c§lDOUBLE§r§7 damage to" };
+const nameOf = (e) => (e instanceof Player ? e.name : e.typeId.split(":")[1].replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
+const wantsChat = (pl) => S.playerData(pl).procChat !== false;
+
+/** Chat line for an enchant going off, at most once every 2s per player and enchant. */
+export function procChat(pl, id, text) {
+  if (!(pl instanceof Player) || !wantsChat(pl)) return;
+  const key = `${pl.id}|${id}`;
+  const now = Date.now();
+  if ((lastProcChat.get(key) ?? 0) > now - 2000) return;
+  lastProcChat.set(key, now);
+  pl.sendMessage(`§8[§dEnchant§8] §r${text}`);
+}
 
 /** Tells the attacker which enchants just triggered, with a sound and particles on the target. */
 function showProcs(attacker, victim, procs) {
@@ -211,6 +246,11 @@ function showProcs(attacker, victim, procs) {
   if ((lastProcBar.get(attacker.id) ?? 0) < now - 300 || procs.includes("obliterate")) {
     attacker.onScreenDisplay.setActionBar(labels.join(" §8| "));
     lastProcBar.set(attacker.id, now);
+  }
+  for (const id of procs) {
+    const name = `${RARITY[ENCHANTS[id].rarity].color}${ENCHANTS[id].name}`;
+    procChat(attacker, id, `${name} §7${PROC_TEXT[id] ?? "hit"} §f${nameOf(victim)}§7.`);
+    if (victim instanceof Player) procChat(victim, `in_${id}`, `§e${attacker.name}'s ${name} §7${VICTIM_TEXT[id] ?? "hit"} §fyou§7.`);
   }
   const top = procs[procs.length - 1];
   const fx = PROC_FX[top];

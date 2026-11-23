@@ -75,17 +75,23 @@ New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can t
 - **Crates** come in 5 rarities: Common, Rare, Epic, Legendary and Mythic.
   - Opening one plays a roll animation, and big wins are announced to the server.
   - Open them with a key anywhere, or on the crate blocks an admin places at spawn.
-- **30 custom enchants** go on vanilla gear through **Enchant Books**. Each book has a success chance. Some examples:
+- **35 custom enchants** go on vanilla gear through **Enchant Books**. Each book has a success chance. Some examples:
 
   | Gear | Enchants |
   |---|---|
   | Weapons (on hit) | Lifesteal, Frostbite, Venom, Blaze, Blind, Withering, Executioner, Thunderstrike, Plunder, Obliterate |
   | Weapons (while held) | Swiftness (Speed), Rage (Strength) |
+  | Weapons (mob grinding) | Greed, Scholar, Looter, Crystal Seeker, Mass Slayer |
   | Tools | Explosive (3x3 mining), Autosmelt, Telepathy, Treasure Hunter, Haste, Experience |
   | Armor | Overload, Regeneration, Dodge, Armored, Reflect, Berserk, Night Vision, Gears (speed), Leaper |
   | Anything | Soulbound (keep it when you die) |
 
-  - Weapon enchants trigger by chance on melee hits. When one fires, its name flashes on your action bar (for example **FROSTBITE!**) with a sound and particles on the target.
+  - Weapon enchants trigger by chance on melee hits. When one fires:
+    - its name flashes on your action bar (for example **FROSTBITE!**)
+    - a sound plays and particles appear on the target
+    - **chat says what happened**, for example `[Enchant] Frostbite slowed Zombie.`
+  - Players hit by your enchants get their own line, like `Steve's Frostbite slowed you.` Dodge and Reflect report in chat too.
+  - Each enchant writes to chat at most once every 2 seconds. Turn the messages off in **Profile > Enchant Messages**.
   - A weapon with any Legendary or Mythic enchant is **Empowered** and gives Speed I while you hold it.
   - Held effects fade a couple of seconds after you switch items.
 - **Legendary gear** drops from crates: Frostbite Blade, Inferno Cleaver, Stormbringer, The Reaper, Excavator 3000, Prospector's Pick and the 4-piece Titan set.
@@ -103,6 +109,7 @@ Open **Kits** in `/menu` or type `/kit`. You pay each time you claim a kit, then
 | Starter | Free | 24h | stone tools, leather armour, food |
 | Farmer | $10k | 12h | Efficiency hoe, seeds, crops, bone meal |
 | Miner | $15k | 12h | Efficiency III + Haste pickaxe, torches, XP shards |
+| Grinder | $60k | 24h | Grinder's Blade (Greed + Scholar), hoppers, chests |
 | Builder | $20k | 12h | stone bricks, glass, logs, a stack of cobble genbuckets |
 | Warrior | $40k | 12h | Protection II iron armour, Sharpness III diamond sword, bow, gapples |
 | Raider | $100k | 24h | 64 TNT, redstone, dispensers, obsidian and sand genbuckets |
@@ -129,6 +136,27 @@ The boss gear can't be found anywhere else. It is the strongest in the game, for
 - **Magma Drill:** a pickaxe with Explosive III, Autosmelt, Telepathy, Treasure Hunter III and Haste III.
 
 The **Bosses** page in `/menu` lists every drop and its chance. Admins can give eggs with `/fadmin give bossegg_<1-4>`.
+
+### Mob grinding
+- **Spawner mobs are frozen:** they stay where they spawn and are put back if pushed, so grinders stay tidy.
+  Turn this off with `freezeSpawnerMobs` in `config.js`.
+- **Grinding enchants** go on swords and axes and work on every mob kill:
+
+  | Enchant | Rarity | What it does |
+  |---|---|---|
+  | Greed I-III | Rare | $8 / $12 / $16 per mob killed |
+  | Scholar I-III | Rare | extra level XP and XP orbs per kill |
+  | Looter I-III | Epic | 20% / 40% / 60% chance to double a mob's drops |
+  | Crystal Seeker I-II | Epic | 1.5% / 3% chance of a crystal per kill |
+  | Mass Slayer I-III | Legendary | each kill takes 1-3 extra mobs off a stack, with their drops |
+- Your action bar shows what each kill earned, like `+$24 | x2 drops | 2 kills`.
+- **Grinding swords:**
+
+  | Sword | Enchants | Where to get it |
+  |---|---|---|
+  | Grinder's Blade | Greed I, Scholar I | Rare crates, the Grinder kit, crystal shop (80) |
+  | Golden Harvester | Greed II, Looter II, Crystal Seeker I, Mass Slayer I | Epic crates, crystal shop (350) |
+  | Soul Collector | Greed III, Scholar III, Looter III, Crystal Seeker II, Mass Slayer III | Legendary crates |
 
 ### Spawners and Ore Crawlers
 - **10 spawners**, from Pig up to Iron Golem.
@@ -233,5 +261,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 106 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 116 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

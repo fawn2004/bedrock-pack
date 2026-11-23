@@ -58,6 +58,7 @@ export const CONFIG = {
   spawnerIntervalSeconds: 12, // -10% per "Spawner speed" upgrade
   spawnerActivationRange: 24,
   maxMobStack: 1000,
+  freezeSpawnerMobs: true, // spawner mobs stay where they spawn
 
   // ---- events
   envoyMinutes: 45, // supply drops

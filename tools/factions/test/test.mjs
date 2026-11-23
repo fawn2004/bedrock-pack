@@ -367,9 +367,51 @@ ok(drops.some((d) => d.typeId === "fc:crystal" && d.amount === 200) && drops.som
 ok(drops.slice(2).every((d) => /Molten|Magma|Crawler|Spawner/.test((d.nameTag ?? "") + d.getLore().join(" "))), "boss loot comes from its exclusive table: " + drops.slice(2).map((d) => strip(d.nameTag ?? d.typeId)).join(", "));
 ok(strip(M.log.at(-1)).includes("was slain") && strip(M.log.at(-1)).includes("Hunter"), "boss death is announced with top damage");
 
+// ---------- frozen spawner mobs + grinding enchants
+const grinder = await join("Grinder", 11000, 11000);
+await f(grinder, "create", "Grinders"); await f(grinder, "claim");
+const gsb = blk(11002, 64, 11002); gsb.setType("fc:spawner_cow");
+world.afterEvents.playerPlaceBlock.fire({ block: gsb, player: grinder });
+await advance(20 * 13);
+const cow = ow.getEntities({ type: "minecraft:cow", tags: ["fc_stack"] })[0];
+ok(cow && cow.effects.slowness?.amplifier === 255 && typeof cow.getDynamicProperty("fc:anchor") === "object", "spawner mobs are frozen in place");
+const anchor = cow.getDynamicProperty("fc:anchor");
+cow.location = { x: anchor.x + 4, y: anchor.y, z: anchor.z };
+await advance(20);
+ok(Math.abs(cow.location.x - anchor.x) < 0.01, "frozen mobs are put back if they get pushed");
+const harvester = I.gearItem("golden_harvester");
+ok(En.readEnchants(harvester).greed === 2 && En.readEnchants(harvester).mass_slayer === 1, "Golden Harvester has grinding enchants");
+grinder.inv.setItem(0, harvester); grinder.selectedSlotIndex = 0;
+cow.setDynamicProperty("fc:stack", 10);
+const old = ow.spawnItem(new ItemStack("minecraft:leather", 5), cow.location);
+await advance(10);
+const m0g = S.playerData(grinder).money, kills0 = S.playerData(grinder).mobKills;
+world.afterEvents.entityDie.fire({ deadEntity: cow, damageSource: { damagingEntity: grinder } });
+ow.spawnItem(new ItemStack("minecraft:beef", 2), cow.location); // the cow's own drop
+await flush(); await advance(4);
+const next = ow.getEntities({ type: "minecraft:cow", tags: ["fc_stack"] }).find((e) => e.isValid && e !== cow);
+ok(next?.getDynamicProperty("fc:stack") === 8, "Mass Slayer I kills 2 from the stack at once");
+ok(S.playerData(grinder).mobKills - kills0 === 2 && S.playerData(grinder).money - m0g >= 24, "Greed II pays per kill ($12 each)");
+const beef = ow.getEntities({ type: "minecraft:item" }).filter((e) => e.item?.typeId === "minecraft:beef");
+ok(beef.length >= 2, "extra kills copy the mob's fresh drops");
+ok(ow.getEntities({ type: "minecraft:item" }).filter((e) => e.item?.typeId === "minecraft:leather").length === 1, "old items lying nearby are never copied");
+
+// ---------- chat messages when enchants go off
+const fsw = new ItemStack("minecraft:diamond_sword"); En.applyBook(fsw, "frostbite", 3, 100);
+grinder.inv.setItem(0, fsw);
+for (let i = 0; i < 60 && !grinder.msgs.some((m) => strip(m).includes("Frostbite slowed Zombie")); i++) { const zz = ow.spawnEntity("minecraft:zombie", { x: 11001, y: 64, z: 11001 }); await hurt(grinder, zz, 2); await advance(41); }
+ok(grinder.msgs.some((m) => strip(m).includes("[Enchant] Frostbite slowed Zombie.")), "chat says which enchant went off and what it did");
+const victim = await join("Victim", 11003, 11003);
+for (let i = 0; i < 60 && !victim.msgs.some((m) => strip(m).includes("Grinder's Frostbite slowed you")); i++) { await hurt(grinder, victim, 1); await advance(41); }
+ok(victim.msgs.some((m) => strip(m).includes("Grinder's Frostbite slowed you")), "players hit by an enchant are told too");
+S.playerData(grinder).procChat = false;
+const n0 = grinder.msgs.length;
+for (let i = 0; i < 30; i++) { const zz = ow.spawnEntity("minecraft:zombie", { x: 11001, y: 64, z: 11001 }); await hurt(grinder, zz, 2); await advance(41); }
+ok(!grinder.msgs.slice(n0).some((m) => strip(m).includes("[Enchant]")), "enchant messages can be turned off");
+
 // ---------- persistence
 const S2 = await import("./scripts/store.js?reload"); S2.ensureLoaded();
-ok(S2.findFaction("wolves") && S2.findPlayerRecord("Alice").kills === 1 && S2.spawnersT.values().length === 1, "everything reloads after a restart");
+ok(S2.findFaction("wolves") && S2.findPlayerRecord("Alice").kills === 1 && S2.spawnersT.values().length === 2, "everything reloads after a restart");
 
 ok(errors.length === 0, "no script errors logged" + (errors.length ? ": " + errors.slice(0, 3).join(" | ") : ""));
 console.log(fails ? `\n${fails} FAILED` : "\nALL PASSED");

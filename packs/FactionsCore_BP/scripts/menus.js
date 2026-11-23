@@ -122,6 +122,7 @@ async function profileMenu(player) {
     body: body.join("\n"),
     buttons: [
       { text: p.hud ? "Hide Sidebar" : "Show Sidebar", sub: "Toggle the profile HUD", icon: "settings", action: () => { p.hud = !p.hud; S.savePlayer(p); refreshHud(player); R.tell(player, `Sidebar ${p.hud ? "§aon" : "§coff"}§r.`); } },
+      { text: `Enchant Messages: ${p.procChat === false ? "OFF" : "ON"}`, sub: "Chat lines when enchants go off", icon: "enchant", action: () => { p.procChat = p.procChat === false; S.savePlayer(p); R.tell(player, `Enchant messages ${p.procChat ? "§aon" : "§coff"}§r.`); } },
       { text: `Chat: ${(p.chatMode ?? "public").toUpperCase()}`, sub: "Public, faction or ally chat", icon: "mail", action: () => attempt(player, () => R.tell(player, `Chat mode: §e${Rk.setChatMode(player)}§r.`)) },
       { text: "Bank", sub: "Pay players, bank notes", icon: "coin", action: () => bankMenu(player) },
       { text: "Get Menu Item", sub: "Lost your menu item?", icon: "menu", action: () => { if (!countItems(player, "fc:menu")) giveItem(player, menuItem()); } },

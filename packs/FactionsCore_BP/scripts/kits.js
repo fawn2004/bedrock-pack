@@ -4,7 +4,7 @@ import { ItemStack, EnchantmentTypes } from "@minecraft/server";
 import * as S from "./store.js";
 import * as R from "./rules.js";
 import * as E from "./economy.js";
-import { giveItem, giveReward, rewardLabel } from "./items.js";
+import { giveItem, giveReward, rewardLabel, gearItem } from "./items.js";
 import { writeEnchants } from "./enchants.js";
 
 /** A vanilla item, optionally with vanilla enchants ([id, level]) and custom enchants ({ id: level }). */
@@ -43,6 +43,12 @@ export const KITS = [
     id: "miner", name: "Miner", icon: "haste", currency: "money", price: 15000, hours: 12,
     desc: "A good pickaxe, light and food for a long dig.",
     items: [gear("iron_pickaxe", [["efficiency", 3], ["unbreaking", 2]], { haste: 1 }), gear("iron_shovel", [["efficiency", 2]]), stack("torch", 64), stack("cooked_beef", 32)],
+    rewards: ["xpshard:3"],
+  },
+  {
+    id: "grinder", name: "Grinder", icon: "mobs", currency: "money", price: 60000, hours: 24,
+    desc: "A Grinder's Blade (Greed + Scholar) for farming spawner mobs.",
+    items: [() => gearItem("grinder_blade"), stack("cooked_beef", 32), stack("hopper", 4), stack("chest", 4)],
     rewards: ["xpshard:3"],
   },
   {
