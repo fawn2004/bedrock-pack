@@ -24,6 +24,7 @@ import { hasPerm } from "./perm.js";
 import { refreshHud } from "./hud.js";
 import { autoclaimers } from "./tasks.js";
 import * as Rk from "./ranks.js";
+import { VERSION } from "./version.js";
 import * as Kt from "./kits.js";
 import { bossInfo } from "./bosses.js";
 
@@ -780,7 +781,7 @@ async function adminMenu(player) {
   const give = (fn) => () => { giveItem(player, fn()); };
   await UI.menu(player, {
     title: "ADMIN",
-    body: `§7Bypass: ${R.hasBypass(player) ? "§aON" : "§cOFF"}\n§7Spawn: ${S.kv.get("spawn") ? "§aset" : "§cnot set (using world spawn)"}\n§7KOTH: ${Ev.kothZone() ? "§aset" : "§cnot set"}\n\n§7Commands: §e/fadmin help`,
+    body: `§7Version: §f${VERSION}\n§7Bypass: ${R.hasBypass(player) ? "§aON" : "§cOFF"}\n§7Spawn: ${S.kv.get("spawn") ? "§aset" : "§cnot set (using world spawn)"}\n§7KOTH: ${Ev.kothZone() ? "§aset" : "§cnot set"}\n\n§7Commands: §e/fadmin help`,
     buttons: [
       { text: "Ranks", sub: "Give ranks, make custom ranks", icon: "crown", action: () => ranksMenu(player) },
       { text: "Toggle Bypass", sub: "Build anywhere", icon: "admin", action: () => { player.setDynamicProperty("fc:bypass", R.hasBypass(player) ? undefined : true); R.tell(player, `Bypass ${R.hasBypass(player) ? "§aon" : "§coff"}`); } },

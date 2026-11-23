@@ -20,7 +20,22 @@ BP = os.path.join(ROOT, "packs", "FactionsCore_BP")
 RP = os.path.join(ROOT, "packs", "FactionsCore_RP")
 DIST = os.path.join(ROOT, "dist")
 
-VERSION = [2, 0, 0]
+def _version():
+    """2.1.<n>: n grows with every commit, so each update is a new version.
+
+    Minecraft ignores an imported pack whose ID and version are already
+    installed, so the version must change every time the add-on changes.
+    """
+    import subprocess
+    try:
+        n = int(subprocess.run(["git", "rev-list", "--count", "HEAD"], cwd=os.path.dirname(os.path.abspath(__file__)),
+                               capture_output=True, text=True, check=True).stdout.strip())
+    except Exception:
+        n = 0
+    return [2, 1, n + 1]
+
+
+VERSION = _version()
 MIN_ENGINE = [1, 26, 20]
 BP_UUID, BP_DATA, BP_SCRIPT = "e01294d7-65a4-4856-b137-a27734420e64", "7c286f51-a204-4948-abc2-3b1d04b1e28e", "e4e9690b-5e9d-4009-983a-8c39d4a3dc8d"
 RP_UUID, RP_RES = "d769002a-fc35-4aa5-a76f-c532c897e981", "8bcc7ff2-873a-4ac4-a141-a71353d3b7f6"
@@ -97,6 +112,8 @@ def block(identifier, textures, seconds, resistance, light, color, sound_tags=()
 
 
 def build_bp():
+    with open(os.path.join(BP, "scripts", "version.js"), "w", encoding="utf-8") as f:
+        f.write(f'// Written by tools/factions/build.py.\nexport const VERSION = "{".".join(map(str, VERSION))}";\n')
     for sub in ("items", "blocks", "entities", "loot_tables"):
         shutil.rmtree(os.path.join(BP, sub), ignore_errors=True)
     write_json(os.path.join(BP, "loot_tables", "empty.json"), {"pools": []})
@@ -453,7 +470,11 @@ def package():
     for folder, name in ((BP, "FactionsCore_BP"), (RP, "FactionsCore_RP"), (CHAT, "FactionsCoreChat_BP")):
         with zipfile.ZipFile(os.path.join(DIST, name + ".mcpack"), "w", zipfile.ZIP_DEFLATED) as z:
             zip_dir(z, folder, "")
-    with zipfile.ZipFile(os.path.join(DIST, "FactionsCore.mcaddon"), "w", zipfile.ZIP_DEFLATED) as z:
+    # The version is in the file name so it's clear which download is newest.
+    for old in os.listdir(DIST):
+        if old.startswith("FactionsCore") and old.endswith(".mcaddon"):
+            os.remove(os.path.join(DIST, old))
+    with zipfile.ZipFile(os.path.join(DIST, f"FactionsCore_v{'.'.join(map(str, VERSION))}.mcaddon"), "w", zipfile.ZIP_DEFLATED) as z:
         zip_dir(z, BP, "FactionsCore_BP")
         zip_dir(z, RP, "FactionsCore_RP")
         zip_dir(z, CHAT, "FactionsCoreChat_BP")
@@ -466,7 +487,7 @@ def main():
     build_rp_entities()
     build_rp_ui()
     package()
-    print("built packs/FactionsCore_BP, packs/FactionsCore_RP and dist/FactionsCore.mcaddon")
+    print(f"built Factions Core {'.'.join(map(str, VERSION))}: packs/FactionsCore_BP, packs/FactionsCore_RP, packs/FactionsCoreChat_BP and dist/FactionsCore_v{'.'.join(map(str, VERSION))}.mcaddon")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 // Factions Core - entry point.
 import { world } from "@minecraft/server";
+import { VERSION } from "./version.js";
 import { ensureLoaded } from "./store.js";
 import { setRewardGiver } from "./economy.js";
 import { setQuestRewardGiver } from "./quests.js";
@@ -52,5 +53,5 @@ setOnRanksChanged((player, first) => {
 
 world.afterEvents.worldLoad.subscribe(() => {
   ensureLoaded();
-  console.log("[Factions] Factions Core loaded.");
+  console.log(`[Factions] Factions Core ${VERSION} loaded.`);
 });
