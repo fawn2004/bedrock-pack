@@ -69,7 +69,7 @@
                         },
                         {
                           "binding_type": "view",
-                          "source_property_name": "(#title_text - '§h§u§b§r' - '§l§s§t§r' - '§m§d§l§r')",
+                          "source_property_name": "(#title_text - '§h§u§b§r' - '§l§s§t§r' - '§m§d§l§r' - '§b§o§a§r')",
                           "target_property_name": "#fc_title"
                         }
                       ]
@@ -1523,6 +1523,9 @@
       },
       {
         "list@fc_ui.list_form": {}
+      },
+      {
+        "board@fc_ui.board_form": {}
       }
     ]
   },
@@ -1638,6 +1641,828 @@
           "controls": [
             {
               "hud_label@fc_ui.hud_label": {}
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "banner_item": {
+    "type": "panel",
+    "size": [
+      "100%",
+      72
+    ],
+    "controls": [
+      {
+        "frame": {
+          "type": "image",
+          "texture": "textures/fc/ui/slot",
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "controls": [
+            {
+              "img": {
+                "type": "image",
+                "size": [
+                  "100% - 4px",
+                  "100% - 4px"
+                ],
+                "layer": 2,
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_texture",
+                    "binding_type": "collection",
+                    "binding_collection_name": "form_buttons",
+                    "binding_name_override": "#texture"
+                  },
+                  {
+                    "binding_name": "#form_button_texture_file_system",
+                    "binding_type": "collection",
+                    "binding_collection_name": "form_buttons",
+                    "binding_name_override": "#texture_file_system"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "#form_button_text",
+        "binding_type": "collection",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(not ((#form_button_text - '§b§n§r§r') = #form_button_text))",
+        "target_property_name": "#visible"
+      }
+    ]
+  },
+  "banner_list": {
+    "type": "stack_panel",
+    "orientation": "vertical",
+    "size": [
+      "100%",
+      "100%c"
+    ],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "factory": {
+      "name": "buttons",
+      "control_ids": {
+        "button": "@fc_ui.banner_item",
+        "label": "@server_form.dynamic_label",
+        "header": "@server_form.dynamic_header",
+        "divider": "@settings_common.option_group_section_divider"
+      }
+    },
+    "collection_name": "form_buttons",
+    "bindings": [
+      {
+        "binding_name": "#form_button_contents",
+        "binding_name_override": "#collection_length"
+      }
+    ]
+  },
+  "action_item": {
+    "type": "panel",
+    "size": [
+      "100%",
+      27
+    ],
+    "controls": [
+      {
+        "go@common.button": {
+          "size": [
+            "100%",
+            24
+          ],
+          "$pressed_button_name": "button.form_button_click",
+          "default_control": "default",
+          "hover_control": "hover",
+          "pressed_control": "pressed",
+          "controls": [
+            {
+              "default": {
+                "type": "image",
+                "texture": "textures/fc/ui/btn_green",
+                "size": [
+                  "100%",
+                  "100%"
+                ]
+              }
+            },
+            {
+              "hover": {
+                "type": "image",
+                "texture": "textures/fc/ui/btn_green_hover",
+                "size": [
+                  "100%",
+                  "100%"
+                ]
+              }
+            },
+            {
+              "pressed": {
+                "type": "image",
+                "texture": "textures/fc/ui/btn_press",
+                "size": [
+                  "100%",
+                  "100%"
+                ]
+              }
+            },
+            {
+              "label": {
+                "type": "label",
+                "text": "#form_button_text",
+                "color": [
+                  1,
+                  1,
+                  1
+                ],
+                "shadow": true,
+                "layer": 3,
+                "font_type": "MinecraftTen",
+                "text_alignment": "center",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_text",
+                    "binding_type": "collection",
+                    "binding_collection_name": "form_buttons"
+                  }
+                ]
+              }
+            }
+          ],
+          "bindings": [
+            {
+              "binding_type": "collection_details",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_name": "#form_button_text",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#form_button_text - '§a§c§t§r') = #form_button_text))",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "locked@common.button": {
+          "size": [
+            "100%",
+            24
+          ],
+          "$pressed_button_name": "button.form_button_click",
+          "default_control": "default",
+          "hover_control": "hover",
+          "pressed_control": "pressed",
+          "controls": [
+            {
+              "default": {
+                "type": "image",
+                "texture": "textures/fc/ui/btn_locked",
+                "size": [
+                  "100%",
+                  "100%"
+                ]
+              }
+            },
+            {
+              "hover": {
+                "type": "image",
+                "texture": "textures/fc/ui/btn_hover",
+                "size": [
+                  "100%",
+                  "100%"
+                ]
+              }
+            },
+            {
+              "pressed": {
+                "type": "image",
+                "texture": "textures/fc/ui/btn_press",
+                "size": [
+                  "100%",
+                  "100%"
+                ]
+              }
+            },
+            {
+              "label": {
+                "type": "label",
+                "text": "#form_button_text",
+                "color": [
+                  1,
+                  1,
+                  1
+                ],
+                "shadow": true,
+                "layer": 3,
+                "font_type": "MinecraftTen",
+                "text_alignment": "center",
+                "bindings": [
+                  {
+                    "binding_name": "#form_button_text",
+                    "binding_type": "collection",
+                    "binding_collection_name": "form_buttons"
+                  }
+                ]
+              }
+            }
+          ],
+          "bindings": [
+            {
+              "binding_type": "collection_details",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_name": "#form_button_text",
+              "binding_type": "collection",
+              "binding_collection_name": "form_buttons"
+            },
+            {
+              "binding_type": "view",
+              "source_property_name": "(not ((#form_button_text - '§a§c§l§r') = #form_button_text))",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      }
+    ],
+    "bindings": [
+      {
+        "binding_name": "#form_button_text",
+        "binding_type": "collection",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "((not ((#form_button_text - '§a§c§t§r') = #form_button_text)) or (not ((#form_button_text - '§a§c§l§r') = #form_button_text)))",
+        "target_property_name": "#visible"
+      }
+    ]
+  },
+  "action_list": {
+    "type": "stack_panel",
+    "orientation": "vertical",
+    "size": [
+      "100%",
+      "100%c"
+    ],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "factory": {
+      "name": "buttons",
+      "control_ids": {
+        "button": "@fc_ui.action_item",
+        "label": "@server_form.dynamic_label",
+        "header": "@server_form.dynamic_header",
+        "divider": "@settings_common.option_group_section_divider"
+      }
+    },
+    "collection_name": "form_buttons",
+    "bindings": [
+      {
+        "binding_name": "#form_button_contents",
+        "binding_name_override": "#collection_length"
+      }
+    ]
+  },
+  "tile_button@common.button": {
+    "size": [
+      "100% - 3px",
+      "100% - 3px"
+    ],
+    "$pressed_button_name": "button.form_button_click",
+    "default_control": "default",
+    "hover_control": "hover",
+    "pressed_control": "pressed",
+    "controls": [
+      {
+        "default": {
+          "type": "image",
+          "texture": "textures/fc/ui/card",
+          "size": [
+            "100%",
+            "100%"
+          ]
+        }
+      },
+      {
+        "hover": {
+          "type": "image",
+          "texture": "textures/fc/ui/card_hover",
+          "size": [
+            "100%",
+            "100%"
+          ]
+        }
+      },
+      {
+        "pressed": {
+          "type": "image",
+          "texture": "textures/fc/ui/btn_press",
+          "size": [
+            "100%",
+            "100%"
+          ]
+        }
+      },
+      {
+        "content": {
+          "type": "stack_panel",
+          "orientation": "horizontal",
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "layer": 2,
+          "controls": [
+            {
+              "pad_l": {
+                "type": "panel",
+                "size": [
+                  4,
+                  "100%"
+                ]
+              }
+            },
+            {
+              "slot": {
+                "type": "panel",
+                "size": [
+                  30,
+                  "100%"
+                ],
+                "controls": [
+                  {
+                    "frame": {
+                      "type": "image",
+                      "texture": "textures/fc/ui/slot",
+                      "size": [
+                        30,
+                        30
+                      ],
+                      "controls": [
+                        {
+                          "icon": {
+                            "type": "panel",
+                            "size": [
+                              24,
+                              24
+                            ],
+                            "controls": [
+                              {
+                                "img": {
+                                  "type": "image",
+                                  "size": [
+                                    24,
+                                    24
+                                  ],
+                                  "layer": 3,
+                                  "bindings": [
+                                    {
+                                      "binding_name": "#form_button_texture",
+                                      "binding_type": "collection",
+                                      "binding_collection_name": "form_buttons",
+                                      "binding_name_override": "#texture"
+                                    },
+                                    {
+                                      "binding_name": "#form_button_texture_file_system",
+                                      "binding_type": "collection",
+                                      "binding_collection_name": "form_buttons",
+                                      "binding_name_override": "#texture_file_system"
+                                    },
+                                    {
+                                      "binding_type": "view",
+                                      "source_property_name": "(not ((#texture = '') or (#texture = 'loading')))",
+                                      "target_property_name": "#visible"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "pad_m": {
+                "type": "panel",
+                "size": [
+                  5,
+                  "100%"
+                ]
+              }
+            },
+            {
+              "text": {
+                "type": "panel",
+                "size": [
+                  "fill",
+                  "100%"
+                ],
+                "controls": [
+                  {
+                    "lbl": {
+                      "type": "label",
+                      "size": [
+                        "100%",
+                        "default"
+                      ],
+                      "text": "#form_button_text",
+                      "color": [
+                        0.9,
+                        0.96,
+                        1.0
+                      ],
+                      "shadow": true,
+                      "layer": 3,
+                      "font_scale_factor": 0.8,
+                      "bindings": [
+                        {
+                          "binding_name": "#form_button_text",
+                          "binding_type": "collection",
+                          "binding_collection_name": "form_buttons"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "bindings": [
+      {
+        "binding_type": "collection_details",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_name": "#form_button_text",
+        "binding_type": "collection",
+        "binding_collection_name": "form_buttons"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(not ((#form_button_text - '§t§i§l§r') = #form_button_text))",
+        "target_property_name": "#visible"
+      }
+    ]
+  },
+  "tile_cell": {
+    "type": "panel",
+    "size": [
+      "50%",
+      44
+    ],
+    "controls": [
+      {
+        "tile@fc_ui.tile_button": {}
+      }
+    ]
+  },
+  "tiles_grid": {
+    "type": "grid",
+    "size": [
+      "100%",
+      308
+    ],
+    "grid_dimensions": [
+      2,
+      7
+    ],
+    "grid_item_template": "fc_ui.tile_cell",
+    "grid_fill_direction": "horizontal",
+    "collection_name": "form_buttons",
+    "anchor_from": "top_left",
+    "anchor_to": "top_left"
+  },
+  "tiles_padded": {
+    "type": "stack_panel",
+    "orientation": "vertical",
+    "size": [
+      "100%",
+      "100%c"
+    ],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "controls": [
+      {
+        "top": {
+          "type": "panel",
+          "size": [
+            "100%",
+            3
+          ]
+        }
+      },
+      {
+        "row": {
+          "type": "stack_panel",
+          "orientation": "horizontal",
+          "size": [
+            "100%",
+            "100%c"
+          ],
+          "controls": [
+            {
+              "l": {
+                "type": "panel",
+                "size": [
+                  3,
+                  1
+                ]
+              }
+            },
+            {
+              "grid@fc_ui.tiles_grid": {
+                "size": [
+                  "fill",
+                  308
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "board_form": {
+    "type": "panel",
+    "size": [
+      "100%",
+      "100%"
+    ],
+    "bindings": [
+      {
+        "binding_name": "#title_text"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(not ((#title_text - '§b§o§a§r') = #title_text))",
+        "target_property_name": "#visible"
+      }
+    ],
+    "controls": [
+      {
+        "layout": {
+          "type": "panel",
+          "size": [
+            "100%",
+            "100%"
+          ],
+          "controls": [
+            {
+              "dim": {
+                "type": "image",
+                "texture": "textures/fc/ui/dim",
+                "size": [
+                  "100%",
+                  "100%"
+                ],
+                "alpha": 0.5,
+                "layer": 0
+              }
+            },
+            {
+              "window": {
+                "type": "image",
+                "texture": "textures/fc/ui/panel",
+                "size": [
+                  "100% - 16px",
+                  "100% - 12px"
+                ],
+                "max_size": [
+                  520,
+                  290
+                ],
+                "layer": 1,
+                "controls": [
+                  {
+                    "inner": {
+                      "type": "panel",
+                      "size": [
+                        "100% - 12px",
+                        "100% - 12px"
+                      ],
+                      "layer": 1,
+                      "controls": [
+                        {
+                          "rows": {
+                            "type": "stack_panel",
+                            "orientation": "vertical",
+                            "size": [
+                              "100%",
+                              "100%"
+                            ],
+                            "controls": [
+                              {
+                                "header@fc_ui.header": {}
+                              },
+                              {
+                                "gap": {
+                                  "type": "panel",
+                                  "size": [
+                                    "100%",
+                                    4
+                                  ]
+                                }
+                              },
+                              {
+                                "cols": {
+                                  "type": "stack_panel",
+                                  "orientation": "horizontal",
+                                  "size": [
+                                    "100%",
+                                    "fill"
+                                  ],
+                                  "controls": [
+                                    {
+                                      "left": {
+                                        "type": "stack_panel",
+                                        "orientation": "vertical",
+                                        "size": [
+                                          "35%",
+                                          "100%"
+                                        ],
+                                        "controls": [
+                                          {
+                                            "banner@fc_ui.banner_list": {}
+                                          },
+                                          {
+                                            "gap1": {
+                                              "type": "panel",
+                                              "size": [
+                                                "100%",
+                                                3
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "body": {
+                                              "type": "image",
+                                              "texture": "textures/fc/ui/inner",
+                                              "size": [
+                                                "100%",
+                                                "fill"
+                                              ],
+                                              "controls": [
+                                                {
+                                                  "scroll": {
+                                                    "type": "panel",
+                                                    "size": [
+                                                      "100%",
+                                                      "100%"
+                                                    ],
+                                                    "controls": [
+                                                      {
+                                                        "scroll@common.scrolling_panel": {
+                                                          "anchor_to": "top_left",
+                                                          "anchor_from": "top_left",
+                                                          "size": [
+                                                            "100% - 4px",
+                                                            "100% - 4px"
+                                                          ],
+                                                          "offset": [
+                                                            2,
+                                                            2
+                                                          ],
+                                                          "$show_background": false,
+                                                          "$scrolling_content": "fc_ui.body_text",
+                                                          "$scroll_size": [
+                                                            4,
+                                                            "100% - 4px"
+                                                          ],
+                                                          "$scrolling_pane_size": [
+                                                            "100% - 2px",
+                                                            "100%"
+                                                          ],
+                                                          "$scrolling_pane_offset": [
+                                                            0,
+                                                            0
+                                                          ],
+                                                          "$scroll_bar_right_padding_size": [
+                                                            0,
+                                                            0
+                                                          ]
+                                                        }
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "gap2": {
+                                              "type": "panel",
+                                              "size": [
+                                                "100%",
+                                                3
+                                              ]
+                                            }
+                                          },
+                                          {
+                                            "actions@fc_ui.action_list": {}
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "gap": {
+                                        "type": "panel",
+                                        "size": [
+                                          5,
+                                          "100%"
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "tiles": {
+                                        "type": "image",
+                                        "texture": "textures/fc/ui/inner",
+                                        "size": [
+                                          "fill",
+                                          "100%"
+                                        ],
+                                        "controls": [
+                                          {
+                                            "scroll": {
+                                              "type": "panel",
+                                              "size": [
+                                                "100%",
+                                                "100%"
+                                              ],
+                                              "controls": [
+                                                {
+                                                  "scroll@common.scrolling_panel": {
+                                                    "anchor_to": "top_left",
+                                                    "anchor_from": "top_left",
+                                                    "size": [
+                                                      "100% - 4px",
+                                                      "100% - 4px"
+                                                    ],
+                                                    "offset": [
+                                                      2,
+                                                      2
+                                                    ],
+                                                    "$show_background": false,
+                                                    "$scrolling_content": "fc_ui.tiles_padded",
+                                                    "$scroll_size": [
+                                                      4,
+                                                      "100% - 4px"
+                                                    ],
+                                                    "$scrolling_pane_size": [
+                                                      "100% - 2px",
+                                                      "100%"
+                                                    ],
+                                                    "$scrolling_pane_offset": [
+                                                      0,
+                                                      0
+                                                    ],
+                                                    "$scroll_bar_right_padding_size": [
+                                                      0,
+                                                      0
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
             }
           ]
         }

@@ -140,7 +140,8 @@ export const setOnRanksChanged = (fn) => { onRanksChanged = fn; };
 export function chatTagsFor(player, alliesOf) {
   const p = S.playerData(player);
   const f = S.getFaction(p.faction);
-  const tags = [`fcprefix:${rankPrefix(player)}${f ? `§7[§${f.color}${f.name}§7] ` : ""}`];
+  const badge = p.rebirths ? `§6[R${p.rebirths}] ` : "";
+  const tags = [`fcprefix:${badge}${rankPrefix(player)}${f ? `§7[§${f.color}${f.name}§7] ` : ""}`];
   const mode = f ? p.chatMode ?? "public" : "public";
   tags.push(`fcmode:${mode}`);
   if (f) {

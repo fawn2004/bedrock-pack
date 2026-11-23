@@ -104,6 +104,30 @@ New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can t
   - The **Sell Wand** sells everything in a chest.
 - **Shards and Mystery Spawners:** XP Shards, Power Shards, and Mystery Spawners (a random spawner, sometimes Iron Golem).
 
+### Quest lines, Quest Levels and rebirth
+Open **Quests** in `/menu`, or type `/quests`.
+**Every item you sell to the server counts toward its quest line.** Use Sell All, Sell Hand, a sell wand, crawler sales or crawler auto-sell.
+
+| Line | Items |
+|---|---|
+| Lumberjack | Oak, Spruce, Mangrove and Cherry logs, Crimson and Warped stems |
+| Miner | Copper, Amethyst, Iron, Quartz, Emerald (raw ores count too) |
+| Farmer | Bamboo, Nether Wart, Beetroot, Pumpkin, Carrot, Potato, Cactus |
+| Monster Hunter | Leather, Feather, Slime Ball, Rabbit Hide, Bone, Beef, Gunpowder, Porkchop, Spider Eye, Honeycomb |
+
+- **Tiers:** each item has **5 tiers**, at 1x, 3x, 8x, 20x and 50x its base amount (for example 400 / 1,200 / 3,200 / 8,000 / 20,000 Oak Logs).
+- **Quest Levels:** every tier reached is worth **1 Quest Level**. The four lines have 140 tiers between them, and Quest Levels go up to **100**.
+- **Quest Master:** every Quest Level has a reward to claim (crate keys and money; Legendary keys every 10 levels, Mythic keys at 50 and 100).
+  Your quest rank climbs from Rookie through Elite, Veteran, Master and Champion to Legend.
+- **Finishing a line:** maxing every item in a line gives its **chat rank** (Lumberjack, Miner, Farmer or Monster Hunter).
+- **Rebirth Oracle** (`/rebirth`): at Quest Level 100 with all 100 rewards claimed, you can rebirth.
+  - **What resets:** every quest line, your claimed levels and your quest rank.
+  - **What you keep:** money, keys and items.
+  - **What you get:** $25M, 16 spawners, 8 Mythic keys, 16 Epic keys, a permanent **sell bonus** (x2 after the first rebirth, x3 after the second, up to x6), and an `[R1]`, `[R2]`... badge in chat.
+
+Each quest page shows a picture banner, line progress, the item closest to its next tier and a **SELL NOW** button. Next to that is a card for every item, with its tier and progress bar.
+The old daily quests are still there, under **Daily Quests** on the Quest Master page.
+
 ### Kits
 Open **Kits** in `/menu` or type `/kit`. You pay each time you claim a kit, then wait for its cooldown.
 
@@ -219,6 +243,7 @@ Ranks are player tags, so the vanilla `/tag` command gives and removes them:
 | `/shop`, `/sell hand\|all`, `/pay <player> <amount>`, `/bal [player]` | money |
 | `/ah`, `/ah sell <price>` | auction house |
 | `/crates`, `/daily`, `/kit [name]`, `/bounty <player> <amount>` | rewards |
+| `/quests`, `/rebirth` | Quest Master and Rebirth Oracle |
 | `/home [name]`, `/sethome [name]`, `/delhome [name]`, `/spawn`, `/wild`, `/warp [name]` | teleports |
 | `/f chat public\|faction\|ally` | where your normal chat goes |
 | `/mute <player> [minutes]`, `/unmute <player>` | operators: mute players |
@@ -264,5 +289,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 118 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 134 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

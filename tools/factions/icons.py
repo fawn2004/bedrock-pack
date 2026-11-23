@@ -612,6 +612,24 @@ def egg(c=GREEN, spot=WHITE):
     return i
 
 
+def axe():
+    i = Icon()
+    i.shape(poly([(70, 230), (46, 206), (170, 82), (194, 106)]), BROWN)
+    i.shape(poly([(130, 40), (200, 20), (236, 80), (206, 120), (150, 86)]), ((235, 240, 250), (140, 150, 170)))
+    i.shape(ell((40, 150, 120, 190)), GREEN, outline=5)
+    return i
+
+
+def phoenix():
+    i = Icon()
+    i.shape(poly([(128, 120), (20, 40), (40, 110), (10, 120), (60, 160), (110, 150)]), ORANGE)
+    i.shape(poly([(128, 120), (236, 40), (216, 110), (246, 120), (196, 160), (146, 150)]), ORANGE)
+    i.shape(poly([(128, 70), (160, 110), (150, 190), (128, 236), (106, 190), (96, 110)]), GOLD)
+    i.shape(ell((106, 40, 150, 84)), RED, outline=5)
+    i.shape(poly(star_pts(128, 30, 22, 9)), GOLD, outline=4)
+    return i
+
+
 BOSS_EGGS = {1: (((120, 210, 90), (40, 110, 40)), ((60, 40, 30), (30, 20, 15))),
              2: (((90, 90, 100), (25, 25, 32)), ((230, 225, 210), (170, 165, 150))),
              3: (((255, 150, 50), (190, 50, 10)), ((255, 235, 120), (230, 160, 40))),
@@ -635,7 +653,7 @@ def build_icons():
         "genbucket_sand": bucket(((255, 235, 160), (220, 190, 100))), "chunk_buster": tnt(PURPLE, "CB"), "sell_wand": wand(),
         "xp_shard": shard(LIME), "power_shard": shard(RED), "haste": pickaxe(), "speed": boot(), "mail": envelope(),
         "spawn": beacon(), "wild": tree(), "nether": portal(), "end": eye(), "menu": star4(), "power": lightning(),
-        "kit": chestplate(), "boss": horned_skull(),
+        "kit": chestplate(), "boss": horned_skull(), "lumberjack": axe(), "rebirth": phoenix(),
     }
     for t, (c, s) in BOSS_EGGS.items():
         icons[f"boss_egg_{t}"] = egg(c, s)
@@ -643,6 +661,75 @@ def build_icons():
         icons[f"key_{r}"] = key(c)
         icons[f"book_{r}"] = book(c)
     return {k: v.done() for k, v in icons.items()}
+
+
+def scene(kind):
+    """512x256 banner art for the quest screens, scaled to 256x128."""
+    W, H = 512, 256
+    img = Image.new("RGBA", (W, H))
+    d = ImageDraw.Draw(img)
+
+    def sky(top, bottom):
+        for y in range(H):
+            t = y / H
+            d.line([(0, y), (W, y)], fill=tuple(int(top[k] + (bottom[k] - top[k]) * t) for k in range(3)) + (255,))
+    import random
+    rnd = random.Random(kind)
+    if kind == "lumberjack":
+        sky((40, 70, 60), (120, 150, 90))
+        for x in range(-20, W, 46):
+            h = rnd.randint(90, 160)
+            d.polygon([(x, 210), (x + 30, 210 - h), (x + 60, 210)], fill=(20 + rnd.randint(0, 20), 60 + rnd.randint(0, 30), 35, 255))
+        d.rectangle((0, 200, W, H), fill=(90, 120, 50, 255))
+        d.ellipse((190, 175, 322, 215), fill=(120, 80, 45, 255))
+        d.rectangle((196, 150, 316, 196), fill=(140, 95, 55, 255))
+        d.ellipse((196, 135, 316, 165), fill=(200, 160, 110, 255))
+        icon = axe()
+    elif kind == "miner":
+        sky((15, 20, 40), (40, 45, 70))
+        for x in range(0, W, 40):
+            d.polygon([(x, 0), (x + 20, rnd.randint(30, 80)), (x + 40, 0)], fill=(30, 32, 50, 255))
+        for x in (60, 120, 400, 450):
+            d.polygon([(x, 230), (x + 14, 160), (x + 28, 230)], fill=(170, 110, 255, 255))
+        d.rectangle((0, 225, W, H), fill=(45, 45, 60, 255))
+        for x in (90, 420):
+            d.ellipse((x, 140, x + 20, 160), fill=(255, 140, 60, 200))
+        icon = pickaxe()
+    elif kind == "farmer":
+        sky((110, 190, 255), (200, 235, 255))
+        d.ellipse((400, 30, 460, 90), fill=(255, 235, 120, 255))
+        for cx in (90, 160):
+            d.ellipse((cx, 30, cx + 70, 60), fill=(255, 255, 255, 230))
+        d.rectangle((0, 180, W, H), fill=(230, 190, 80, 255))
+        for x in range(0, W, 8):
+            d.line([(x, 180), (x + 3, 165 + rnd.randint(0, 10))], fill=(210, 160, 50, 255), width=3)
+        d.ellipse((0, 150, W, 230), fill=(120, 190, 80, 120))
+        icon = wheat()
+    elif kind == "monster":
+        sky((60, 10, 20), (140, 30, 40))
+        d.ellipse((176, 20, 336, 180), fill=(240, 200, 200, 255))
+        for x in range(10, W, 70):
+            d.rectangle((x, 175, x + 8, 225), fill=(20, 10, 12, 255))
+            d.rectangle((x - 12, 188, x + 20, 196), fill=(20, 10, 12, 255))
+        d.rectangle((0, 220, W, H), fill=(25, 10, 14, 255))
+        icon = skull()
+    elif kind == "rebirth":
+        sky((40, 15, 70), (20, 8, 40))
+        import math
+        for k in range(24):
+            a = math.radians(k * 15)
+            d.polygon([(256, 128), (256 + 400 * math.cos(a), 128 + 400 * math.sin(a)), (256 + 400 * math.cos(a + 0.12), 128 + 400 * math.sin(a + 0.12))], fill=(120, 60, 200, 120))
+        d.ellipse((136, 200, 376, 240), fill=(170, 110, 255, 255))
+        icon = phoenix()
+    else:  # quest master
+        sky((25, 30, 80), (60, 40, 110))
+        for _ in range(60):
+            x, y = rnd.randint(0, W), rnd.randint(0, H)
+            d.ellipse((x, y, x + 3, y + 3), fill=(255, 255, 255, 200))
+        icon = book(PURPLE)
+    art = icon.done(170)
+    img.alpha_composite(art, ((W - 170) // 2, (H - 170) // 2 - 10))
+    return img.resize((256, 128), Image.LANCZOS)
 
 
 def build_logo(size=128):

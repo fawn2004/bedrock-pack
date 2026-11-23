@@ -9,7 +9,11 @@ import { CONFIG } from "./config.js";
 import * as R from "./rules.js";
 import { Fail } from "./economy.js";
 
-export const MARK = { hub: "§h§u§b§r", list: "§l§s§t§r", modal: "§m§d§l§r", card: "§c§r§d§r" };
+export const MARK = {
+  hub: "§h§u§b§r", list: "§l§s§t§r", modal: "§m§d§l§r", card: "§c§r§d§r",
+  // "board" layout (quests): banner + text + action buttons | grid of tiles
+  board: "§b§o§a§r", tile: "§t§i§l§r", banner: "§b§n§r§r", action: "§a§c§t§r", locked: "§a§c§l§r",
+};
 /** Our icon by name ("coin"), or any full texture path ("textures/items/diamond"). */
 export const ICON = (name) => (name.includes("/") ? name : `textures/fc/ui/icons/${name}`);
 
@@ -73,6 +77,24 @@ export async function menu(player, { title, body = "", buttons, back = undefined
   if (res.canceled || res.selection === undefined) return;
   R.sound(player, "random.click", 1.2, 0.5);
   await all[res.selection].action?.();
+}
+
+/**
+ * The board layout used by the quest screens:
+ * left = banner picture, text and big action buttons; right = grid of tiles.
+ * tiles: [{ text, icon, action }], actions: [{ text, locked, action }], banner: texture path.
+ */
+export async function board(player, { title, body, tiles, banner, actions }) {
+  const form = new ActionFormData().title(MARK.board + title).body(body);
+  const all = [];
+  for (const t of tiles) { form.button(MARK.tile + t.text, ICON(t.icon)); all.push(t.action); }
+  form.button(MARK.banner, ICON(banner));
+  all.push(undefined);
+  for (const a of actions) { form.button((a.locked ? MARK.locked : MARK.action) + a.text); all.push(a.action); }
+  const res = await show(player, form);
+  if (res.canceled || res.selection === undefined) return;
+  R.sound(player, "random.click", 1.2, 0.5);
+  await all[res.selection]?.();
 }
 
 /** An input form. `build(form)` adds the fields. Returns the values or undefined. */

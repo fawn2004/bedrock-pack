@@ -249,6 +249,8 @@ export function setupCommands() {
     }, 1);
     simple("ah", "Auction house: /ah or /ah sell <price>", (pl, a) => (a[0] === "sell" ? AH.list(pl, need(a[1], "/ah sell <price>")) : M.auctionMenu(pl)), 2);
     simple("crates", "Open the crates menu", (pl) => M.cratesMenu(pl));
+    simple("quests", "Quest Master: quest lines, Quest Levels and rebirth", (pl) => M.questMasterMenu(pl));
+    simple("rebirth", "Open the Rebirth Oracle", (pl) => M.rebirthMenu(pl));
     simple("kit", "Kit shop: /kit or /kit <name>", (pl, a) => (a[0] ? Kt.claimKit(pl, a[0]) : M.kitsMenu(pl)), 1);
     simple("daily", "Claim your daily reward", (pl) => claimDaily(pl));
     simple("bounty", "Place a bounty: /bounty <player> <amount>", (pl, a) => placeBounty(pl, need(a[0], "/bounty <player> <amount>"), need(a[1], "/bounty <player> <amount>")), 2);

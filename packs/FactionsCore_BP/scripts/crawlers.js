@@ -7,7 +7,7 @@ import * as S from "./store.js";
 import * as R from "./rules.js";
 import * as E from "./economy.js";
 import { CRAWLERS, CRAWLER_TIERS, crawlerItem, giveItem } from "./items.js";
-import { sellPriceOf, paySale } from "./shop.js";
+import { sellPriceOf, paySale, paySaleRecord } from "./shop.js";
 import { questEvent } from "./quests.js";
 
 export const ENTITY = "fc:crawler";
@@ -144,12 +144,13 @@ export function sellStorage(player, ent) {
   const total = Math.floor(storedValue(c));
   const n = stored(c);
   if (!n) E.fail("Nothing to sell yet.");
+  const items = Object.fromEntries(Object.entries(c.storage).map(([id, k]) => [`minecraft:${id}`, k]));
   c.storage = {};
-  c.sold += total;
+  const paid = paySale(player, total, items);
+  c.sold += paid;
   save(ent, c);
-  paySale(player, total);
   questEvent(player, "crawler", n);
-  R.tell(player, `Sold §e${n}§r ores for §a${E.money(total)}§r.`);
+  R.tell(player, `Sold §e${n}§r ores for §a${E.money(paid)}§r.`);
 }
 
 export function buyUpgrade(player, ent, id) {
@@ -241,7 +242,7 @@ function work(ent) {
   if (c.upgrades.autosell) {
     const total = Math.floor(sellPriceOf(`minecraft:${id}`) * n);
     const owner = S.getPlayerRecord(c.owner);
-    if (owner && total > 0) { E.addMoney(owner, total); c.sold += total; }
+    if (owner && total > 0) c.sold += paySaleRecord(owner, total, { [`minecraft:${id}`]: n });
   } else if (stored(c) < capacity(c)) {
     c.storage[id] = (c.storage[id] ?? 0) + Math.min(n, capacity(c) - stored(c));
   }

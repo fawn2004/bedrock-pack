@@ -206,7 +206,7 @@ export function setupItemUse() {
         if (!inv) E.fail("That has no inventory.");
         const r = sellContainer(inv);
         if (!r.count) E.fail("Nothing sellable in there.");
-        paySale(player, r.total);
+        const paid = paySale(player, r.total, r.items);
         const held = player.getComponent("minecraft:inventory").container.getItem(player.selectedSlotIndex);
         const uses = Number(held?.getDynamicProperty("uses") ?? 1) - 1;
         if (uses <= 0) { consumeHeld(player, "fc:sell_wand"); R.tell(player, "§cYour sell wand broke."); } else if (held) {
@@ -214,7 +214,7 @@ export function setupItemUse() {
           held.setLore(held.getLore().map((l) => (l.includes("Uses left") ? `§r§eUses left: ${uses}` : l)));
           player.getComponent("minecraft:inventory").container.setItem(player.selectedSlotIndex, held);
         }
-        R.tell(player, `Sold §e${r.count}§r items for §a${E.money(r.total)}§r.`);
+        R.tell(player, `Sold §e${r.count}§r items for §a${E.money(paid)}§r.`);
       });
     }
     // Any other custom item tapped on a block acts like using it in the air.

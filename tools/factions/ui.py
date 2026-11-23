@@ -9,7 +9,7 @@ every other form (vanilla or other add-ons) is left exactly as it was.
 
 The HUD gets a sidebar that shows the last title starting with "fchud:".
 """
-from markers import HUB, LIST, MODAL, CARD, HUD
+from markers import HUB, LIST, MODAL, CARD, HUD, BOARD, TILE, BANNER, ACTION, LOCKED
 
 T = "textures/fc/ui/"
 TEXT = [0.9, 0.96, 1.0]
@@ -116,7 +116,7 @@ def header():
         "type": "label", "size": ["fill", "default"], "text": "#fc_title", "color": ACCENT, "shadow": True, "layer": 3,
         "font_type": "MinecraftTen", "font_scale_factor": 1.0,
         "bindings": [{"binding_name": "#title_text"},
-                     {"binding_type": "view", "source_property_name": f"(#title_text - '{HUB}' - '{LIST}' - '{MODAL}')", "target_property_name": "#fc_title"}],
+                     {"binding_type": "view", "source_property_name": f"(#title_text - '{HUB}' - '{LIST}' - '{MODAL}' - '{BOARD}')", "target_property_name": "#fc_title"}],
     }
     close = {
         "size": [16, 16],
@@ -155,6 +155,92 @@ def window(max_size, inner):
             {"window": image("panel", ("100% - 16px", "100% - 12px"), max_size=max_size, layer=1, controls=[
                 {"inner": {"type": "panel", "size": ["100% - 12px", "100% - 12px"], "layer": 1, "controls": inner}}])},
         ]}
+
+
+def big_button(tex, hover, press, visible):
+    """A full-width button with centred text (SELL NOW, CLAIM...)."""
+    return {
+        "size": ["100%", 24],
+        "$pressed_button_name": "button.form_button_click",
+        "default_control": "default", "hover_control": "hover", "pressed_control": "pressed",
+        "controls": button_states(tex, hover, press) + [
+            {"label": {"type": "label", "text": "#form_button_text", "color": [1, 1, 1], "shadow": True, "layer": 3,
+                       "font_type": "MinecraftTen", "text_alignment": "center", "bindings": [coll("#form_button_text")]}},
+        ],
+        "bindings": [
+            {"binding_type": "collection_details", "binding_collection_name": "form_buttons"},
+            coll("#form_button_text"),
+            {"binding_type": "view", "source_property_name": visible, "target_property_name": "#visible"},
+        ],
+    }
+
+
+def board_pieces():
+    """Pieces of the quest "board" layout."""
+    is_action = has(ACTION, "#form_button_text")
+    is_locked = has(LOCKED, "#form_button_text")
+    return {
+        # banner: the picture of the button marked BANNER
+        "banner_item": {"type": "panel", "size": ["100%", 72], "controls": [
+            {"frame": image("slot", ("100%", "100%"), controls=[{"img": {
+                "type": "image", "size": ["100% - 4px", "100% - 4px"], "layer": 2,
+                "bindings": [coll("#form_button_texture", "#texture"), coll("#form_button_texture_file_system", "#texture_file_system")]}}])}],
+            "bindings": [coll("#form_button_text"), {"binding_type": "view", "source_property_name": has(BANNER, "#form_button_text"), "target_property_name": "#visible"}]},
+        "banner_list": button_list("@fc_ui.banner_item"),
+        # action buttons: green, or grey when locked
+        "action_item": {"type": "panel", "size": ["100%", 27], "controls": [
+            {"go@common.button": big_button("btn_green", "btn_green_hover", "btn_press", is_action)},
+            {"locked@common.button": big_button("btn_locked", "btn_hover", "btn_press", is_locked)}],
+            "bindings": [coll("#form_button_text"), {"binding_type": "view", "source_property_name": f"({is_action} or {is_locked})", "target_property_name": "#visible"}]},
+        "action_list": button_list("@fc_ui.action_item"),
+        # tiles: icon in a slot + up to 3 lines of text
+        "tile_button@common.button": {
+            "size": ["100% - 3px", "100% - 3px"],
+            "$pressed_button_name": "button.form_button_click",
+            "default_control": "default", "hover_control": "hover", "pressed_control": "pressed",
+            "controls": button_states("card", "card_hover", "btn_press") + [
+                {"content": {"type": "stack_panel", "orientation": "horizontal", "size": ["100%", "100%"], "layer": 2, "controls": [
+                    {"pad_l": pad(4, "100%")},
+                    {"slot": {"type": "panel", "size": [30, "100%"], "controls": [{"frame": image("slot", (30, 30), controls=[{"icon": icon_from_button(24)}])}]}},
+                    {"pad_m": pad(5, "100%")},
+                    {"text": {"type": "panel", "size": ["fill", "100%"], "controls": [{"lbl": {
+                        "type": "label", "size": ["100%", "default"], "text": "#form_button_text", "color": TEXT, "shadow": True, "layer": 3,
+                        "font_scale_factor": 0.8, "bindings": [coll("#form_button_text")]}}]}},
+                ]}},
+            ],
+            "bindings": [
+                {"binding_type": "collection_details", "binding_collection_name": "form_buttons"},
+                coll("#form_button_text"),
+                {"binding_type": "view", "source_property_name": has(TILE, "#form_button_text"), "target_property_name": "#visible"},
+            ],
+        },
+        "tile_cell": {"type": "panel", "size": ["50%", 44], "controls": [{"tile@fc_ui.tile_button": {}}]},
+        "tiles_grid": {"type": "grid", "size": ["100%", 308], "grid_dimensions": [2, 7], "grid_item_template": "fc_ui.tile_cell",
+                       "grid_fill_direction": "horizontal", "collection_name": "form_buttons", "anchor_from": "top_left", "anchor_to": "top_left"},
+        "tiles_padded": {"type": "stack_panel", "orientation": "vertical", "size": ["100%", "100%c"], "anchor_from": "top_left", "anchor_to": "top_left", "controls": [
+            {"top": pad("100%", 3)},
+            {"row": {"type": "stack_panel", "orientation": "horizontal", "size": ["100%", "100%c"], "controls": [
+                {"l": pad(3, 1)}, {"grid@fc_ui.tiles_grid": {"size": ["fill", 308]}}]}}]},
+        "board_form": {
+            "type": "panel", "size": ["100%", "100%"],
+            "bindings": [{"binding_name": "#title_text"}, {"binding_type": "view", "source_property_name": has(BOARD), "target_property_name": "#visible"}],
+            "controls": [{"layout": window([520, 290], [{"rows": {"type": "stack_panel", "orientation": "vertical", "size": ["100%", "100%"], "controls": [
+                {"header@fc_ui.header": {}},
+                {"gap": pad("100%", 4)},
+                {"cols": {"type": "stack_panel", "orientation": "horizontal", "size": ["100%", "fill"], "controls": [
+                    {"left": {"type": "stack_panel", "orientation": "vertical", "size": ["35%", "100%"], "controls": [
+                        {"banner@fc_ui.banner_list": {}},
+                        {"gap1": pad("100%", 3)},
+                        {"body": image("inner", ("100%", "fill"), controls=[{"scroll": scroll("fc_ui.body_text")}])},
+                        {"gap2": pad("100%", 3)},
+                        {"actions@fc_ui.action_list": {}},
+                    ]}},
+                    {"gap": pad(5, "100%")},
+                    {"tiles": image("inner", ("fill", "100%"), controls=[{"scroll": scroll("fc_ui.tiles_padded")}])},
+                ]}},
+            ]}}])}],
+        },
+    }
 
 
 def files():
@@ -224,7 +310,7 @@ def files():
                 {"body": image("inner", ("100%", "fill"), controls=[{"scroll": scroll("server_form.custom_form_scrolling_content")}])},
             ]}}])}],
         },
-        "long_root": {"type": "panel", "size": ["100%", "100%"], "controls": [{"hub@fc_ui.hub_form": {}}, {"list@fc_ui.list_form": {}}]},
+        "long_root": {"type": "panel", "size": ["100%", "100%"], "controls": [{"hub@fc_ui.hub_form": {}}, {"list@fc_ui.list_form": {}}, {"board@fc_ui.board_form": {}}]},
         "custom_root": {"type": "panel", "size": ["100%", "100%"], "controls": [{"modal@fc_ui.modal_form": {}}]},
 
         # ---------------- HUD sidebar (keeps the last "fchud:" title)
@@ -252,6 +338,8 @@ def files():
                      "controls": [{"hud_label@fc_ui.hud_label": {}}]}}]},
     }
 
+    ns.update(board_pieces())
+
     server_form = {
         "namespace": "server_form",
         "main_screen_content": {
@@ -263,7 +351,7 @@ def files():
         },
         "long_form": {"modifications": [{"array_name": "bindings", "operation": "insert_back", "value": [
             {"binding_name": "#title_text"},
-            {"binding_type": "view", "source_property_name": lacks(HUB, LIST), "target_property_name": "#visible"}]}]},
+            {"binding_type": "view", "source_property_name": lacks(HUB, LIST, BOARD), "target_property_name": "#visible"}]}]},
         "custom_form": {"modifications": [{"array_name": "bindings", "operation": "insert_back", "value": [
             {"binding_name": "#title_text"},
             {"binding_type": "view", "source_property_name": lacks(MODAL), "target_property_name": "#visible"}]}]},

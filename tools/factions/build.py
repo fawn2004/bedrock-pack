@@ -256,6 +256,8 @@ def build_rp_art():
     for name, img in ic.items():
         save_png(img, RP, "textures", "fc", "ui", "icons", f"{name}.png")
     save_png(icons.build_logo(128), RP, "textures", "fc", "ui", "logo.png")
+    for kind in ("lumberjack", "miner", "farmer", "monster", "questmaster", "rebirth"):
+        save_png(icons.scene(kind), RP, "textures", "fc", "ui", "banners", f"{kind}.png")
 
     for name, (img, nine, base) in art.ui_textures().items():
         save_png(img, RP, "textures", "fc", "ui", f"{name}.png")

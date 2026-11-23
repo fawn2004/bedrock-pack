@@ -26,6 +26,7 @@ import { autoclaimers } from "./tasks.js";
 import * as Rk from "./ranks.js";
 import { VERSION } from "./version.js";
 import * as Kt from "./kits.js";
+import * as QL from "./questlines.js";
 import { bossInfo } from "./bosses.js";
 
 const { attempt } = UI;
@@ -81,7 +82,7 @@ async function hubScreen(player) {
     { text: "ENCHANTER", sub: "Custom Enchants", icon: "enchant", action: () => enchanterMenu(player) },
     { text: "F-TOP", sub: "Faction Rankings", icon: "ftop", action: () => ftopMenu(player) },
     { text: "DAILY REWARDS", sub: "Claim Rewards", icon: "daily", action: () => dailyMenu(player) },
-    { text: "QUESTS", sub: "Complete Tasks", icon: "quests", action: () => questsMenu(player) },
+    { text: "QUESTS", sub: "Quest Lines & Rebirth", icon: "quests", action: () => questMasterMenu(player) },
     { text: "AUCTION HOUSE", sub: "Buy & Sell", icon: "auction", action: () => auctionMenu(player) },
     { text: "HOMES", sub: "Manage Homes", icon: "home", action: () => homesMenu(player) },
     { text: "DIMENSIONS", sub: "Teleportation", icon: "world", action: () => warpsMenu(player) },
@@ -878,5 +879,138 @@ async function bossesMenu(player) {
     body: ["§fBoss Eggs only come from §cMythic Crates§f. Use one on the ground to summon its boss - each tier is tougher and drops loot you can't get anywhere else.", "§7Bosses get enraged below half health. Loot drops on the ground, so watch out for thieves!", "", ...bossInfo()].join("\n"),
     buttons: [{ text: "Mythic Crate", sub: "Where boss eggs come from", icon: "key_mythic", action: () => cratePreview(player, "mythic", () => bossesMenu(player)) }],
     back: back(player),
+  });
+}
+
+// ============================================================ QUEST LINES, QUEST MASTER, REBIRTH
+
+const KEY_ICON = (L) => (L % 10 === 0 ? "key_legendary" : L % 5 === 0 ? "key_epic" : L % 2 === 0 ? "key_rare" : "key_common");
+const banner = (name) => `textures/fc/ui/banners/${name}`;
+const rebirthBadge = (p) => (p.rebirths ? `§6Rebirth ${p.rebirths}` : "§7No rebirths yet");
+
+export async function questMasterMenu(player) {
+  const p = S.playerData(player);
+  const q = QL.ql(p);
+  const L = QL.questLevel(p);
+  const waiting = L - q.claimed;
+  const next = QL.nextRank(L);
+  const closestLine = QL.LINES.map((l) => [l, QL.lineTiers(p, l) / QL.totalTiers(l)]).sort((a, b) => Number(b[1]) - Number(a[1])).find(([l]) => !QL.lineDone(p, l))?.[0];
+  const body = [
+    `§e§lQuest Level ${L}`,
+    `${QL.questRank(L)} Rank${next ? `  §8(next: ${next[1]}§8 at Quest Level ${next[0]})` : ""}`,
+    "",
+    `§7ROAD TO 100   §fClaimed ${q.claimed} of 100`,
+    E.bar(q.claimed / QL.MAX_LEVEL, 30, "§6", "§8"),
+    "",
+    waiting > 0 ? `§a§l${waiting} reward${waiting > 1 ? "s" : ""} waiting!` : "§7Nothing to claim yet",
+    closestLine ? `§7Next level: §f${QL.closest(p, closestLine)}` : "§aEvery quest line is MAXED!",
+    "",
+    `§7Sales pay §ax${QL.sellMultiplier(p)}§7. ${rebirthBadge(p)}`,
+    "",
+    "§8Sell items to the server to level up your quest lines. Every tier is worth 1 Quest Level.",
+  ];
+  const tiles = [];
+  for (let L2 = q.claimed + 1; L2 <= Math.min(QL.MAX_LEVEL, q.claimed + 6); L2++) {
+    const ready = L2 <= L;
+    tiles.push({ text: `§lLevel ${L2}§r  ${ready ? "§a[CLAIM]" : "§8[LOCKED]"}\n§7${QL.levelRewardText(L2)}`, icon: KEY_ICON(L2), action: () => (ready ? attempt(player, () => QL.claimLevels(player)) : questMasterMenu(player)) });
+  }
+  for (const line of QL.LINES) {
+    const t = QL.lineTiers(p, line);
+    tiles.push({ text: `§l${line.name}§r  §7${t} of ${QL.totalTiers(line)}\n${E.bar(t / QL.totalTiers(line), 24, "§a", "§8")}`, icon: line.icon, action: () => questLineMenu(player, line.id) });
+  }
+  await UI.board(player, {
+    title: `QUEST MASTER §8| ${rebirthBadge(p)}`,
+    body: body.join("\n"),
+    banner: banner("questmaster"),
+    tiles,
+    actions: [
+      { text: waiting > 0 ? `CLAIM ${waiting} REWARD${waiting > 1 ? "S" : ""}` : "NO REWARDS WAITING", locked: waiting <= 0, action: async () => { if (waiting > 0) attempt(player, () => QL.claimLevels(player)); await questMasterMenu(player); } },
+      { text: "REBIRTH ORACLE", locked: !QL.canRebirth(p), action: () => rebirthMenu(player) },
+      { text: "DAILY QUESTS", locked: true, action: () => questsMenu(player) },
+      { text: "BACK", locked: true, action: back(player) },
+    ],
+  });
+}
+
+export async function questLineMenu(player, id) {
+  const line = QL.lineById(id);
+  const p = S.playerData(player);
+  const t = QL.lineTiers(p, line);
+  const total = QL.totalTiers(line);
+  const rank = line.rank.slice(5).replace(/&([0-9a-v])/g, "§$1");
+  const body = [
+    `§6§l${line.title}`,
+    "§7LINE PROGRESS",
+    E.bar(t / total, 30, "§a", "§8"),
+    `§fLine tiers ${t} of ${total}`,
+    "",
+    `§7Closest: §f${QL.closest(p, line)}`,
+    "",
+    "§6§lFINISH THE LINE",
+    `${rank}§r §7chat rank`,
+    `§7Reach MAXED on all ${line.items.length} items.`,
+    `§eWorth ${total} Quest Levels`,
+    "",
+    "§8Progress counts every item you sell to the server.",
+  ];
+  const tiles = line.items.map((it) => {
+    const sold = QL.soldOf(p, it);
+    const tier = QL.tierOf(sold, it);
+    const target = QL.nextTarget(sold, it);
+    const prevTarget = tier ? it.base * QL.TIERS[tier - 1] : 0;
+    return {
+      text: `§l${it.name}§r  ${target === undefined ? "§6[MAXED]" : `§8[§bTier ${QL.TIER_NAMES[tier]}§8]`}\n§7Sold §f${E.fmt(sold)}§7 of §f${E.fmt(target ?? sold)}\n${E.bar(target === undefined ? 1 : (sold - prevTarget) / (target - prevTarget), 20, "§b", "§8")}`,
+      icon: it.icon,
+      action: () => UI.menu(player, {
+        title: `${it.name.toUpperCase()} TIERS`,
+        body: [`§7Sold so far: §f${E.fmt(sold)}`, "", ...QL.TIERS.map((m, i) => `${tier > i ? "§a[x]" : "§8[ ]"} §fTier ${QL.TIER_NAMES[i]} §7- sell ${E.fmt(it.base * m)}`)].join("\n"),
+        buttons: [],
+        back: () => questLineMenu(player, id),
+      }),
+    };
+  });
+  await UI.board(player, {
+    title: `${line.name} §8| §bQuest Level ${QL.questLevel(p)}`,
+    body: body.join("\n"),
+    banner: banner(line.id),
+    tiles,
+    actions: [
+      { text: "SELL NOW", action: async () => { attempt(player, () => Shop.sellAll(player)); await questLineMenu(player, id); } },
+      { text: "BACK", locked: true, action: () => questMasterMenu(player) },
+    ],
+  });
+}
+
+export async function rebirthMenu(player) {
+  const p = S.playerData(player);
+  const L = QL.questLevel(p);
+  const q = QL.ql(p);
+  const ready = QL.canRebirth(p);
+  const body = [
+    `§d§lYour Quest Level ${L}`,
+    E.bar(L / QL.MAX_LEVEL, 30, "§d", "§8"),
+    "",
+    `§7Needs Quest Level §f${QL.MAX_LEVEL}`,
+    `§7Rewards claimed §f${q.claimed} of ${QL.MAX_LEVEL}`,
+    "",
+    "§c§lWARNING",
+    "§7Resets every quest line, your claimed levels and your quest rank. Money, keys and items stay.",
+    "",
+    ready ? "§aYou're ready to rebirth!" : `§6Reach Quest Level ${QL.MAX_LEVEL} first - you are at ${L}`,
+    "",
+    "§8The phoenix burns to rise again.",
+  ];
+  await UI.board(player, {
+    title: `REBIRTH ORACLE §8| ${rebirthBadge(p)}`,
+    body: body.join("\n"),
+    banner: banner("rebirth"),
+    tiles: QL.REBIRTH_REWARDS((p.rebirths ?? 0) + 1).map((r) => ({ text: `§l${r.label}`, icon: r.icon, action: () => rebirthMenu(player) })),
+    actions: [
+      { text: ready ? "REBIRTH NOW" : "REBIRTH LOCKED", locked: !ready, action: async () => {
+        if (!ready) return rebirthMenu(player);
+        if (await UI.confirm(player, "REBIRTH", "Reset all quest lines and Quest Levels for the rebirth rewards? Money, keys and items stay.", "Rebirth")) attempt(player, () => QL.rebirth(player));
+      } },
+      { text: "BACK", locked: true, action: () => questMasterMenu(player) },
+    ],
   });
 }

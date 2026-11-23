@@ -273,7 +273,7 @@ ok(hub && hub.title.startsWith("§h§u§b§r") && hub.buttons.slice(0, 8).every(
 for (let i = 8; i < hub.buttons.length; i++) { globalThis.formAnswers = [i]; await Mn.openHub(alice); await flush(); await flush(); }
 ok(shown.length > hub.buttons.length, `opened ${shown.length} screens`);
 const titles = shown.map((s) => strip(s.title)); 
-ok(["FACTION", "SERVER SHOP", "CRATES", "ENCHANTER", "F-TOP", "DAILY REWARDS", "DAILY QUESTS", "AUCTION HOUSE", "HOMES", "DIMENSIONS", "BOUNTIES", "EVENTS", "LEADERBOARDS", "PROFILE", "ADMIN"].every((t) => titles.some((x) => x.includes(t)) || (t === "ADMIN")), "every hub page opens: " + titles.join(", "));
+ok(["FACTION", "SERVER SHOP", "CRATES", "ENCHANTER", "F-TOP", "DAILY REWARDS", "QUEST MASTER", "AUCTION HOUSE", "HOMES", "DIMENSIONS", "BOUNTIES", "EVENTS", "LEADERBOARDS", "PROFILE", "ADMIN"].every((t) => titles.some((x) => x.includes(t)) || (t === "ADMIN")), "every hub page opens: " + titles.join(", "));
 await Mn.factionMenu(alice); await Mn.crawlerMenu(alice, ow.spawnEntity("fc:crawler", { x: 3, y: 64, z: 3 })); await Mn.spawnerMenu(alice, sb); await Mn.cratePreview(alice, "mythic");
 await flush();
 ok(shown.some((s) => strip(s.title).includes("MYTHIC CRATE") && s.body.includes("%")), "crate preview lists chances");
@@ -415,6 +415,51 @@ S.playerData(grinder).procChat = false;
 const n0 = grinder.msgs.length;
 for (let i = 0; i < 30; i++) { const zz = ow.spawnEntity("minecraft:zombie", { x: 11001, y: 64, z: 11001 }); await hurt(grinder, zz, 2); await advance(41); }
 ok(!grinder.msgs.slice(n0).some((m) => strip(m).includes("[Enchant]")), "enchant messages can be turned off");
+
+// ---------- quest lines, Quest Master and rebirth
+const QL = await import("./scripts/questlines.js");
+const ShopQ = await import("./scripts/shop.js");
+const quester = await join("Quester", 13000, 13000);
+quester.inv.setItem(0, new ItemStack("minecraft:oak_log", 64));
+for (let i = 1; i < 8; i++) quester.inv.setItem(i, new ItemStack("minecraft:oak_log", 64));
+quester.inv.setItem(8, new ItemStack("minecraft:raw_iron", 10));
+ShopQ.sellAll(quester);
+const qp = S.playerData(quester);
+ok(QL.soldOf(qp, QL.lineById("lumberjack").items[0]) === 512 && QL.questLevel(qp) === 1, "selling 512 oak logs reaches Oak Log Tier I = Quest Level 1");
+ok(QL.soldOf(qp, QL.lineById("miner").items[2]) === 10, "raw iron counts toward the Iron quest");
+ok(quester.msgs.some((m) => strip(m).includes("Oak Log reached Tier I")), "tier-ups are announced");
+const keys0 = quester.inv.slots.filter((i) => i?.typeId === "fc:key_common").reduce((n, i) => n + i.amount, 0);
+QL.claimLevels(quester);
+ok(QL.ql(qp).claimed === 1 && quester.inv.slots.some((i) => i?.typeId === "fc:key_common" && i.amount > keys0 - 1), "Quest Master rewards can be claimed");
+try { QL.claimLevels(quester); ok(false, "double claim"); } catch { ok(true, "can't claim the same level twice"); }
+try { QL.rebirth(quester); ok(false, "early rebirth"); } catch (e) { ok(strip(e.message).includes("Quest Level 100"), "rebirth is locked before Quest Level 100"); }
+// Max the Farmer line to earn its chat rank.
+for (const it of QL.lineById("farmer").items) QL.recordSold(qp, `minecraft:${it.match[0]}`, it.base * 50, quester);
+ok(QL.lineDone(qp, QL.lineById("farmer")) && quester.hasTag("rank:&a&lFARMER"), "maxing a line gives its chat rank");
+// Max everything, claim to 100, rebirth.
+for (const line of QL.LINES) for (const it of line.items) QL.recordSold(qp, `minecraft:${it.match[0]}`, it.base * 50, quester);
+ok(QL.questLevel(qp) === 100, "Quest Level caps at 100 (lines have 140 tiers)");
+QL.claimLevels(quester);
+const money0 = qp.money;
+QL.rebirth(quester);
+ok(qp.rebirths === 1 && QL.questLevel(qp) === 0 && QL.ql(qp).claimed === 0 && qp.money >= money0 + 25000000, "rebirth resets quests and gives rewards");
+const qHas = (id) => quester.inv.slots.some((i) => i?.typeId === id) || ow.getEntities({ type: "minecraft:item", location: quester.location, maxDistance: 2 }).some((e) => e.item?.typeId === id);
+ok(qHas("fc:key_mythic") && qHas("fc:spawner_blaze"), "rebirth gives mythic keys and spawners (full inventory drops at your feet)");
+quester.inv.setItem(20, new ItemStack("minecraft:diamond", 10));
+const m1q = qp.money; quester.selectedSlotIndex = 20; ShopQ.sellHand(quester);
+ok(qp.money - m1q === 2400, "after rebirth 1 sales pay x2");
+await advance(40);
+ok(quester.getTags().some((t) => t.startsWith("fcprefix:") && t.includes("[R1]")), "rebirth badge shows in chat");
+// screens
+const MnQ = await import("./scripts/menus.js");
+shown.length = 0; globalThis.formAnswers = [];
+await MnQ.questMasterMenu(quester); await MnQ.questLineMenu(quester, "monster"); await MnQ.rebirthMenu(quester); await flush();
+const [qm, qline, reb] = shown;
+const tileCount = (f) => f.buttons.filter((b) => b.t.startsWith("§t§i§l§r")).length;
+ok(qm.title.startsWith("§b§o§a§r") && tileCount(qm) === 10 && qm.buttons.some((b) => b.t.startsWith("§b§n§r§r")), "Quest Master: 6 reward + 4 line tiles and a banner");
+ok(tileCount(qline) === 10 && qline.buttons.some((b) => strip(b.t).includes("SELL NOW")), "Monster Hunter page: 10 item tiles and SELL NOW");
+ok(tileCount(reb) === 6 && reb.buttons.some((b) => b.t.startsWith("§a§c§l§r") && strip(b.t).includes("REBIRTH LOCKED")), "Rebirth Oracle: 6 reward tiles, locked button");
+ok(qm.buttons.findIndex((b) => b.t.startsWith("§t§i§l§r")) === 0 && qm.buttons.slice(0, 10).every((b) => b.t.startsWith("§t§i§l§r")), "tiles come first so the grid shows them");
 
 // ---------- persistence
 const S2 = await import("./scripts/store.js?reload"); S2.ensureLoaded();

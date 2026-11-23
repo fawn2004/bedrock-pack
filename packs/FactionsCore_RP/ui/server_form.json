@@ -41,7 +41,7 @@
           },
           {
             "binding_type": "view",
-            "source_property_name": "((#title_text - '§h§u§b§r' - '§l§s§t§r') = #title_text)",
+            "source_property_name": "((#title_text - '§h§u§b§r' - '§l§s§t§r' - '§b§o§a§r') = #title_text)",
             "target_property_name": "#visible"
           }
         ]

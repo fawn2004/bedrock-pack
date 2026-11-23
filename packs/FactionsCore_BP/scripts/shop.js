@@ -5,13 +5,14 @@ import * as R from "./rules.js";
 import * as E from "./economy.js";
 import { giveItem, gearItem, spawnerItem, crawlerItem, SPAWNERS, CRAWLERS, keyItem, bookItem, genbucketItem, busterItem, wandItem, xpShardItem, powerShardItem, mysteryItem } from "./items.js";
 import { questEvent } from "./quests.js";
+import { recordSold, sellMultiplier } from "./questlines.js";
 
 // [item, buy price (0 = can't buy), sell price (0 = can't sell)]
 export const CATEGORIES = {
   blocks: {
     name: "Building Blocks", icon: "blocks", items: [
       ["stone", 12, 1], ["cobblestone", 8, 1], ["dirt", 6, 0.5], ["grass_block", 20, 0], ["sand", 10, 1], ["gravel", 10, 1],
-      ["oak_log", 30, 3], ["spruce_log", 30, 3], ["glass", 25, 0], ["stone_bricks", 25, 0], ["smooth_stone", 25, 0],
+      ["oak_log", 30, 3], ["spruce_log", 30, 3], ["mangrove_log", 30, 3], ["cherry_log", 30, 3], ["crimson_stem", 40, 4], ["warped_stem", 40, 4], ["glass", 25, 0], ["stone_bricks", 25, 0], ["smooth_stone", 25, 0],
       ["quartz_block", 120, 0], ["glowstone", 90, 0], ["sea_lantern", 150, 0], ["obsidian", 400, 20], ["end_stone", 60, 0],
       ["deepslate_bricks", 40, 0], ["black_concrete", 40, 0], ["white_concrete", 40, 0], ["cyan_concrete", 40, 0],
     ],
@@ -34,7 +35,7 @@ export const CATEGORIES = {
     name: "Mob Drops", icon: "mobs", items: [
       ["rotten_flesh", 0, 3], ["bone", 30, 6], ["string", 30, 6], ["spider_eye", 0, 6], ["gunpowder", 60, 14], ["ender_pearl", 220, 45],
       ["blaze_rod", 180, 40], ["slime_ball", 100, 18], ["leather", 50, 8], ["feather", 0, 3], ["beef", 0, 5], ["porkchop", 0, 5],
-      ["chicken", 0, 4], ["magma_cream", 0, 20], ["ghast_tear", 0, 120], ["phantom_membrane", 0, 40], ["ink_sac", 0, 4],
+      ["chicken", 0, 4], ["magma_cream", 0, 20], ["ghast_tear", 0, 120], ["phantom_membrane", 0, 40], ["ink_sac", 0, 4], ["rabbit_hide", 0, 10], ["honeycomb", 0, 12],
     ],
   },
   raiding: {
@@ -56,6 +57,10 @@ export const ITEM_ICONS = {
   gravel: "textures/blocks/gravel",
   oak_log: "textures/blocks/log_oak",
   spruce_log: "textures/blocks/log_spruce",
+  mangrove_log: "textures/blocks/mangrove_log_side",
+  cherry_log: "textures/blocks/cherry_log_side",
+  crimson_stem: "textures/blocks/huge_fungus/crimson_log_side",
+  warped_stem: "textures/blocks/huge_fungus/warped_stem_side",
   glass: "textures/blocks/glass",
   stone_bricks: "textures/blocks/stonebrick",
   smooth_stone: "textures/blocks/stone_slab_top",
@@ -117,6 +122,8 @@ export const ITEM_ICONS = {
   ghast_tear: "textures/items/ghast_tear",
   phantom_membrane: "textures/items/phantom_membrane",
   ink_sac: "textures/items/dye_powder_black",
+  rabbit_hide: "textures/items/rabbit_hide",
+  honeycomb: "textures/items/honeycomb",
   tnt: "textures/blocks/tnt_side",
   redstone_block: "textures/blocks/redstone_block",
   repeater: "textures/items/repeater",
@@ -181,6 +188,7 @@ export const sellPriceOf = (typeId) => SELL.get(typeId) ?? 0;
 export function sellContainer(container, filterSlot) {
   let total = 0;
   let count = 0;
+  const items = {};
   for (let i = 0; i < container.size; i++) {
     if (filterSlot !== undefined && i !== filterSlot) continue;
     const it = container.getItem(i);
@@ -188,33 +196,51 @@ export function sellContainer(container, filterSlot) {
     if (!price) continue;
     total += price * it.amount;
     count += it.amount;
+    items[it.typeId] = (items[it.typeId] ?? 0) + it.amount;
     container.setItem(i, undefined);
   }
-  return { total: Math.floor(total), count };
+  return { total: Math.floor(total), count, items };
 }
 
-export function paySale(player, total) {
-  if (total <= 0) return;
+/**
+ * Pays for a sale (with the rebirth sell bonus) and counts the items toward
+ * quest lines. `items` = { "minecraft:id": count }. Returns what was paid.
+ */
+export function paySale(player, total, items = {}) {
+  if (total <= 0) return 0;
   const p = S.playerData(player);
-  E.addMoney(p, total);
-  questEvent(player, "sell", total);
+  const paid = Math.floor(total * sellMultiplier(p));
+  E.addMoney(p, paid);
+  for (const [id, n] of Object.entries(items)) recordSold(p, id, n, player);
+  S.savePlayer(p);
+  questEvent(player, "sell", paid);
   R.sound(player, "random.orb", 1.2);
+  return paid;
+}
+
+/** For sales made while the player may be offline (crawler auto-sell). */
+export function paySaleRecord(p, total, items = {}) {
+  const paid = Math.floor(total * sellMultiplier(p));
+  E.addMoney(p, paid);
+  for (const [id, n] of Object.entries(items)) recordSold(p, id, n);
+  S.savePlayer(p);
+  return paid;
 }
 
 export function sellHand(player) {
   const inv = player.getComponent("minecraft:inventory").container;
   const r = sellContainer(inv, player.selectedSlotIndex);
   if (!r.count) E.fail("You can't sell what you're holding.");
-  paySale(player, r.total);
-  R.tell(player, `Sold §e${r.count}§r items for §a${E.money(r.total)}§r.`);
+  const paid = paySale(player, r.total, r.items);
+  R.tell(player, `Sold §e${r.count}§r items for §a${E.money(paid)}§r.`);
 }
 
 export function sellAll(player) {
   const inv = player.getComponent("minecraft:inventory").container;
   const r = sellContainer(inv);
   if (!r.count) E.fail("You have nothing to sell. Ores, crops and mob drops sell well!");
-  paySale(player, r.total);
-  R.tell(player, `Sold §e${r.count}§r items for §a${E.money(r.total)}§r.`);
+  const paid = paySale(player, r.total, r.items);
+  R.tell(player, `Sold §e${r.count}§r items for §a${E.money(paid)}§r.`);
 }
 
 export function buyVanilla(player, id, amount) {
