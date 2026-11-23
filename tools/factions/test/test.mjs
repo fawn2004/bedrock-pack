@@ -99,6 +99,24 @@ const zombie = ow.spawnEntity("minecraft:zombie", { x: 500, y: 64, z: 500 }); zo
 carol.inv.setItem(0, exe); carol.selectedSlotIndex = 0;
 const ev = await hurt(carol, zombie, 10);
 ok(ev.damage > 10, "Executioner boosts damage on low-health targets");
+// trigger feedback: a hit that triggers an enchant tells the attacker
+const fb = new ItemStack("minecraft:diamond_sword"); En.applyBook(fb, "blaze", 2, 100);
+carol.inv.setItem(0, fb); carol.selectedSlotIndex = 0; carol.bar = "";
+for (let i = 0; i < 40 && !strip(carol.bar).includes("BLAZE"); i++) { const z2 = ow.spawnEntity("minecraft:zombie", { x: 500, y: 64, z: 500 }); await hurt(carol, z2, 4); await advance(7); }
+ok(strip(carol.bar).includes("BLAZE!"), "triggered enchants show on the action bar");
+// held-weapon bonuses
+const held = new ItemStack("minecraft:diamond_sword"); En.applyBook(held, "swiftness", 2, 100); En.applyBook(held, "rage", 2, 100);
+carol.inv.setItem(0, held); carol.selectedSlotIndex = 0; carol.effects = {};
+await advance(40);
+ok(carol.effects.speed?.amplifier === 1 && carol.effects.strength?.amplifier === 1, "Swiftness II + Rage II give Speed II and Strength II while held");
+ok(carol.effects.strength.duration <= 50, "held effects are short so they fade after switching away");
+const emp = new ItemStack("minecraft:diamond_sword"); En.applyBook(emp, "thunder", 1, 100);
+carol.inv.setItem(0, emp); carol.effects = {};
+await advance(40);
+ok(carol.effects.speed?.amplifier === 0 && !carol.effects.strength, "swords with a Legendary enchant are Empowered (Speed I)");
+carol.inv.setItem(0, undefined); carol.effects = {};
+await advance(40);
+ok(!carol.effects.speed && !carol.effects.strength, "no held bonus with an empty hand");
 // armor passives
 const boots = new ItemStack("minecraft:diamond_boots"); En.applyBook(boots, "speed", 2, 100); carol.eq.Feet = boots;
 await advance(40);

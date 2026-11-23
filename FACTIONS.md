@@ -71,14 +71,19 @@ New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can t
 - **Crates** come in 5 rarities: Common, Rare, Epic, Legendary and Mythic.
   - Opening one plays a roll animation, and big wins are announced to the server.
   - Open them with a key anywhere, or on the crate blocks an admin places at spawn.
-- **28 custom enchants** go on vanilla gear through **Enchant Books**. Each book has a success chance. Some examples:
+- **30 custom enchants** go on vanilla gear through **Enchant Books**. Each book has a success chance. Some examples:
 
   | Gear | Enchants |
   |---|---|
-  | Weapons | Lifesteal, Frostbite, Venom, Blaze, Withering, Executioner, Thunderstrike, Plunder, Obliterate |
+  | Weapons (on hit) | Lifesteal, Frostbite, Venom, Blaze, Blind, Withering, Executioner, Thunderstrike, Plunder, Obliterate |
+  | Weapons (while held) | Swiftness (Speed), Rage (Strength) |
   | Tools | Explosive (3x3 mining), Autosmelt, Telepathy, Treasure Hunter, Haste, Experience |
   | Armor | Overload, Regeneration, Dodge, Armored, Reflect, Berserk, Night Vision, Gears (speed), Leaper |
   | Anything | Soulbound (keep it when you die) |
+
+  - Weapon enchants trigger by chance on melee hits. When one fires, its name flashes on your action bar (for example **FROSTBITE!**) with a sound and particles on the target.
+  - A weapon with any Legendary or Mythic enchant is **Empowered** and gives Speed I while you hold it.
+  - Held effects fade a couple of seconds after you switch items.
 - **Legendary gear** drops from crates: Frostbite Blade, Inferno Cleaver, Stormbringer, The Reaper, Excavator 3000, Prospector's Pick and the 4-piece Titan set.
 - **Classic factions tools:**
   - Cobble, Obsidian and Sand **Genbuckets** build walls straight down.
@@ -166,5 +171,5 @@ After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to
   - `art.py` and `icons.py`: all textures and icons
   - `ui.py`: the JSON UI
   - `preview.py`: the pictures above
-- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 71 behaviours. Run it before shipping changes.
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 76 behaviours. Run it before shipping changes.
 - Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

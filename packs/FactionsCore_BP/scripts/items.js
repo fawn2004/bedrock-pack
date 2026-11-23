@@ -162,9 +162,9 @@ const ench = (it, list) => {
 
 export const GEAR = {
   frostbite_blade: { item: "minecraft:netherite_sword", name: "§b§lFrostbite Blade", rarity: "legendary", vanilla: [["sharpness", 5], ["unbreaking", 3]], custom: { frostbite: 3, lifesteal: 2 } },
-  inferno_axe: { item: "minecraft:netherite_axe", name: "§6§lInferno Cleaver", rarity: "legendary", vanilla: [["sharpness", 4], ["unbreaking", 3]], custom: { blaze: 2, executioner: 2 } },
-  stormbringer: { item: "minecraft:diamond_sword", name: "§e§lStormbringer", rarity: "legendary", vanilla: [["sharpness", 5], ["fire_aspect", 1]], custom: { thunder: 3, blind: 1 } },
-  vampire_fang: { item: "minecraft:iron_sword", name: "§4§lVampire Fang", rarity: "epic", vanilla: [["sharpness", 3], ["unbreaking", 2]], custom: { lifesteal: 3, venom: 2 } },
+  inferno_axe: { item: "minecraft:netherite_axe", name: "§6§lInferno Cleaver", rarity: "legendary", vanilla: [["sharpness", 4], ["unbreaking", 3]], custom: { blaze: 2, executioner: 2, rage: 1 } },
+  stormbringer: { item: "minecraft:diamond_sword", name: "§e§lStormbringer", rarity: "legendary", vanilla: [["sharpness", 5], ["fire_aspect", 1]], custom: { thunder: 3, blind: 1, swiftness: 2 } },
+  vampire_fang: { item: "minecraft:iron_sword", name: "§4§lVampire Fang", rarity: "epic", vanilla: [["sharpness", 3], ["unbreaking", 2]], custom: { lifesteal: 3, venom: 2, swiftness: 1 } },
   reaper: { item: "minecraft:netherite_sword", name: "§c§lThe Reaper", rarity: "mythic", vanilla: [["sharpness", 5], ["unbreaking", 3], ["looting", 3]], custom: { obliterate: 1, wither: 2, plunder: 3, soulbound: 1 } },
   excavator: { item: "minecraft:netherite_pickaxe", name: "§d§lExcavator 3000", rarity: "legendary", vanilla: [["efficiency", 5], ["unbreaking", 3], ["fortune", 3]], custom: { explosive: 3, autosmelt: 1, telepathy: 1 } },
   prospector: { item: "minecraft:diamond_pickaxe", name: "§a§lProspector's Pick", rarity: "epic", vanilla: [["efficiency", 4], ["fortune", 2]], custom: { treasure: 3, haste: 2, experience: 2 } },

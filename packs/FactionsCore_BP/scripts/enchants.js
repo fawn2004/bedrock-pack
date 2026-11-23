@@ -25,6 +25,8 @@ export const ENCHANTS = {
   plunder: { name: "Plunder", rarity: "epic", max: 3, on: W, desc: "More money and crystals from kills" },
   thunder: { name: "Thunderstrike", rarity: "legendary", max: 3, on: W, desc: "Chance to call down lightning" },
   obliterate: { name: "Obliterate", rarity: "mythic", max: 1, on: W, desc: "10% chance to deal double damage" },
+  swiftness: { name: "Swiftness", rarity: "rare", max: 2, on: W, desc: "Speed while you hold it" },
+  rage: { name: "Rage", rarity: "epic", max: 2, on: W, desc: "Strength while you hold it" },
   // ---- tools
   telepathy: { name: "Telepathy", rarity: "common", max: 1, on: T, desc: "Drops go straight to your inventory" },
   haste: { name: "Haste", rarity: "common", max: 3, on: T, desc: "Haste while held" },
@@ -144,15 +146,17 @@ export function setupEnchants() {
     if (attacker instanceof Player && !e.damageSource.damagingProjectile) {
       const ench = readEnchants(heldItem(attacker));
       const hp = health(victim);
-      if (ench.executioner && hp && hp.cur / hp.max < 0.3) e.damage *= 1 + 0.15 * ench.executioner;
-      if (ench.obliterate && chance(10)) { e.damage *= 2; later.push(() => attacker.onScreenDisplay.setActionBar("§c§lOBLITERATE!")); }
-      if (ench.lifesteal && chance(15 + ench.lifesteal * 8)) later.push(() => { const h = health(attacker); if (h) h.comp.setCurrentValue(Math.min(h.max, h.cur + ench.lifesteal)); });
-      if (ench.frostbite && chance(12 + ench.frostbite * 8)) later.push(() => victim.addEffect("slowness", 40 + ench.frostbite * 20, { amplifier: ench.frostbite - 1 }));
-      if (ench.venom && chance(10 + ench.venom * 8)) later.push(() => victim.addEffect("poison", 40 + ench.venom * 20, { amplifier: ench.venom - 1 }));
-      if (ench.wither && chance(10 + ench.wither * 7)) later.push(() => victim.addEffect("wither", 60, { amplifier: ench.wither - 1 }));
-      if (ench.blind && chance(8 + ench.blind * 6)) later.push(() => victim.addEffect("blindness", 40 + ench.blind * 20));
-      if (ench.blaze && chance(25 + ench.blaze * 15)) later.push(() => victim.setOnFire(2 + ench.blaze * 2, true));
-      if (ench.thunder && chance(ench.thunder * 4)) later.push(() => { victim.dimension.spawnEntity("minecraft:lightning_bolt", victim.location); });
+      const procs = [];
+      if (ench.executioner && hp && hp.cur / hp.max < 0.3) { e.damage *= 1 + 0.15 * ench.executioner; procs.push("executioner"); }
+      if (ench.obliterate && chance(10)) { e.damage *= 2; procs.push("obliterate"); }
+      if (ench.lifesteal && chance(15 + ench.lifesteal * 8)) { procs.push("lifesteal"); later.push(() => { const h = health(attacker); if (h) h.comp.setCurrentValue(Math.min(h.max, h.cur + ench.lifesteal)); }); }
+      if (ench.frostbite && chance(12 + ench.frostbite * 8)) { procs.push("frostbite"); later.push(() => victim.addEffect("slowness", 40 + ench.frostbite * 20, { amplifier: ench.frostbite - 1 })); }
+      if (ench.venom && chance(10 + ench.venom * 8)) { procs.push("venom"); later.push(() => victim.addEffect("poison", 40 + ench.venom * 20, { amplifier: ench.venom - 1 })); }
+      if (ench.wither && chance(10 + ench.wither * 7)) { procs.push("wither"); later.push(() => victim.addEffect("wither", 60, { amplifier: ench.wither - 1 })); }
+      if (ench.blind && chance(8 + ench.blind * 6)) { procs.push("blind"); later.push(() => victim.addEffect("blindness", 40 + ench.blind * 20)); }
+      if (ench.blaze && chance(25 + ench.blaze * 15)) { procs.push("blaze"); later.push(() => victim.setOnFire(2 + ench.blaze * 2, true)); }
+      if (ench.thunder && chance(ench.thunder * 4)) { procs.push("thunder"); later.push(() => { victim.dimension.spawnEntity("minecraft:lightning_bolt", victim.location); }); }
+      if (procs.length) later.push(() => showProcs(attacker, victim, procs));
     }
 
     if (victim instanceof Player) {
@@ -165,7 +169,11 @@ export function setupEnchants() {
       if (arm.armored) e.damage *= 1 - 0.06 * arm.armored;
       if (arm.reflect && attacker && attacker.id !== victim.id && chance(arm.reflect * 7)) {
         const dmg = e.damage * 0.3;
-        later.push(() => attacker.applyDamage(dmg, { cause: EntityDamageCause.thorns, damagingEntity: victim }));
+        later.push(() => {
+          attacker.applyDamage(dmg, { cause: EntityDamageCause.thorns, damagingEntity: victim });
+          victim.onScreenDisplay.setActionBar("§5§lREFLECT!");
+          R.sound(victim, "random.anvil_land", 1.8, 0.3);
+        });
       }
     }
 
@@ -180,6 +188,46 @@ export function setupEnchants() {
   }, 40);
 }
 
+// What each enchant looks and sounds like when it triggers: [label, sound, pitch, particle]
+const PROC_FX = {
+  executioner: ["§4§lEXECUTIONER!", "mob.wither.hurt", 1.6, "minecraft:critical_hit_emitter"],
+  obliterate: ["§c§lOBLITERATE!", "random.explode", 1.4, "minecraft:huge_explosion_emitter"],
+  lifesteal: ["§c§lLIFESTEAL!", "random.drink", 1.4, "minecraft:heart_particle"],
+  frostbite: ["§b§lFROSTBITE!", "random.glass", 1.3, "minecraft:snowflake_particle"],
+  venom: ["§2§lVENOM!", "mob.spider.say", 1.6, "minecraft:villager_angry"],
+  wither: ["§8§lWITHERING!", "mob.wither.shoot", 1.6, "minecraft:soul_particle"],
+  blind: ["§7§lBLIND!", "mob.bat.hurt", 0.8, "minecraft:basic_smoke_particle"],
+  blaze: ["§6§lBLAZE!", "mob.ghast.fireball", 1.4, "minecraft:basic_flame_particle"],
+  thunder: ["§e§lTHUNDERSTRIKE!", "ambient.weather.thunder", 1.2, "minecraft:electric_spark_particle"],
+};
+
+const lastProcBar = new Map();
+
+/** Tells the attacker which enchants just triggered, with a sound and particles on the target. */
+function showProcs(attacker, victim, procs) {
+  const now = Date.now();
+  const labels = procs.map((id) => PROC_FX[id]?.[0] ?? ENCHANTS[id].name);
+  // Don't let a fast-clicking player spam the action bar; the newest procs win.
+  if ((lastProcBar.get(attacker.id) ?? 0) < now - 300 || procs.includes("obliterate")) {
+    attacker.onScreenDisplay.setActionBar(labels.join(" §8| "));
+    lastProcBar.set(attacker.id, now);
+  }
+  const top = procs[procs.length - 1];
+  const fx = PROC_FX[top];
+  if (fx) R.sound(attacker, fx[1], fx[2], 0.6);
+  const at = { x: victim.location.x, y: victim.location.y + 1, z: victim.location.z };
+  for (const id of procs) {
+    const particle = PROC_FX[id]?.[3];
+    if (!particle) continue;
+    try { victim.dimension.spawnParticle(particle, at); } catch { /* unknown particle or unloaded */ }
+  }
+}
+
+/** Swords with a Legendary or Mythic enchant are "Empowered": Speed I while held. */
+export function isEmpowered(ench) {
+  return Object.keys(ench).some((id) => ["legendary", "mythic"].includes(ENCHANTS[id].rarity) && ENCHANTS[id].on === W);
+}
+
 function effect(player, id, amp, dur = 80) {
   const cur = player.getEffect(id);
   if (cur && cur.amplifier === amp && cur.duration > 40) return;
@@ -189,7 +237,10 @@ function effect(player, id, amp, dur = 80) {
 function passives(player) {
   const arm = armorEnchants(player);
   const held = readEnchants(heldItem(player));
-  if (arm.speed) effect(player, "speed", arm.speed - 1);
+  // Held-weapon effects are short so they fade a couple of seconds after you switch away.
+  const speed = Math.max(arm.speed ?? 0, held.swiftness ?? 0, isEmpowered(held) ? 1 : 0);
+  if (speed) effect(player, "speed", speed - 1, speed > (arm.speed ?? 0) ? 50 : 80);
+  if (held.rage) effect(player, "strength", held.rage - 1, 50);
   if (arm.jump) effect(player, "jump_boost", arm.jump - 1);
   if (arm.nightvision) effect(player, "night_vision", 0, 400);
   if (arm.aquatic) effect(player, "water_breathing", 0);
@@ -201,7 +252,7 @@ function passives(player) {
   }
   if (arm.berserk) {
     const h = health(player);
-    if (h && h.cur / h.max < 0.4) effect(player, "strength", arm.berserk - 1);
+    if (h && h.cur / h.max < 0.4 && (held.rage ?? 0) < arm.berserk) effect(player, "strength", arm.berserk - 1);
   }
   if (held.haste) effect(player, "haste", held.haste - 1);
 
@@ -211,7 +262,7 @@ function passives(player) {
     const f = S.getFaction(p.faction);
     const hasteLvl = R.upgradeLevel(f, "haste");
     if (hasteLvl && !held.haste) effect(player, "haste", hasteLvl - 1);
-    if (R.upgradeLevel(f, "speed") && !arm.speed) effect(player, "speed", 0);
+    if (R.upgradeLevel(f, "speed") && !speed) effect(player, "speed", 0);
   }
 }
 
