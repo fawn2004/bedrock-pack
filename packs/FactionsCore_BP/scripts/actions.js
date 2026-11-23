@@ -1,12 +1,14 @@
 // Factions Core - every player action. Commands and menus both call these.
 // An action throws Fail("reason") to stop and tell the player why.
 import { world } from "@minecraft/server";
-import { CONFIG, COLOR, RANKS, RANK_LEVEL, RANK_ICON } from "./config.js";
+import { CONFIG, COLOR, RANKS, RANK_LEVEL, RANK_ICON, UPGRADES } from "./config.js";
 import * as S from "./store.js";
 import * as R from "./rules.js";
+import * as E from "./economy.js";
+import { Fail, fail } from "./economy.js";
+import { questEvent } from "./quests.js";
 
-export class Fail extends Error {}
-const fail = (msg) => { throw new Fail(msg); };
+export { Fail };
 
 // ------------------------------------------------------------ helpers
 
@@ -46,6 +48,7 @@ function setRank(t, rank) {
 }
 
 const fmtPower = (n) => (Math.round(n * 10) / 10).toString();
+export const dur = (ms) => { const m = Math.max(0, Math.round(ms / 60000)); return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`; };
 
 // ------------------------------------------------------------ faction lifecycle
 
@@ -107,7 +110,7 @@ export function join(player, name) {
   const f = S.findFaction(name);
   if (!f || f.system) fail(`There is no faction called ${name}.`);
   if (!f.open && !isInvited(f, player.name)) fail(`${f.name} is invite only.`);
-  if (S.membersOf(f.id).length >= CONFIG.maxMembers) fail(`${f.name} is full.`);
+  if (S.membersOf(f.id).length >= R.maxMembers(f)) fail(`${f.name} is full.`);
   delete f.invites[player.name.toLowerCase()];
   S.saveFaction(f);
   p.faction = f.id;
@@ -216,7 +219,9 @@ export function infoLines(f, viewerFid) {
   lines.push(`§7Leader: §f${leaderRec?.name ?? "?"}   §7Joining: ${f.open ? "§aopen" : "§cinvite only"}`);
   lines.push(`§7Land / Power / Max: §f${claimsN} / ${fmtPower(R.factionPower(f.id))} / ${R.factionMaxPower(f.id)}`);
   if (R.isRaidable(f.id)) lines.push("§c§lRAIDABLE§r §7(more land than power)");
-  lines.push(`§7Home: ${f.home ? "§aset" : "§cnot set"}`);
+  const sh = R.shieldState(f);
+  lines.push(`§7Treasury: §a${E.money(f.treasury)}   §7Home: ${f.home ? "§aset" : "§cnot set"}`);
+  lines.push(`§7Shield: ${sh.none ? "§cnot set" : sh.active ? `§aUP§7 (drops in ${dur(sh.ms)})` : `§cDOWN§7 (up in ${dur(sh.ms)})`}`);
   const rel = { ally: [], truce: [], enemy: [] };
   for (const o of S.allFactions()) {
     const r = R.relation(f.id, o.id);
@@ -226,7 +231,7 @@ export function infoLines(f, viewerFid) {
   if (rel.truce.length) lines.push(`§7Truces: ${COLOR.truce}${rel.truce.join(", ")}`);
   if (rel.enemy.length) lines.push(`§7Enemies: ${COLOR.enemy}${rel.enemy.join(", ")}`);
   const list = members.map((m) => `${onlineIds.has(m.id) ? "§a" : "§7"}${RANK_ICON[m.rank]}${m.name}`);
-  lines.push(`§7Members (${members.length}/${CONFIG.maxMembers}): ${list.join("§7, ")}`);
+  lines.push(`§7Members (${members.length}/${R.maxMembers(f)}): ${list.join("§7, ")}`);
   return lines;
 }
 
@@ -297,10 +302,11 @@ function claimChunk(f, dimId, cx, cz, admin) {
     const o = S.getFaction(owner);
     if (o?.system) return `that is ${o.name}`;
     if (!R.isRaidable(owner)) return `${o?.name} owns that chunk`;
+    if (R.isShielded(owner)) return `${o?.name} is shielded right now`;
     if (R.relation(f.id, owner) !== "enemy") return `you must be enemies with ${o?.name} to take their land`;
     overclaim = true;
   }
-  if (S.claimsOf(f.id) + 1 > R.landLimit(f.id)) return "not enough power (one chunk per power)";
+  if (S.claimsOf(f.id) + 1 > R.landLimit(f.id)) return "not enough power (one chunk per power, more with the Land Grant upgrade)";
   if (CONFIG.claimsMustConnect && S.claimsOf(f.id) > 0 && !overclaim) {
     if (!neighbours(cx, cz).some(([x, z]) => S.ownerOfChunk(dimId, x, z) === f.id)) return "claims must connect to your land";
   }
@@ -312,7 +318,10 @@ function claimChunk(f, dimId, cx, cz, admin) {
     }
   }
   S.setClaim(key, f.id);
-  if (overclaim) R.tellFaction(owner, `§c${f.name} took a chunk of your land at ${cx * 16}, ${cz * 16}!`);
+  if (overclaim) {
+    R.tellFaction(owner, `§c${f.name} took a chunk of your land at ${cx * 16}, ${cz * 16}!`);
+    S.factionLog(S.getFaction(owner), `§c${f.name} overclaimed ${cx * 16}, ${cz * 16}`);
+  }
   return undefined;
 }
 
@@ -341,6 +350,7 @@ export function claim(player, radius, fid) {
     }
   }
   if (done === 0) fail(`Couldn't claim: ${lastReason ?? "this land is already yours"}.`);
+  if (!admin) questEvent(player, "claim", done);
   const msg = `§e${player.name}§r claimed §a${done}§r chunk${done === 1 ? "" : "s"} for ${R.colorName(f, f.id)}§r.`;
   if (admin) R.tell(player, msg);
   else R.tellFaction(f.id, msg + (todo.length && lastReason ? ` §7(${todo.length} skipped: ${lastReason})` : ""));
@@ -475,28 +485,88 @@ export function chat(player, text, toAllies) {
   }
 }
 
+// ------------------------------------------------------------ treasury, upgrades, shield
+
+export function deposit(player, amountText) {
+  const { p, f } = myFaction(player);
+  const amount = E.parseAmount(amountText);
+  if (!(amount > 0)) fail("Usage: §e/f deposit <amount>");
+  E.takeMoney(p, amount, "the deposit");
+  f.treasury += amount;
+  S.factionLog(f, `§a${player.name} deposited ${E.money(amount)}`);
+  R.tellFaction(f.id, `§e${player.name}§r deposited §a${E.money(amount)}§r into the treasury.`);
+}
+
+export function withdraw(player, amountText) {
+  const { p, f } = myFaction(player, "officer");
+  const amount = E.parseAmount(amountText);
+  if (!(amount > 0)) fail("Usage: §e/f withdraw <amount>");
+  if (f.treasury < amount) fail(`The treasury only has ${E.money(f.treasury)}.`);
+  f.treasury -= amount;
+  E.addMoney(p, amount);
+  S.factionLog(f, `§c${player.name} withdrew ${E.money(amount)}`);
+  R.tellFaction(f.id, `§e${player.name}§r withdrew §c${E.money(amount)}§r from the treasury.`);
+}
+
+export function buyUpgrade(player, id) {
+  const { f } = myFaction(player, "officer");
+  const u = UPGRADES[id];
+  if (!u) fail(`Upgrades: ${Object.keys(UPGRADES).join(", ")}`);
+  const lvl = R.upgradeLevel(f, id);
+  if (lvl >= u.costs.length) fail(`${u.name} is already maxed.`);
+  const cost = u.costs[lvl];
+  if (f.treasury < cost) fail(`${u.name} ${lvl + 1} costs ${E.money(cost)} from the treasury (it has ${E.money(f.treasury)}). Use §e/f deposit§r.`);
+  f.treasury -= cost;
+  f.upgrades[id] = lvl + 1;
+  S.factionLog(f, `§b${player.name} bought ${u.name} ${lvl + 1}`);
+  R.tellFaction(f.id, `§e${player.name}§r upgraded §b${u.name}§r to level §b${lvl + 1}§r! §7(${u.desc})`);
+  for (const pl of R.onlineMembers(f.id)) R.sound(pl, "random.levelup");
+}
+
+export function setShield(player, hourText) {
+  const { f } = myFaction(player, "leader");
+  const hour = Math.floor(Number(hourText));
+  if (!(hour >= 0 && hour <= 23)) fail(`Usage: §e/f shield <hour 0-23>§r (UTC${CONFIG.timezoneOffsetHours ? (CONFIG.timezoneOffsetHours > 0 ? "+" : "") + CONFIG.timezoneOffsetHours : ""}). Your shield lasts ${R.shieldLength(f)} hours from then.`);
+  const wait = f.shieldChanged + CONFIG.shieldChangeCooldownHours * 3600000 - Date.now();
+  if (wait > 0 && f.shieldStart !== null) fail(`You can change the shield again in ${dur(wait)}.`);
+  if (R.shieldState(f).active) fail("You can't move your shield while it is up.");
+  f.shieldStart = hour;
+  f.shieldChanged = Date.now();
+  S.factionLog(f, `§b${player.name} set the shield to ${hour}:00`);
+  R.tellFaction(f.id, `Shield set: up every day from §b${hour}:00§r for §b${R.shieldLength(f)}h§r.`);
+}
+
+const COLORS = { red: "c", orange: "6", yellow: "e", green: "a", aqua: "b", blue: "9", pink: "d", purple: "5", white: "f", gold: "g" };
+export function setColor(player, name) {
+  const { f } = myFaction(player, "leader");
+  const c = COLORS[String(name).toLowerCase()];
+  if (!c) fail(`Colours: ${Object.keys(COLORS).join(", ")}`);
+  f.color = c;
+  S.saveFaction(f);
+  R.refreshFactionNametags(f.id);
+  R.tellFaction(f.id, `Faction colour set to §${c}${name}§r.`);
+}
+
 // ------------------------------------------------------------ help
 
 export const HELP = [
-  ["/f", "open the factions menu"],
-  ["/f create <name>", "start a faction"],
-  ["/f join <name>", "join an open faction or one that invited you"],
-  ["/f info [faction|player]", "faction details"],
-  ["/f list [page]", "all factions"],
-  ["/f map", "map of nearby land"],
-  ["/f claim [radius]", "claim this chunk (or a square)"],
-  ["/f unclaim [all]", "give up this chunk (or everything)"],
-  ["/f autoclaim", "claim as you walk"],
-  ["/f invite|uninvite <player>", "manage invites"],
-  ["/f kick|promote|demote <player>", "manage members"],
-  ["/f leader <player>", "hand over leadership"],
+  ["/menu", "the server menu (or tap your menu item)"],
+  ["/f", "your faction dashboard"],
+  ["/f create|join|leave|disband", "faction basics"],
+  ["/f info|list|who|power|map|top", "information"],
+  ["/f claim [radius]  /f unclaim [all]  /f autoclaim", "land"],
+  ["/f invite|kick|promote|demote|leader <player>", "members"],
   ["/f sethome  /f home", "faction home"],
   ["/f ally|truce|neutral|enemy <faction>", "relations"],
-  ["/f open", "toggle invite only"],
-  ["/f rename <name>  /f desc <text>", "change name/description"],
-  ["/f power [player]  /f who <player>", "player info"],
-  ["/f leave  /f disband", "leave or end your faction"],
-  ["/fc <msg>  /fa <msg>", "faction chat / ally chat"],
+  ["/f deposit|withdraw <amount>  /f upgrade <id>", "treasury"],
+  ["/f shield <hour>", "daily raid shield"],
+  ["/f open|rename|desc|color", "settings"],
+  ["/fc <msg>  /fa <msg>", "faction / ally chat"],
+  ["/shop  /sell hand|all  /pay  /bal", "money"],
+  ["/ah  /ah sell <price>", "auction house"],
+  ["/crates  /daily  /bounty <player> <amount>", "rewards"],
+  ["/home  /sethome  /delhome  /spawn  /wild  /warp", "teleports"],
+  ["/hud", "show/hide the sidebar"],
 ];
 
 export function help(player) {

@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Factions Core RP",
+    "description": "Menus, HUD, items, blocks and models for Factions Core.",
+    "uuid": "d769002a-fc35-4aa5-a76f-c532c897e981",
+    "version": [
+      2,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      26,
+      20
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "8bcc7ff2-873a-4ac4-a141-a71353d3b7f6",
+      "version": [
+        2,
+        0,
+        0
+      ]
+    }
+  ]
+}

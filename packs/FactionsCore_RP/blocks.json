@@ -1,0 +1,51 @@
+{
+  "format_version": "1.1.0",
+  "fc:spawner_pig": {
+    "sound": "metal"
+  },
+  "fc:spawner_chicken": {
+    "sound": "metal"
+  },
+  "fc:spawner_cow": {
+    "sound": "metal"
+  },
+  "fc:spawner_zombie": {
+    "sound": "metal"
+  },
+  "fc:spawner_spider": {
+    "sound": "metal"
+  },
+  "fc:spawner_skeleton": {
+    "sound": "metal"
+  },
+  "fc:spawner_creeper": {
+    "sound": "metal"
+  },
+  "fc:spawner_blaze": {
+    "sound": "metal"
+  },
+  "fc:spawner_enderman": {
+    "sound": "metal"
+  },
+  "fc:spawner_iron_golem": {
+    "sound": "metal"
+  },
+  "fc:crate_common": {
+    "sound": "wood"
+  },
+  "fc:crate_rare": {
+    "sound": "wood"
+  },
+  "fc:crate_epic": {
+    "sound": "wood"
+  },
+  "fc:crate_legendary": {
+    "sound": "wood"
+  },
+  "fc:crate_mythic": {
+    "sound": "wood"
+  },
+  "fc:supply_drop": {
+    "sound": "metal"
+  }
+}

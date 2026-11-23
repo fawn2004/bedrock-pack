@@ -1,82 +1,170 @@
-# Factions Core (Minecraft Bedrock add-on)
+# Factions Core 2.0 (Minecraft Bedrock add-on)
 
-A factions core for your server. Players can:
-- start factions and claim land
-- build up power, make allies and enemies
-- raid factions that let their power slip
+The complete core for a factions server. It is a behavior pack plus a resource pack: the resource pack draws the styled menus, the sidebar, the items and the models.
 
-It's a separate pack from More Building Blocks and doesn't need it.
+![Main menu](docs/factions/menu_hub.png)
+
+| | |
+|---|---|
+| ![Faction page](docs/factions/menu_list.png) | ![Sidebar](docs/factions/hud_sidebar.png) |
+
+*Previews are drawn from the real textures and layout; in game the text uses the Minecraft font.*
 
 ## Install
-Double-click `dist/FactionsCore.mcpack`, then turn on the behavior pack in your world or server.
-It needs Minecraft Bedrock **1.26.20 or newer** and no experiments.
-All data is saved in the world, so it survives restarts.
+1. Double-click `dist/FactionsCore.mcaddon` to import both packs.
+2. Turn on **Factions Core** in your world's behavior packs. The resource pack is turned on with it automatically.
+3. You need Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 
-## How it plays
-- **Factions:** players have 4 ranks: leader `**`, officer `*`, member `+` and recruit `-`.
-  The faction name shows above members' heads.
-- **Power:** every player has power, from -10 up to 10.
-  - Dying costs 4 power.
-  - Being online gives back 0.5 power a minute.
-  - A faction's power is the total of all its members' power.
-- **Land:** a faction can claim one 16x16 chunk for each point of power.
-  - Claims must touch your existing land.
-  - There must be 1 chunk of wilderness between your land and another faction's land.
-  - On your land, outsiders can't break, place or open anything. They also can't hurt animals.
-- **Raiding:** a faction becomes **raidable** when it has more land than power, for example after its members die a lot. Then:
-  - explosions work on its land
-  - its **enemies** can claim its chunks out from under it
-- **Relations:** *ally* and *truce* both need the two factions to agree. *Enemy* only needs one side.
-  - You can't hurt members of your own faction, your allies or your truces.
-  - Allies can use each other's doors.
-- **Territory:** walking into new land shows its name, coloured by your relation to it:
+**On a dedicated server**, copy both pack folders from the `.mcaddon` into `behavior_packs` and `resource_packs`. Then list them in the world's `world_behavior_packs.json` and `world_resource_packs.json`, and turn on "require resource packs" so players get the menus.
 
-  | Colour | Land |
+New players get a **Server Menu** item, $500 and 2 Common Crate Keys. They can tap the item or type `/menu` to open everything.
+
+## What's inside
+
+### Factions, land and raiding
+- **Factions:** four ranks (leader `**`, officer `*`, member `+`, recruit `-`), invites or open joining, and a faction colour.
+  Each faction also has a treasury, an activity log, faction chat (`/fc`) and ally chat (`/fa`).
+- **Power:** each player has −10 to 10 power. Dying costs 3 power, and being online gives 0.5 back each minute.
+  A faction can hold one chunk for each point of its members' total power.
+- **Land:**
+  - Claims must touch your existing land and keep a 1-chunk gap from other factions.
+  - Outsiders can't build, open containers or hurt animals on your land.
+  - Allies can use your doors.
+- **Raiding:**
+  - TNT works on your land whenever your **shield** is down.
+  - A faction with more land than power becomes **raidable**, and its enemies can **overclaim** its land.
+  - Raid alerts tell you when your land is being blown up.
+- **Shield:** the leader picks a daily window when your land can't be blown up or overclaimed. It is 6 hours long, and upgrades add more.
+- **Relations:** ally, truce, neutral or enemy. Ally and truce need both sides to agree, and those factions can't hurt each other.
+- **Upgrades** are bought with treasury money:
+
+  | Upgrade | Effect |
   |---|---|
-  | Green | Your faction |
-  | Pink | Ally |
-  | Aqua | Truce |
-  | White | Neutral |
-  | Red | Enemy |
-  | Gold | SafeZone |
-  | Dark red | WarZone |
+  | Recruitment | more member slots |
+  | Land Grant | more claimable chunks |
+  | Spawner Speed | faster spawners |
+  | Crawler Speed | faster crawlers |
+  | Miner's Haste | Haste on your land |
+  | Swift Land | Speed on your land |
+  | Shield Generator | longer shield |
+  | Wisdom | more XP for members |
+- **SafeZone and WarZone:** admin land. SafeZone has no PvP and no building. WarZone allows PvP but no building.
 
-- **Home:** officers set a faction home on your land. `/f home` teleports you there after 5 seconds.
-  Moving or getting hurt cancels it.
+### Economy and progression
+- **Money and Crystals.** Crystals are the rare currency. They come from kills, quests, levels, crates, crawlers and KOTH.
+- **Levels:** you earn XP from mining ores, kills and quests.
+  - Every level pays money, every 5 levels gives crystals, and every 10 levels gives a crate key.
+  - You get one more home every 10 levels.
+- **Server Shop:** buy and sell blocks, ores, crops, mob drops and raiding gear (TNT, redstone, gapples).
+  It also sells spawners and ore crawlers. Use `/sell hand` or `/sell all` to sell quickly.
+- **Crystal Shop:** crate keys, enchant books, genbuckets, chunk busters, sell wands, XP shards, power shards and mystery spawners.
+- **Auction House:** list the item in your hand. Names, lore and custom enchants are kept.
+  Unsold items return to your mailbox after 48 hours, and sales pay 5% tax.
+- **Bank notes:** turn money into an item you can trade.
+- **Daily rewards** on a 7-day streak. Day 7 gives a Legendary key.
+- **Daily quests:** 3 random quests each day. Finishing all 3 gives an Epic key.
+- **Bounties:** pay to put a price on someone's head. Whoever kills them collects it.
+- **Kill streaks** are announced every 5 kills.
+- **Combat tag:** you can't teleport for 15 seconds after a PvP hit. If you log out while tagged, you die when you come back.
+
+### Custom items, enchants and rare loot
+- **Crates** come in 5 rarities: Common, Rare, Epic, Legendary and Mythic.
+  - Opening one plays a roll animation, and big wins are announced to the server.
+  - Open them with a key anywhere, or on the crate blocks an admin places at spawn.
+- **28 custom enchants** go on vanilla gear through **Enchant Books**. Each book has a success chance. Some examples:
+
+  | Gear | Enchants |
+  |---|---|
+  | Weapons | Lifesteal, Frostbite, Venom, Blaze, Withering, Executioner, Thunderstrike, Plunder, Obliterate |
+  | Tools | Explosive (3x3 mining), Autosmelt, Telepathy, Treasure Hunter, Haste, Experience |
+  | Armor | Overload, Regeneration, Dodge, Armored, Reflect, Berserk, Night Vision, Gears (speed), Leaper |
+  | Anything | Soulbound (keep it when you die) |
+- **Legendary gear** drops from crates: Frostbite Blade, Inferno Cleaver, Stormbringer, The Reaper, Excavator 3000, Prospector's Pick and the 4-piece Titan set.
+- **Classic factions tools:**
+  - Cobble, Obsidian and Sand **Genbuckets** build walls straight down.
+  - The **Chunk Buster** clears a whole chunk on your land.
+  - The **Sell Wand** sells everything in a chest.
+- **Shards and Mystery Spawners:** XP Shards, Power Shards, and Mystery Spawners (a random spawner, sometimes Iron Golem).
+
+### Spawners and Ore Crawlers
+- **10 spawners**, from Pig up to Iron Golem.
+  - Stack them on one block by using more of the same spawner on it. Sneak to add the whole stack.
+  - They spawn **stacked mobs** (one mob showing "x56") that die one at a time.
+  - Explosions drop each spawner in a stack half the time.
+  - Their value counts toward **F-Top**.
+- **Ore Crawlers** are little mining robots, in 6 tiers: Coal, Iron, Gold, Diamond, Emerald and Netherite.
+  - They wander around your base digging ores into their storage.
+  - Tap one to collect or sell its ores, or to buy upgrades: Speed, Fortune, Storage and Auto-Sell.
+  - You can **evolve** a crawler into the next tier.
+  - **Enemies can steal your crawlers if they take the land they're on.**
+
+### Events
+- **Envoy:** every 45 minutes, supply drops land in the WarZone, or near spawn if there is no WarZone. Each one holds loot from every rarity.
+- **King of the Hill:** hold the hill alone for 2 minutes.
+  The winner gets $250k, 50 crystals and a Legendary key, and their faction treasury gets $100k.
+
+### Interface
+- **Styled menus** for every screen, as in the previews above. Forms from other add-ons keep the normal vanilla look.
+- **Sidebar:** your balance, crystals, level, K/D, power, faction, F-Top rank, shield timer and live event info. Turn it on or off with `/hud`.
+- **Floating leaderboards:** admins can place them at spawn for F-Top, richest players, top killers, highest levels and best streaks.
 
 ## Commands
-Type **`/f`** on its own to open a menu that does nearly everything. You can also type commands:
+`/menu` opens everything. These shortcuts work too:
 
 | Command | What it does |
 |---|---|
-| `/f help` | list commands |
-| `/f create <name>` / `/f disband` | start or end a faction |
-| `/f join <name>` / `/f leave` | join (open, or you were invited) / leave |
-| `/f invite <player>` / `/f uninvite <player>` | officers: manage invites |
-| `/f kick`, `/f promote`, `/f demote` `<player>` | officers: manage members |
-| `/f leader <player>` | hand over leadership |
-| `/f claim [radius]` / `/f unclaim [all]` / `/f autoclaim` | officers: land |
-| `/f map` | coloured map of nearby chunks |
-| `/f sethome` / `/f home` | faction home |
-| `/f ally`, `/f truce`, `/f neutral`, `/f enemy` `<faction>` | relations |
-| `/f info [faction or player]`, `/f list`, `/f who <player>`, `/f power [player]` | information |
-| `/f open`, `/f rename <name>`, `/f desc <text>` | settings |
-| `/fc <message>` / `/fa <message>` | faction chat / ally chat |
+| `/f` | your faction dashboard (`/f help` lists every faction command) |
+| `/f create`, `join`, `leave`, `disband`, `invite`, `kick`, `promote`, `demote`, `leader` | faction basics |
+| `/f claim [radius]`, `/f unclaim [all]`, `/f autoclaim`, `/f map` | land |
+| `/f sethome`, `/f home`, `/f shield <hour>` | faction home and shield |
+| `/f deposit`, `/f withdraw`, `/f upgrade <id>` | treasury and upgrades |
+| `/f ally`, `truce`, `neutral`, `enemy` `<faction>` | relations |
+| `/f info`, `list`, `who`, `power`, `top` | information |
+| `/fc <msg>`, `/fa <msg>` | faction chat, ally chat |
+| `/shop`, `/sell hand\|all`, `/pay <player> <amount>`, `/bal [player]` | money |
+| `/ah`, `/ah sell <price>` | auction house |
+| `/crates`, `/daily`, `/bounty <player> <amount>` | rewards |
+| `/home [name]`, `/sethome [name]`, `/delhome [name]`, `/spawn`, `/wild`, `/warp [name]` | teleports |
+| `/hud` | show or hide the sidebar |
 
-For player names with spaces, put the name in quotes, for example `/f invite "Some Player"`.
-If another add-on also uses `/f`, type `/factions:f` instead.
+If another add-on uses the same command name, add the prefix, for example `/factions:f` or `/factions:menu`.
+For player names with spaces, put the name in quotes.
+Amounts can be written like `5000`, `2.5k` or `1m`.
 
 ### Admin (operators)
+The **Admin** page in `/menu` has buttons for most of this. `/fadmin help` lists every command.
+
 | Command | What it does |
 |---|---|
-| `/fadmin bypass` | toggle building and opening anything anywhere |
-| `/fadmin safezone [radius]` | claim SafeZone: no PvP, no building, no explosions |
-| `/fadmin warzone [radius]` | claim WarZone: PvP on, no building |
-| `/fadmin unclaim [radius]` | remove any claims around you |
-| `/fadmin disband <faction>` | delete a faction |
-| `/fadmin setpower <player> <amount>` | change a player's power |
-| `/fadmin join <faction>` | join any faction as an officer |
+| `/fadmin bypass` | build and open anything anywhere |
+| `/fadmin safezone [radius]`, `/fadmin warzone [radius]`, `/fadmin unclaim [radius]` | admin land |
+| `/fadmin setspawn`, `/fadmin setwarp <name>`, `/fadmin delwarp <name>` | spawn and warps (for example `nether` and `end`) |
+| `/fadmin koth set [radius]`, `/fadmin koth start\|stop` | King of the Hill |
+| `/fadmin envoy` | drop supply crates now |
+| `/fadmin hologram <ftop\|money\|kills\|level\|streak\|welcome\|remove>` | floating leaderboards |
+| `/fadmin give <item> [amount]` | `key_<rarity>`, `book_<rarity>`, `spawner_<type>`, `crawler_<tier>`, `gear_<id>`, `crate_<rarity>`, `crystal`, `genbucket`, `buster`, `wand`, `xpshard`, `power`, `mystery` |
+| `/fadmin eco give\|take\|set <player> <amount>`, `/fadmin crystals <player> <amount>` | money and crystals |
+| `/fadmin disband <faction>`, `/fadmin setpower <player> <n>`, `/fadmin join <faction>` | faction tools |
+
+### Suggested server setup
+1. Build spawn, then run `/fadmin setspawn` and `/fadmin safezone 3`.
+2. Place crate blocks at spawn: `/fadmin give crate_common` and the other rarities.
+3. Add leaderboards with `/fadmin hologram ftop` and `/fadmin hologram money`.
+4. Claim a WarZone ring for envoys with `/fadmin warzone 2`, then set the KOTH hill inside it with `/fadmin koth set 5`.
+5. Set `nether` and `end` warps with `/fadmin setwarp`.
 
 ## Settings
-Change the numbers at the top of `packs/FactionsCore_BP/scripts/config.js` (power, claim rules, explosions, home warmup...).
-Then run `python3 tools/build_factions.py` to rebuild `dist/FactionsCore.mcpack`.
+- Gameplay numbers are at the top of `packs/FactionsCore_BP/scripts/config.js`. This includes the server name on the menus and sidebar, power, claim and explosion rules, shield hours, kill rewards, auction tax, spawner speed and event timers.
+- Shop prices are in `scripts/shop.js`, crate loot in `scripts/crates.js`, and enchants in `scripts/enchants.js`.
+
+After changing anything, run `python3 tools/build_factions.py` (needs Pillow) to rebuild both packs and `dist/FactionsCore.mcaddon`.
+
+## For developers
+- `packs/FactionsCore_BP/scripts/` holds the hand-written game logic, on `@minecraft/server` 2.7.0 and `@minecraft/server-ui` 2.0.0.
+- `tools/factions/` generates everything else:
+  - `build.py`: item, block and entity JSON, and packaging
+  - `art.py` and `icons.py`: all textures and icons
+  - `ui.py`: the JSON UI
+  - `preview.py`: the pictures above
+- `sh tools/factions/test/run.sh` plays a scripted game session against a fake Minecraft API and checks 71 behaviours. Run it before shipping changes.
+- Styled menus are chosen by an invisible marker at the start of the form title (see `scripts/ui.js`). The sidebar reads titles that start with `fchud:`.

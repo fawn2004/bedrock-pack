@@ -1,0 +1,87 @@
+{
+  "resource_pack_name": "factions",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "fc_crystal": {
+      "textures": "textures/fc/items/crystal"
+    },
+    "fc_bank_note": {
+      "textures": "textures/fc/items/bank_note"
+    },
+    "fc_sell_wand": {
+      "textures": "textures/fc/items/sell_wand"
+    },
+    "fc_genbucket": {
+      "textures": "textures/fc/items/genbucket"
+    },
+    "fc_genbucket_obsidian": {
+      "textures": "textures/fc/items/genbucket_obsidian"
+    },
+    "fc_genbucket_sand": {
+      "textures": "textures/fc/items/genbucket_sand"
+    },
+    "fc_chunk_buster": {
+      "textures": "textures/fc/items/chunk_buster"
+    },
+    "fc_xp_shard": {
+      "textures": "textures/fc/items/xp_shard"
+    },
+    "fc_power_shard": {
+      "textures": "textures/fc/items/power_shard"
+    },
+    "fc_mystery_spawner": {
+      "textures": "textures/fc/items/mystery_spawner"
+    },
+    "fc_menu": {
+      "textures": "textures/fc/items/menu"
+    },
+    "fc_key_common": {
+      "textures": "textures/fc/items/key_common"
+    },
+    "fc_book_common": {
+      "textures": "textures/fc/items/book_common"
+    },
+    "fc_key_rare": {
+      "textures": "textures/fc/items/key_rare"
+    },
+    "fc_book_rare": {
+      "textures": "textures/fc/items/book_rare"
+    },
+    "fc_key_epic": {
+      "textures": "textures/fc/items/key_epic"
+    },
+    "fc_book_epic": {
+      "textures": "textures/fc/items/book_epic"
+    },
+    "fc_key_legendary": {
+      "textures": "textures/fc/items/key_legendary"
+    },
+    "fc_book_legendary": {
+      "textures": "textures/fc/items/book_legendary"
+    },
+    "fc_key_mythic": {
+      "textures": "textures/fc/items/key_mythic"
+    },
+    "fc_book_mythic": {
+      "textures": "textures/fc/items/book_mythic"
+    },
+    "fc_crawler_coal": {
+      "textures": "textures/fc/items/crawler_coal"
+    },
+    "fc_crawler_iron": {
+      "textures": "textures/fc/items/crawler_iron"
+    },
+    "fc_crawler_gold": {
+      "textures": "textures/fc/items/crawler_gold"
+    },
+    "fc_crawler_diamond": {
+      "textures": "textures/fc/items/crawler_diamond"
+    },
+    "fc_crawler_emerald": {
+      "textures": "textures/fc/items/crawler_emerald"
+    },
+    "fc_crawler_netherite": {
+      "textures": "textures/fc/items/crawler_netherite"
+    }
+  }
+}

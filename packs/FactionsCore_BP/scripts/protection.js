@@ -1,5 +1,5 @@
 // Factions Core - land protection and PvP rules.
-import { world, Player } from "@minecraft/server";
+import { system, world, Player } from "@minecraft/server";
 import { CONFIG } from "./config.js";
 import * as S from "./store.js";
 import * as R from "./rules.js";
@@ -20,7 +20,20 @@ const FACE_OFFSET = {
   Up: [0, 1, 0], Down: [0, -1, 0], North: [0, 0, -1], South: [0, 0, 1], East: [1, 0, 0], West: [-1, 0, 0],
 };
 
-let lastWarn = new Map();
+const lastWarn = new Map();
+const lastAlert = new Map();
+
+/** Tell a faction its land is being blown up (at most every 30s). */
+function raidAlert(fid) {
+  const f = S.getFaction(fid);
+  if (!f || f.system || (lastAlert.get(fid) ?? 0) > Date.now()) return;
+  lastAlert.set(fid, Date.now() + 30000);
+  S.factionLog(f, "§cYour land was hit by an explosion");
+  for (const pl of R.onlineMembers(fid)) {
+    pl.onScreenDisplay.setActionBar("§c§l! RAID ALERT ! §r§cYour land is being blown up!");
+    R.sound(pl, "random.anvil_land", 0.5, 0.6);
+  }
+}
 function deny(player, what) {
   const now = Date.now();
   if ((lastWarn.get(player.id) ?? 0) + 1500 > now) return;
@@ -31,6 +44,8 @@ function deny(player, what) {
 
 export function setupProtection() {
   world.beforeEvents.playerBreakBlock.subscribe((e) => {
+    // Hitting a supply drop opens it, wherever it landed (itemuse.js handles it).
+    if (e.block.typeId === "fc:supply_drop") return;
     if (!R.canBuild(e.player, e.dimension.id, e.block.location)) {
       e.cancel = true;
       deny(e.player, "break blocks");
@@ -40,6 +55,11 @@ export function setupProtection() {
   world.beforeEvents.playerInteractWithBlock.subscribe((e) => {
     const { player, block } = e;
     const dimId = block.dimension.id;
+    // Crates, supply drops and spawner info are usable anywhere; itemuse.js checks the details.
+    if (block.typeId.startsWith("fc:crate_") || block.typeId === "fc:supply_drop" || block.typeId.startsWith("fc:spawner_")) return;
+    // Custom items that don't place anything (keys, books, crystals...) work when tapped on any block.
+    const it = e.itemStack?.typeId ?? "";
+    if (it.startsWith("fc:") && !/^fc:(spawner_|crawler_|genbucket|chunk_buster|sell_wand)/.test(it)) return;
     // Placing: the new block lands next to the clicked face, maybe in another chunk.
     // (Clicking a door you may use just opens it, so that's left alone.)
     const door = isDoorLike(block.typeId);
@@ -67,16 +87,18 @@ export function setupProtection() {
   });
 
   world.beforeEvents.explosion.subscribe((e) => {
-    if (CONFIG.explosionsInClaims === "always") return;
     const dimId = e.dimension.id;
     const blocks = e.getImpactedBlocks();
+    const hitFactions = new Set();
     const keep = blocks.filter((b) => {
       const owner = S.ownerAt(dimId, b.location);
       if (!owner) return true;
-      if (S.getFaction(owner)?.system) return false;
-      return CONFIG.explosionsInClaims === "raidable" && R.isRaidable(owner);
+      if (!R.explosionsAllowed(owner)) return false;
+      hitFactions.add(owner);
+      return true;
     });
     if (keep.length !== blocks.length) e.setImpactedBlocks(keep);
+    if (hitFactions.size) system.run(() => { for (const fid of hitFactions) raidAlert(fid); });
   });
 
   world.beforeEvents.entityHurt.subscribe((e) => {

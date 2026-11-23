@@ -1,0 +1,38 @@
+{
+  "format_version": "1.26.20",
+  "minecraft:block": {
+    "description": {
+      "identifier": "fc:supply_drop",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.6
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 3600000
+      },
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "fc_supply_side",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "fc_supply_top",
+          "render_method": "opaque"
+        },
+        "down": {
+          "texture": "fc_supply_top",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:light_emission": 12,
+      "minecraft:map_color": "#c0c4d0",
+      "minecraft:loot": "loot_tables/empty.json",
+      "minecraft:tags": []
+    }
+  }
+}

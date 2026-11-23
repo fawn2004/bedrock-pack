@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "fc:genbucket",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "fc_genbucket"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§7Cobblestone Genbucket"
+      },
+      "minecraft:max_stack_size": 16
+    }
+  }
+}

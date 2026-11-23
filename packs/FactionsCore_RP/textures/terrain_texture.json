@@ -1,0 +1,89 @@
+{
+  "resource_pack_name": "factions",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "fc_spawner_pig": {
+      "textures": "textures/fc/blocks/spawner_pig"
+    },
+    "fc_spawner_chicken": {
+      "textures": "textures/fc/blocks/spawner_chicken"
+    },
+    "fc_spawner_cow": {
+      "textures": "textures/fc/blocks/spawner_cow"
+    },
+    "fc_spawner_zombie": {
+      "textures": "textures/fc/blocks/spawner_zombie"
+    },
+    "fc_spawner_spider": {
+      "textures": "textures/fc/blocks/spawner_spider"
+    },
+    "fc_spawner_skeleton": {
+      "textures": "textures/fc/blocks/spawner_skeleton"
+    },
+    "fc_spawner_creeper": {
+      "textures": "textures/fc/blocks/spawner_creeper"
+    },
+    "fc_spawner_blaze": {
+      "textures": "textures/fc/blocks/spawner_blaze"
+    },
+    "fc_spawner_enderman": {
+      "textures": "textures/fc/blocks/spawner_enderman"
+    },
+    "fc_spawner_iron_golem": {
+      "textures": "textures/fc/blocks/spawner_iron_golem"
+    },
+    "fc_crate_common_side": {
+      "textures": "textures/fc/blocks/crate_common_side"
+    },
+    "fc_crate_common_top": {
+      "textures": "textures/fc/blocks/crate_common_top"
+    },
+    "fc_crate_common_bottom": {
+      "textures": "textures/fc/blocks/crate_common_bottom"
+    },
+    "fc_crate_rare_side": {
+      "textures": "textures/fc/blocks/crate_rare_side"
+    },
+    "fc_crate_rare_top": {
+      "textures": "textures/fc/blocks/crate_rare_top"
+    },
+    "fc_crate_rare_bottom": {
+      "textures": "textures/fc/blocks/crate_rare_bottom"
+    },
+    "fc_crate_epic_side": {
+      "textures": "textures/fc/blocks/crate_epic_side"
+    },
+    "fc_crate_epic_top": {
+      "textures": "textures/fc/blocks/crate_epic_top"
+    },
+    "fc_crate_epic_bottom": {
+      "textures": "textures/fc/blocks/crate_epic_bottom"
+    },
+    "fc_crate_legendary_side": {
+      "textures": "textures/fc/blocks/crate_legendary_side"
+    },
+    "fc_crate_legendary_top": {
+      "textures": "textures/fc/blocks/crate_legendary_top"
+    },
+    "fc_crate_legendary_bottom": {
+      "textures": "textures/fc/blocks/crate_legendary_bottom"
+    },
+    "fc_crate_mythic_side": {
+      "textures": "textures/fc/blocks/crate_mythic_side"
+    },
+    "fc_crate_mythic_top": {
+      "textures": "textures/fc/blocks/crate_mythic_top"
+    },
+    "fc_crate_mythic_bottom": {
+      "textures": "textures/fc/blocks/crate_mythic_bottom"
+    },
+    "fc_supply_side": {
+      "textures": "textures/fc/blocks/supply_side"
+    },
+    "fc_supply_top": {
+      "textures": "textures/fc/blocks/supply_top"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.fc_crawler": {
+      "arrays": {
+        "textures": {
+          "Array.skins": [
+            "Texture.coal",
+            "Texture.iron",
+            "Texture.gold",
+            "Texture.diamond",
+            "Texture.emerald",
+            "Texture.netherite"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.skins[math.clamp(q.property('fc:tier'), 0, 5)]"
+      ]
+    },
+    "controller.render.fc_hologram": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ]
+    }
+  }
+}

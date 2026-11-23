@@ -1,0 +1,42 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "fc:crawler",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "coal": "textures/fc/entity/crawler_coal",
+        "iron": "textures/fc/entity/crawler_iron",
+        "gold": "textures/fc/entity/crawler_gold",
+        "diamond": "textures/fc/entity/crawler_diamond",
+        "emerald": "textures/fc/entity/crawler_emerald",
+        "netherite": "textures/fc/entity/crawler_netherite"
+      },
+      "geometry": {
+        "default": "geometry.fc_crawler"
+      },
+      "animations": {
+        "idle": "animation.fc_crawler.idle",
+        "walk": "animation.fc_crawler.walk",
+        "dig": "animation.fc_crawler.dig"
+      },
+      "scripts": {
+        "animate": [
+          "idle",
+          {
+            "walk": "q.modified_move_speed > 0.05"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.fc_crawler"
+      ],
+      "spawn_egg": {
+        "base_color": "#3a3f4f",
+        "overlay_color": "#46c3ff"
+      }
+    }
+  }
+}

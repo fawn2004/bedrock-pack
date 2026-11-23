@@ -1,0 +1,38 @@
+{
+  "format_version": "1.26.20",
+  "minecraft:block": {
+    "description": {
+      "identifier": "fc:crate_epic",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 1000
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 3600000
+      },
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "fc_crate_epic_side",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "fc_crate_epic_top",
+          "render_method": "opaque"
+        },
+        "down": {
+          "texture": "fc_crate_epic_bottom",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:light_emission": 9,
+      "minecraft:map_color": "#6b4a2a",
+      "minecraft:loot": "loot_tables/empty.json",
+      "minecraft:tags": []
+    }
+  }
+}

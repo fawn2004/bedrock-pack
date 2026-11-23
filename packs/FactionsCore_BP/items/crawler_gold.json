@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "fc:crawler_gold",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "fc_crawler_gold"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§9Gold Crawler"
+      },
+      "minecraft:max_stack_size": 1
+    }
+  }
+}
