@@ -13,6 +13,8 @@ Shapes and collision work like the vanilla blocks.
 Double-click `dist/MoreBuildingBlocks3.mcaddon`, then turn on the behavior pack in your world.
 Requires Minecraft Bedrock **1.26.20 or newer**. No experiments are needed.
 
+On Android, if tapping the file doesn't open Minecraft, install the [Add-on Importer](importer-app/README.md) app (`dist/AddonImporter.apk`) and open the file with it.
+
 ## How the blocks behave
 - **Logs** point the way you place them (up, sideways, or end-on). Use an axe on a log to strip it.
 - **Slabs** go in the top or bottom half depending on where you click. Click a slab with the same slab to make a double slab.
