@@ -67,7 +67,8 @@ const F_ACTIONS = {
   upgrade: (pl, a) => A.buyUpgrade(pl, need(a[0], "/f upgrade <members|land|spawners|crawlers|haste|speed|shield|xp>")),
   shield: (pl, a) => A.setShield(pl, a[0]),
   top: (pl) => M.ftopMenu(pl),
-  quests: (pl) => M.questsMenu(pl),
+  quests: (pl) => M.questMasterMenu(pl),
+  rebirth: (pl) => M.rebirthMenu(pl),
   chat: (pl, a) => R.tell(pl, `Chat mode: §e${Rk.setChatMode(pl, a[0])}§r. Normal chat now goes to ${({ public: "everyone", faction: "your faction", ally: "your faction and allies" })[S.playerData(pl).chatMode]}.`),
 };
 

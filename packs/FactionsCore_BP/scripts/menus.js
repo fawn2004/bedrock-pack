@@ -74,6 +74,7 @@ async function hubScreen(player) {
     { text: "POSITION", sub: `§f${Math.floor(l.x)}, ${Math.floor(l.z)}`, icon: "position", action: () => A.map(player) },
   ];
   const rail = [
+    { text: "QUEST MASTER", sub: "Quest Lines & Rebirth", icon: "quests", action: () => questMasterMenu(player) },
     { text: "FACTIONS", sub: "Dashboard & Stats", icon: "faction", action: () => factionMenu(player) },
     { text: "SERVER SHOP", sub: "Buy & Sell Items", icon: "shop", action: () => shopMenu(player) },
     { text: "KITS", sub: "Gear Bundles", icon: "kit", action: () => kitsMenu(player) },
@@ -82,7 +83,6 @@ async function hubScreen(player) {
     { text: "ENCHANTER", sub: "Custom Enchants", icon: "enchant", action: () => enchanterMenu(player) },
     { text: "F-TOP", sub: "Faction Rankings", icon: "ftop", action: () => ftopMenu(player) },
     { text: "DAILY REWARDS", sub: "Claim Rewards", icon: "daily", action: () => dailyMenu(player) },
-    { text: "QUESTS", sub: "Quest Lines & Rebirth", icon: "quests", action: () => questMasterMenu(player) },
     { text: "AUCTION HOUSE", sub: "Buy & Sell", icon: "auction", action: () => auctionMenu(player) },
     { text: "HOMES", sub: "Manage Homes", icon: "home", action: () => homesMenu(player) },
     { text: "DIMENSIONS", sub: "Teleportation", icon: "world", action: () => warpsMenu(player) },

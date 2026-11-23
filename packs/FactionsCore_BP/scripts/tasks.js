@@ -70,6 +70,7 @@ export function setupTasks() {
     const f = S.getFaction(p.faction);
     if (f) R.tell(player, `Welcome back to §${f.color}${f.name}§r. ${R.onlineMembers(f.id).length} member(s) online.`);
     else R.tell(player, "Welcome back! You're not in a faction yet - type §e/f§r to find one.");
+    R.tell(player, "§6Quests:§r sell items to level up your quest lines - type §e/quests§r or open §eQuest Master§r in §e/menu§r.");
     if (p.mail.length) R.tell(player, `§eYou have ${p.mail.length} item(s) waiting in your mailbox§r (Menu > Auction House).`);
   });
 
